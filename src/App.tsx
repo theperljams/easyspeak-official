@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import openAIkey from './openAIkey.json';
 import './App.css';
 import ResponseGenerator from './GenerateResponse';
@@ -6,6 +6,7 @@ import MicInput from './MicInput';
 import people from './messages.json';
 import dospeak from './speak';
 import bgImage from './bgimage.png';
+import axios from 'axios';
 
 const App: React.FC = () => {
     const [inputValue, setInputValue] = useState('');
@@ -16,8 +17,6 @@ const App: React.FC = () => {
     const [isListening, setIsListening] = useState(false);
 
     var input: MicInput = new MicInput(openAIkey['apikey']);
-    var response: ResponseGenerator = new ResponseGenerator();
-    var messageHistory: Array<string> = people['history'];
     var blob: Blob;
 
     const [audioURL, setAudioURL] = useState<string | null>(null); // Initialize the state with a null value
@@ -25,15 +24,14 @@ const App: React.FC = () => {
     useEffect(() => {
         if (input.transcript && input.transcript.text) {
             setInputValue(input.transcript.text);
-            var newMessage: string = "**Them**: " + input.transcript.text + "\n";
-            messageHistory.push(newMessage);
-            console.log(messageHistory);
         };
-    }, [input.transcript, messageHistory]);
+
+    }, [input.transcript]);
 
     useEffect(() => {
-        setResponseValue("");
-    }, []);
+       setResponseValue("");
+      }, []);
+    
 
     const clear = () => {
         setInputValue('');
@@ -72,41 +70,41 @@ const App: React.FC = () => {
         handleSpeak(inputValue);
     }
 
-    function generate() {
-
-        //input.stopRecording();
-
-        for (let i = 0; i < 3; i++) { 
-            const rawcompletion = response.getCompletion(people['prompt'], messageHistory, inputValue);
-            rawcompletion.then(res => {
-            if (res != null && i === 0) {
-                setResVal1(res.content);
-                var newResponse = "**You**: " + res.content + "\n";
-                messageHistory.push(newResponse);
-                console.log(newResponse);
-                //handleSpeak(res.content);
-            }
-            else if (res != null && i === 1) { 
-                setResVal2(res.content);
-                var newResponse = "**You**: " + res.content + "\n";
-                messageHistory.push(newResponse);
-                console.log(newResponse);
-                //handleSpeak(res.content);
-            }
-            else if (res != null && i === 2) { 
-                setResVal3(res.content);
-                var newResponse = "**You**: " + res.content + "\n";
-                messageHistory.push(newResponse);
-                console.log(newResponse);
-                //handleSpeak(res.content);
-            }
-            else {
-                setResponseValue(people['default response']);
-            }
-            });
-        }
+//     function generate() {
+//         console.log(inputValue);
+//         axios.post('http://0.0.0.0:3001/query', inputValue, {
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+// }).then(res => {
+//         if (res != null) {
+//             setResVal1(res.data);
+//         }
+//         else {
+//             setResponseValue(people['default response']);
+//         }
+//         });
         
+//     }
+
+async function generate(): Promise<void> {
+    console.log(inputValue);
+    const res = await fetch(`http://0.0.0.0:3001/query`, {
+      method: 'POST',
+      body: inputValue,
+      headers: {
+        'Content-Type': 'text/plain'
+      },
+    });
+    const data = await res.text();
+    console.log(res);
+    if (res.status === 200) {
+      setResponseValue(data);
+    } else {
+      setResponseValue(people['default response']);
     }
+  }
+  
 
     function chooseResponse(val: string) {
        setInputValue(val);
@@ -136,18 +134,8 @@ const App: React.FC = () => {
                 />
                 <div style={{ display: 'flex', flexDirection: 'row'}}>
                     <textarea
-                        value={resVal1}
-                        onClick={() => chooseResponse(resVal1)}
-                        style={{ width: '410px', marginTop: '22px', marginLeft: '0px', height: '120px', border: '20px solid lightblue', backgroundColor: 'lightblue', fontSize: '15px', borderRadius: '10px', textAlign: 'center' }}
-                    />
-                    <textarea
-                        value={resVal2}
-                        onClick={() => chooseResponse(resVal2)}
-                        style={{ width: '410px', marginTop: '22px', marginLeft: '0px', height: '120px', border: '20px solid lightblue', backgroundColor: 'lightblue', fontSize: '15px', borderRadius: '10px', textAlign: 'center' }}
-                    />
-                    <textarea
-                        value={resVal3}
-                        onClick={() => chooseResponse(resVal3)}
+                        value={responseValue}
+                        onClick={() => chooseResponse(responseValue)}
                         style={{ width: '410px', marginTop: '22px', marginLeft: '0px', height: '120px', border: '20px solid lightblue', backgroundColor: 'lightblue', fontSize: '15px', borderRadius: '10px', textAlign: 'center' }}
                     />
                 </div>
