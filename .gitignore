@@ -26,3 +26,8 @@ package-lock.json
 # for the openai api key should contain:
 # { "apikey": "SUPERSECRETKEY" }
 /src/openAIkey.json
+.env
+
+__pycache__/
+venv/
+```
