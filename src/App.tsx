@@ -89,11 +89,12 @@ const App: React.FC = () => {
 
 async function generate(): Promise<void> {
     console.log(inputValue);
-    const res = await fetch(`http://0.0.0.0:3001/query`, {
+    const res = await fetch(`http://0.0.0.0:8000/query`, {
       method: 'POST',
-      body: inputValue,
+      body: "{\"question\": \"" + inputValue + "\"}",
       headers: {
-        'Content-Type': 'text/plain'
+        'Content-Type': 'application/json',
+        'accept': 'application/json'
       },
     });
     const data = await res.text();

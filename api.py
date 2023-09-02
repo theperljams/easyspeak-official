@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+import uvicorn
 import os
 import dotenv
 import langchain
@@ -71,10 +72,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class Question(BaseModel):
+    question: str
 
 @app.post("/query")
-async def query_chain(question: str):
-    result = await qa.run(query=question, verbose=False)
+async def query_chain(question: Question):
+    print(f"Question: {question}")
+    query = f"{question.question}"
+    result = qa.run(query=query, verbose=True)
     return result
 
 
+if __name__ == '__main__':
+
+    uvicorn.run(app, host='127.0.0.1', port=8000)
