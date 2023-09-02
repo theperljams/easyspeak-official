@@ -79,7 +79,9 @@ class Question(BaseModel):
 async def query_chain(question: Question):
     print(f"Question: {question}")
     query = f"{question.question}"
-    result = qa.run(query=query, verbose=True)
+    result = qa.run(query=query, verbose=False)
+    if result[0] == '\n':
+        result = result[1:]
     return result
 
 

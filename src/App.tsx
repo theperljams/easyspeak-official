@@ -137,7 +137,7 @@ async function generate(): Promise<void> {
                     <textarea
                         value={responseValue}
                         onClick={() => chooseResponse(responseValue)}
-                        style={{ width: '410px', marginTop: '22px', marginLeft: '0px', height: '120px', border: '20px solid lightblue', backgroundColor: 'lightblue', fontSize: '15px', borderRadius: '10px', textAlign: 'center' }}
+                        style={{ width: '1230px', marginTop: '22px', marginLeft: '0px', height: '120px', border: '20px solid lightblue', backgroundColor: 'lightblue', fontSize: '15px', borderRadius: '10px', textAlign: 'center' }}
                     />
                 </div>
                 <div>
