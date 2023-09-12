@@ -89,6 +89,8 @@ const App: React.FC = () => {
 
 async function generate(): Promise<void> {
     console.log(inputValue);
+    // input.stopRecording();
+    // setIsListening(false);
     const res = await fetch(`http://0.0.0.0:8000/query`, {
       method: 'POST',
       body: "{\"question\": \"" + inputValue + "\"}",
