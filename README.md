@@ -1,9 +1,11 @@
 **How to run locally**
 
-Prequisites: 
+**Prequisites:** 
 1. Create a .env file in the root directory.
 2. create a file called openAIkey.json in /src.
 3. Put credentials in both.
+
+**To Start**
 
 1. Start by opening up 2 terminals
 2. cd into hackathonspeakeasy in both
