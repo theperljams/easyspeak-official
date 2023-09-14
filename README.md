@@ -1,6 +1,9 @@
 **How to run locally**
 
-Prequisite: Create a .env file in the root directory. Then create a file called openAIkey.json in /src. Put credentials in both.
+Prequisites: 
+1. Create a .env file in the root directory.
+2. create a file called openAIkey.json in /src.
+3. Put credentials in both.
 
 1. Start by opening up 2 terminals
 2. cd into hackathonspeakeasy in both
@@ -11,6 +14,7 @@ Prequisite: Create a .env file in the root directory. Then create a file called 
 3. Run the server by using this command: `uvicorn api:app --host localhos --port 8000`
 
 **Terminal 2:**
-1. Just run `npm start`
+1. If this is your first time, run `npm install`
+2. Just run `npm start`
 
 The app should run on http://localhost:3000
