@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+
+import React, { useState, useEffect } from 'react';
+import { Button } from '@mui/material';
 import openAIkey from './openAIkey.json';
 import './App.css';
 import ResponseGenerator from './GenerateResponse';
@@ -15,7 +17,8 @@ const App: React.FC = () => {
     const [resVal2, setResVal2] = useState('');
     const [resVal3, setResVal3] = useState('');
     const [isListening, setIsListening] = useState(false);
-
+    var input = MicInput();
+    var messageHistory: Array<string> = people['history'];
     var input: MicInput = new MicInput(openAIkey['apikey']);
     var blob: Blob;
 
