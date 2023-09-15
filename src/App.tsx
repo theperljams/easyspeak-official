@@ -1,9 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@mui/material';
-import openAIkey from './openAIkey.json';
 import './App.css';
-import ResponseGenerator from './GenerateResponse';
 import MicInput from './MicInput';
 import people from './messages.json';
 import dospeak from './speak';

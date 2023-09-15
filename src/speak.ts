@@ -1,4 +1,3 @@
-import openAIkey from './openAIkey.json';
 
 
 export const binarytoBlob = (binarydata: string): Blob => {
