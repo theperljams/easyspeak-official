@@ -18,8 +18,7 @@ const App: React.FC = () => {
     const [resVal3, setResVal3] = useState('');
     const [isListening, setIsListening] = useState(false);
     var input = MicInput();
-    var messageHistory: Array<string> = people['history'];
-    var input: MicInput = new MicInput(openAIkey['apikey']);
+    // var messageHistory: Array<string> = people['history'];
     var blob: Blob;
 
     const [audioURL, setAudioURL] = useState<string | null>(null); // Initialize the state with a null value

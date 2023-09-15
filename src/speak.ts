@@ -34,17 +34,18 @@ async function dospeak(input: string) {
 */
 async function dospeak(input: string) {
     console.log("input: " + input)
+    
     const options = {
         method: 'POST',
         headers: {
             accept: 'audio/mpeg',
             'content-type': 'application/json',
-            'xi-api-key': openAIkey['xi-api-key'],
+            'xi-api-key': process.env.REACT_APP_XI_API_KEY as string,
         },
         body: JSON.stringify({ 'text': input }),
     };
 
-    const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + openAIkey['xi-voice'], options);
+    const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + process.env.REACT_APP_XI_VOICE, options);
     const blob = await response.blob();
     return blob;
 }
