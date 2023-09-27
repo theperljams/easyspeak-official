@@ -2,7 +2,7 @@
 
 **Prequisites:** 
 1. Create a .env file in the root directory.
-3. Put credentials in both.
+3. Put provided credentials file
 
 **To Start**
 
