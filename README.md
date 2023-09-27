@@ -2,7 +2,6 @@
 
 **Prequisites:** 
 1. Create a .env file in the root directory.
-2. create a file called openAIkey.json in /src.
 3. Put credentials in both.
 
 **To Start**
