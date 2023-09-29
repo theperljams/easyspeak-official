@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { Button } from '@mui/material';
 import './App.css';
 import MicInput from './MicInput';
@@ -9,8 +10,9 @@ import bgImage from './bgimage.png';
 import axios from 'axios';
 
 const App: React.FC = () => {
-    const [inputValue, setInputValue] = useState('');
+    const [voiceInput, setVoiceInput] = useState('');
     const [responseValue, setResponseValue] = useState('');
+    const [listenBtn, setListenBtn] = useState('Listen');
     const [resVal1, setResVal1] = useState('');
     const [resVal2, setResVal2] = useState('');
     const [resVal3, setResVal3] = useState('');
@@ -23,7 +25,7 @@ const App: React.FC = () => {
 
     useEffect(() => {
         if (input.transcript && input.transcript.text) {
-            setInputValue(input.transcript.text);
+            setVoiceInput(input.transcript.text);
         };
 
     }, [input.transcript]);
@@ -32,14 +34,21 @@ const App: React.FC = () => {
        setResponseValue("");
       }, []);
     
+    /*useEffect(() => {
+        if(isListening) {
+            transcribe(isListening);
+        }
+        else {
+            console.log('done listening')
+        }
+    }, [isListening]);*/
 
     const clear = () => {
-        setInputValue('');
+        setVoiceInput('');
     };
 
 
     function doListen() {
-        clear();
         if (!isListening) { 
             input.startRecording();
             setIsListening(true);
@@ -47,6 +56,48 @@ const App: React.FC = () => {
         else {
             input.stopRecording();
             setIsListening(false);
+            setListenBtn('Listen');
+        }
+    }
+
+    /*function transcribePromise(){
+        return new Promise((resolve, reject) => {
+            console.log('promise: ' + isListening);
+            if(isListening) {
+                setTimeout(() => {console.log("timeout")}, 2000);
+                resolve(isListening);
+            }
+            else {
+                resolve(isListening);
+            }
+        }).then(
+            (value) => {
+                if(value) {
+                    console.log('resolve:' + value);
+                transcribePromise();
+                }
+                else {
+                    console.log('donzo');
+                }
+                
+            },
+            () => {
+                console.log('reject');
+            }
+        )
+    } */
+
+
+    function transcribe(isListening: string | boolean) {
+        console.log('isListening:' + isListening);
+        if(isListening) {
+            console.log('listening');
+            //transcribePromise(); 
+            //setVoiceInput();
+            //setTimeout(transcribe, 100, isListening)
+        }
+        else {
+            console.log("done");
         }
     }
 
@@ -67,7 +118,7 @@ const App: React.FC = () => {
     }
 
     function speak() {
-        handleSpeak(inputValue);
+        handleSpeak(voiceInput);
     }
 
 //     function generate() {
@@ -88,12 +139,12 @@ const App: React.FC = () => {
 //     }
 
 async function generate(): Promise<void> {
-    console.log(inputValue);
+    console.log(voiceInput);
     // input.stopRecording();
     // setIsListening(false);
     const res = await fetch(`http://0.0.0.0:8000/query`, {
       method: 'POST',
-      body: "{\"question\": \"" + inputValue + "\"}",
+      body: "{\"question\": \"" + voiceInput + "\"}",
       headers: {
         'Content-Type': 'application/json',
         'accept': 'application/json'
@@ -110,37 +161,17 @@ async function generate(): Promise<void> {
   
 
     function chooseResponse(val: string) {
-       setInputValue(val);
+       setVoiceInput(val);
     }
 
 
     return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'row',
-            height: '100vh'
-        }}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <button onClick={doListen} style={{ backgroundColor: 'green', color: 'white', width: '160px', height: '160px', marginLeft: '180px', marginTop: '8px', fontSize: '32px', fontWeight: 'bold', borderRadius: '10px' }}>Listen</button>
-                {/* <button onClick={input.stopRecording} style={{ backgroundColor: 'red', color: 'white', width: '165px', height: '165px', marginLeft: '179px', marginTop: '15px', fontSize: '32px', fontWeight: 'bold', borderRadius: '10px' }}>Stop</button> */}
-            </div>
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column'
-            }}>
-                <textarea
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onClick={speak}
-                    style={{ width: '1200px', height: '290px', marginLeft: '10px', border: '30px solid lightblue', backgroundColor: 'lightblue', fontSize: '25px', borderRadius: '10px', textAlign: 'center' }}
-                />
-                <div style={{ display: 'flex', flexDirection: 'row'}}>
-                    <textarea
-                        value={responseValue}
-                        onClick={() => chooseResponse(responseValue)}
-                        style={{ width: '1230px', marginTop: '22px', marginLeft: '0px', height: '120px', border: '20px solid lightblue', backgroundColor: 'lightblue', fontSize: '15px', borderRadius: '10px', textAlign: 'center' }}
-                    />
-                </div>
+
+        <div>
+            
+            <div>
+                <textarea id="text-input"   value={voiceInput}    onChange={(e) => setVoiceInput(e.target.value)} />
+                <textarea id="response-box" value={responseValue} onClick={()   => chooseResponse(responseValue)} />
                 <div>
                     {audioURL && (
                         <audio autoPlay key={audioURL}>
@@ -149,10 +180,11 @@ async function generate(): Promise<void> {
                     )}
                 </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <button onClick={generate} style={{ backgroundColor: 'orange', color: 'white', width: '160px', height: '160px', marginLeft: '5px', marginTop: '8px', fontSize: '32px', fontWeight: 'bold', borderRadius: '10px' }}>Generate</button>
-                <div style={{ backgroundColor: 'lightblue', width: '320px', height: '160px', marginTop: '210px', border: 'none' }}>
-                </div>
+            <div className='btn-container'>
+                <button className="listen-btn large-btn"   onClick={doListen} >{listenBtn}</button>
+                <button className='generate-btn large-btn' onClick={generate} >Generate</button>
+                <button className='clear-btn large-btn'    onClick={clear}    >Clear</button>
+                <button className='play-btn large-btn'     onClick={speak}    >Speak</button>
             </div>
         </div>
 

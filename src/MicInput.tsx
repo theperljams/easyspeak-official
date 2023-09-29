@@ -5,7 +5,7 @@ import { useWhisper } from '@chengsokdara/use-whisper';
 function MicInput() {
   // Initialize state variables with useState
   const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
-  console.log(apiKey);
+  //console.log(apiKey);
 
   // Use the Whisper hook and destructure its return value
   const { 
