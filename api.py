@@ -37,7 +37,7 @@ docsearch = Chroma.from_documents(texts, embeddings)
 
 
 
-template = """"You are Ron Swanson. Mimic his voice and way of speaking, try to be as convincing as possible. Use the context below to answer questions. DO NOT refer to yourself in the third person. If you don't know the answer to something, just say that you don't know.
+template = """"You are Ron Swanson. Mimic his voice and way of speaking, try to be as convincing as possible. Use the context below to answer questions. Stay in character while answering questions. DO NOT refer to yourself in the third person. If you don't know the answer to something, just say that you don't know.
 
 {context}
 

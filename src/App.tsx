@@ -116,7 +116,6 @@ async function generate(): Promise<void> {
 
     return (
         <div style={{
-            backgroundImage: `url(${bgImage})`,
             display: 'flex',
             flexDirection: 'row',
             height: '100vh'
