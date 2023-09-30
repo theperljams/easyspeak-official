@@ -34,14 +34,16 @@ const App: React.FC = () => {
        setResponseValue("");
       }, []);
     
-    /*useEffect(() => {
+    useEffect(() => {
         if(isListening) {
+            setListenBtn('Stop Recording');
             transcribe(isListening);
         }
         else {
+            setListenBtn('Listen');
             console.log('done listening')
         }
-    }, [isListening]);*/
+    }, [isListening]);
 
     const clear = () => {
         setVoiceInput('');
@@ -51,6 +53,7 @@ const App: React.FC = () => {
     function doListen() {
         if (!isListening) { 
             input.startRecording();
+
             setIsListening(true);
         }
         else {
@@ -166,11 +169,11 @@ async function generate(): Promise<void> {
 
 
     return (
-        <div>
+        <div className='page-container'>
             
-            <div>
-                <textarea id="text-input"   value={voiceInput}    onChange={(e) => setVoiceInput(e.target.value)} />
-                <textarea id="response-box" value={responseValue} onClick={()   => chooseResponse(responseValue)} />
+            <div className='text-area'>
+                <textarea className='text-box' id="text-input"   value={voiceInput}    onChange={(e) => setVoiceInput(e.target.value)} />
+                <textarea className='text-box' id="response-box" value={responseValue} onClick={()   => chooseResponse(responseValue)} />
                 <div>
                     {audioURL && (
                         <audio autoPlay key={audioURL}>
@@ -182,8 +185,9 @@ async function generate(): Promise<void> {
             <div className='btn-container'>
                 <button className="listen-btn large-btn"   onClick={doListen} >{listenBtn}</button>
                 <button className='generate-btn large-btn' onClick={generate} >Generate</button>
-                <button className='clear-btn large-btn'    onClick={clear}    >Clear</button>
                 <button className='play-btn large-btn'     onClick={speak}    >Speak</button>
+                <button className='clear-btn large-btn'    onClick={clear}    >Clear</button>
+
             </div>
         </div>
 
