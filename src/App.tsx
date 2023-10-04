@@ -9,13 +9,12 @@ import dospeak from './speak';
 import bgImage from './bgimage.png';
 import axios from 'axios';
 
+const SERVER_URL = `http://0.0.0.0:8000/query`;
+
 const App: React.FC = () => {
     const [voiceInput, setVoiceInput] = useState('');
     const [responseValue, setResponseValue] = useState('');
     const [listenBtn, setListenBtn] = useState('Listen');
-    const [resVal1, setResVal1] = useState('');
-    const [resVal2, setResVal2] = useState('');
-    const [resVal3, setResVal3] = useState('');
     const [isListening, setIsListening] = useState(false);
     var input = MicInput();
     // var messageHistory: Array<string> = people['history'];
@@ -145,7 +144,9 @@ async function generate(): Promise<void> {
     console.log(voiceInput);
     // input.stopRecording();
     // setIsListening(false);
-    const res = await fetch(`http://0.0.0.0:8000/query`, {
+    console.log(SERVER_URL);
+
+    const res = await fetch(SERVER_URL, {
       method: 'POST',
       body: "{\"question\": \"" + voiceInput + "\"}",
       headers: {
