@@ -171,6 +171,8 @@ async function generate(): Promise<void> {
 
     return (
         <div className='page-container'>
+
+        <div>
             
             <div className='text-area'>
                 <textarea className='text-box' id="text-input"   value={voiceInput}    onChange={(e) => setVoiceInput(e.target.value)} />
