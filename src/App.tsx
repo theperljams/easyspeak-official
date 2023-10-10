@@ -9,13 +9,12 @@ import dospeak from './speak';
 import bgImage from './bgimage.png';
 import axios from 'axios';
 
+const SERVER_URL = `http://0.0.0.0:8000/query`;
+
 const App: React.FC = () => {
     const [voiceInput, setVoiceInput] = useState('');
     const [responseValue, setResponseValue] = useState('');
     const [listenBtn, setListenBtn] = useState('Listen');
-    const [resVal1, setResVal1] = useState('');
-    const [resVal2, setResVal2] = useState('');
-    const [resVal3, setResVal3] = useState('');
     const [isListening, setIsListening] = useState(false);
     var input = MicInput();
     // var messageHistory: Array<string> = people['history'];
@@ -34,14 +33,16 @@ const App: React.FC = () => {
        setResponseValue("");
       }, []);
     
-    /*useEffect(() => {
+    useEffect(() => {
         if(isListening) {
+            setListenBtn('Stop Recording');
             transcribe(isListening);
         }
         else {
+            setListenBtn('Listen');
             console.log('done listening')
         }
-    }, [isListening]);*/
+    }, [isListening]);
 
     const clear = () => {
         setVoiceInput('');
@@ -51,6 +52,7 @@ const App: React.FC = () => {
     function doListen() {
         if (!isListening) { 
             input.startRecording();
+
             setIsListening(true);
         }
         else {
@@ -142,7 +144,9 @@ async function generate(): Promise<void> {
     console.log(voiceInput);
     // input.stopRecording();
     // setIsListening(false);
-    const res = await fetch(`http://0.0.0.0:8000/query`, {
+    console.log(SERVER_URL);
+
+    const res = await fetch(SERVER_URL, {
       method: 'POST',
       body: "{\"question\": \"" + voiceInput + "\"}",
       headers: {
@@ -166,12 +170,13 @@ async function generate(): Promise<void> {
 
 
     return (
+        <div className='page-container'>
 
         <div>
             
-            <div>
-                <textarea id="text-input"   value={voiceInput}    onChange={(e) => setVoiceInput(e.target.value)} />
-                <textarea id="response-box" value={responseValue} onClick={()   => chooseResponse(responseValue)} />
+            <div className='text-area'>
+                <textarea className='text-box' id="text-input"   value={voiceInput}    onChange={(e) => setVoiceInput(e.target.value)} />
+                <textarea className='text-box' id="response-box" value={responseValue} onClick={()   => chooseResponse(responseValue)} />
                 <div>
                     {audioURL && (
                         <audio autoPlay key={audioURL}>
@@ -183,8 +188,9 @@ async function generate(): Promise<void> {
             <div className='btn-container'>
                 <button className="listen-btn large-btn"   onClick={doListen} >{listenBtn}</button>
                 <button className='generate-btn large-btn' onClick={generate} >Generate</button>
-                <button className='clear-btn large-btn'    onClick={clear}    >Clear</button>
                 <button className='play-btn large-btn'     onClick={speak}    >Speak</button>
+                <button className='clear-btn large-btn'    onClick={clear}    >Clear</button>
+
             </div>
         </div>
 

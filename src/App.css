@@ -1,3 +1,8 @@
+:root{
+  --text-bg-color: #fdfdff;
+  background-color: #444449;
+}
+
 .App {
   text-align: center;
   background-color: '#c3e1e3';
@@ -47,76 +52,53 @@
 
 .large-btn {
   height: 15vh;
-  margin-left: 5px;
-  margin-top: 8px;
-  font-size: 32px;
+  margin: 16px 12px;
+  font-size: 40px;
   font-weight: bold;
   border-radius: 10px;
   color: white;
   width: 25%;
-  box-shadow: 1px 3px rgba(0, 0, 0, .5);
+  box-shadow: 2px 6px rgba(0, 0, 0, 1);
   border: none;
+  background-color: #003dff;
 }
 
 .large-btn:hover {
-  box-shadow: 1px 2px #ffffff;
+  box-shadow: 0px 0px #000;
+  background-color: #002FC8;
+
 }
 
-.listen-btn {
-  background-color: green;
+
+
+.text-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.generate-btn {
-  background-color: orange;
-}
 
-.play-btn {
-  background-color: blue;
-}
-
-.clear-btn {
-  background-color: red;
-}
-
-.listen-btn:hover {
-  background-color: rgb(0, 100, 0);
-}
-
-.generate-btn:hover {
-  background-color: rgb(134, 87, 0);
-}
-
-.play-btn:hover {
-  background-color: rgb(0, 0, 100);
-}
-
-.clear-btn:hover {
-  background-color: rgb(120,0,0);
-}
-
-#response-box {
-  width: 100%;
-  height: 30vh;
-  border: 30px solid lightblue;
-  background-color: lightblue;
-  font-size: 15px;
+.text-box {
+  width: calc(100vw - 196px);
+  height: 25vh;
+  padding: 32px;
+  background-color: var(--text-bg-color);
+  font-size: 32px;
   border-radius: 10px;
   text-align: center;
-}
-
-#text-input {
-  width: 100%;
-  height: 30vh;
-  border: 30px solid lightblue;
-  background-color: lightblue;
-  font-size: 25px;
-  border-radius: 10px;
-  text-align: center;
-
+  margin: 16px;
+  box-shadow: 2px 6px rgba(0, 0, 0, 1);
 }
 
 .btn-container{
   display: flex;
   flex-direction: row;
+  width: calc(100vw - 64px);
+  margin: 0 32px;
+}
+
+.page-container {
+  display: flex;
+  flex-direction: column;
   width: 100vw;
 }
