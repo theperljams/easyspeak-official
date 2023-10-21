@@ -27,7 +27,7 @@ openai_api_key = os.environ.get("OPENAI_API_KEY")
 
 embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
 
-loader = DirectoryLoader('data', glob="**/*.pdf")
+loader = DirectoryLoader('data', glob="**/*.txt")
 documents = loader.load()
 
 text_splitter = CharacterTextSplitter(chunk_size=2500, chunk_overlap=0)

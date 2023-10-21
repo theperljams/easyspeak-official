@@ -3,6 +3,5 @@ fastapi
 python-dotenv
 langchain
 openai
-unstructured[pdf]
 chromadb
 tiktoken

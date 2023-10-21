@@ -1,13 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-import { Button } from '@mui/material';
 import './App.css';
 import MicInput from './MicInput';
-import people from './messages.json';
 import dospeak from './speak';
-import bgImage from './bgimage.png';
-import axios from 'axios';
 
 const SERVER_URL = `http://0.0.0.0:8000/query`;
 
@@ -159,7 +154,7 @@ async function generate(): Promise<void> {
     if (res.status === 200) {
       setResponseValue(data);
     } else {
-      setResponseValue(people['default response']);
+      setResponseValue('I don\'t know');
     }
   }
   
@@ -192,6 +187,7 @@ async function generate(): Promise<void> {
                 <button className='clear-btn large-btn'    onClick={clear}    >Clear</button>
 
             </div>
+        </div>
         </div>
 
     );
