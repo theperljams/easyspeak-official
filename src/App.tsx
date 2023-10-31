@@ -6,97 +6,56 @@ import dospeak from './speak';
 
 const SERVER_URL = `http://0.0.0.0:8000/query`;
 
+const WEBSOCKET_URL = 'ws://0.0.0.0:8000/transcribe';
+
 const App: React.FC = () => {
     const [voiceInput, setVoiceInput] = useState('');
     const [responseValue, setResponseValue] = useState('');
     const [listenBtn, setListenBtn] = useState('Listen');
     const [isListening, setIsListening] = useState(false);
+    const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
     var input = MicInput();
-    // var messageHistory: Array<string> = people['history'];
     var blob: Blob;
 
     const [audioURL, setAudioURL] = useState<string | null>(null); // Initialize the state with a null value
 
-    useEffect(() => {
-        if (input.transcript && input.transcript.text) {
-            setVoiceInput(input.transcript.text);
+    const doListen = async () => {
+        const socket = new WebSocket(WEBSOCKET_URL);
+    
+        socket.onopen = (event) => {
+          console.log('WebSocket connection opened:', event);
         };
 
-    }, [input.transcript]);
-
+        setListenBtn('Stop Recording');
+    
+        socket.onmessage = (event) => {
+          // Handle incoming transcription results
+          const transcriptionResult = event.data;
+          console.log('Transcription Result:', transcriptionResult);
+          setVoiceInput(transcriptionResult);
+        };
+    
+        socket.onclose = (event) => {
+          if (event.wasClean) {
+            console.log('WebSocket closed cleanly:', event);
+          } else {
+            console.error('WebSocket connection closed unexpectedly:', event);
+          }
+        };
+    
+        setWebSocket(socket);
+    }
+    
+    
     useEffect(() => {
        setResponseValue("");
       }, []);
     
-    useEffect(() => {
-        if(isListening) {
-            setListenBtn('Stop Recording');
-            transcribe(isListening);
-        }
-        else {
-            setListenBtn('Listen');
-            console.log('done listening')
-        }
-    }, [isListening]);
 
     const clear = () => {
         setVoiceInput('');
     };
 
-
-    function doListen() {
-        if (!isListening) { 
-            input.startRecording();
-
-            setIsListening(true);
-        }
-        else {
-            input.stopRecording();
-            setIsListening(false);
-            setListenBtn('Listen');
-        }
-    }
-
-    /*function transcribePromise(){
-        return new Promise((resolve, reject) => {
-            console.log('promise: ' + isListening);
-            if(isListening) {
-                setTimeout(() => {console.log("timeout")}, 2000);
-                resolve(isListening);
-            }
-            else {
-                resolve(isListening);
-            }
-        }).then(
-            (value) => {
-                if(value) {
-                    console.log('resolve:' + value);
-                transcribePromise();
-                }
-                else {
-                    console.log('donzo');
-                }
-                
-            },
-            () => {
-                console.log('reject');
-            }
-        )
-    } */
-
-
-    function transcribe(isListening: string | boolean) {
-        console.log('isListening:' + isListening);
-        if(isListening) {
-            console.log('listening');
-            //transcribePromise(); 
-            //setVoiceInput();
-            //setTimeout(transcribe, 100, isListening)
-        }
-        else {
-            console.log("done");
-        }
-    }
 
     const handleSpeak = async (inputstr: string) => {
         try {
@@ -118,22 +77,6 @@ const App: React.FC = () => {
         handleSpeak(voiceInput);
     }
 
-//     function generate() {
-//         console.log(inputValue);
-//         axios.post('http://0.0.0.0:3001/query', inputValue, {
-//   headers: {
-//     'Content-Type': 'application/json',
-//   },
-// }).then(res => {
-//         if (res != null) {
-//             setResVal1(res.data);
-//         }
-//         else {
-//             setResponseValue(people['default response']);
-//         }
-//         });
-        
-//     }
 
 async function generate(): Promise<void> {
     console.log(voiceInput);
