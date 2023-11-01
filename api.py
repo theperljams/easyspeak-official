@@ -102,7 +102,10 @@ async def query_chain(question: Question):
     return result
 
 async def send_transcription(websocket, transcription):
+    # for transcript in transcription:
     await websocket.send(transcription)
+
+
 
 @app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
@@ -130,6 +133,7 @@ async def transcribe(websocket: WebSocket):
     # Prevents permanent application hang and crash by using the wrong Microphone
     if 'linux' in platform:
         mic_name = 'pulse'
+        print(mic_name)
         if not mic_name or mic_name == 'list':
             print("Available microphone devices are: ")
             for index, name in enumerate(sr.Microphone.list_microphone_names()):
@@ -139,6 +143,8 @@ async def transcribe(websocket: WebSocket):
             for index, name in enumerate(sr.Microphone.list_microphone_names()):
                 if mic_name in name:
                     source = sr.Microphone(sample_rate=16000, device_index=index)
+                    print("Source: " , source)
+                    print(name)
                     break
     else:
         source = sr.Microphone(sample_rate=16000)
@@ -149,6 +155,8 @@ async def transcribe(websocket: WebSocket):
     if model != "large" and not non_english:
         model = model + ".en"
     audio_model = whisper.load_model(model)
+    
+    print("Model loaded")
 
     record_timeout = 2
     phrase_timeout = 3
@@ -157,6 +165,7 @@ async def transcribe(websocket: WebSocket):
     transcription = ['']
 
     with source:
+        print(source)
         recorder.adjust_for_ambient_noise(source)
 
     def record_callback(_, audio:sr.AudioData) -> None:
@@ -167,15 +176,20 @@ async def transcribe(websocket: WebSocket):
         # Grab the raw bytes and push it into the thread safe queue.
         data = audio.get_raw_data()
         data_queue.put(data)
+        print("data added to queue")
 
     # Create a background thread that will pass us raw audio bytes.
     # We could do this manually but SpeechRecognizer provides a nice helper.
     recorder.listen_in_background(source, record_callback, phrase_time_limit=record_timeout)
 
+    print("recorder thread started")
+
     while True:
+        print("looping")
         now = datetime.utcnow()
         # Pull raw recorded audio from the queue.
         if not data_queue.empty():
+            print("has data")
             phrase_complete = False
             # If enough time has passed between recordings, consider the phrase complete.
             # Clear the current working audio buffer to start over with the new data.
@@ -187,26 +201,31 @@ async def transcribe(websocket: WebSocket):
 
             # Concatenate our current audio data with the latest audio data.
             while not data_queue.empty():
+                print("adding to last sample")
                 data = data_queue.get()
                 last_sample += data
 
             # Use AudioData to convert the raw data to wav data.
             audio_data = sr.AudioData(last_sample, source.SAMPLE_RATE, source.SAMPLE_WIDTH)
             wav_data = io.BytesIO(audio_data.get_wav_data())
+            print("converted audio and wav data")
 
             # Write wav data to the temporary file as bytes.
             with open(temp_file, 'w+b') as f:
                 f.write(wav_data.read())
 
+            print("made temp file")
             # Read the transcription.
             result = audio_model.transcribe(temp_file, fp16=torch.cuda.is_available())
             text = result['text'].strip()
+            print("Made text: ", text)
 
             # If we detected a pause between recordings, add a new item to our transcription.
             # Otherwise edit the existing one.
             if phrase_complete:
                 transcription.append(text)
-                await send_transcription(websocket, transcription)
+                print("Transcription: ", transcription)
+                await send_transcription(websocket, text)
             else:
                 transcription[-1] = text
 
