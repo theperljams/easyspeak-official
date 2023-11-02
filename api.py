@@ -29,6 +29,8 @@ import whisper
 import torch
 from fastapi import WebSocket
 import asyncio
+import websockets
+from starlette.types import Message
 
 
 from datetime import datetime, timedelta
@@ -49,8 +51,6 @@ text_splitter = CharacterTextSplitter(chunk_size=2500, chunk_overlap=0)
 texts = text_splitter.split_documents(documents)
 
 docsearch = Chroma.from_documents(texts, embeddings)
-
-
 
 template = """"You are Ron Swanson. Mimic his voice and way of speaking, try to be as convincing as possible. Use the context below to answer questions. Stay in character while answering questions. DO NOT refer to yourself in the third person. If you don't know the answer to something, just say that you don't know.
 
@@ -102,20 +102,18 @@ async def query_chain(question: Question):
     return result
 
 async def send_transcription(websocket, transcription):
-    # for transcript in transcription:
-    await websocket.send(transcription)
+    for transcript in transcription:
+        if(transcript != ''):
+            await websocket.send_text(transcript)
+        else:
+            continue
 
 
 
 @app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
-    
-    websockets = []
 
     await websocket.accept()
-    
-    websockets.append(websocket)
-
 
     # The last time a recording was retrieved from the queue.
     phrase_time = None
@@ -185,7 +183,6 @@ async def transcribe(websocket: WebSocket):
     print("recorder thread started")
 
     while True:
-        print("looping")
         now = datetime.utcnow()
         # Pull raw recorded audio from the queue.
         if not data_queue.empty():
@@ -225,7 +222,7 @@ async def transcribe(websocket: WebSocket):
             if phrase_complete:
                 transcription.append(text)
                 print("Transcription: ", transcription)
-                await send_transcription(websocket, text)
+                await send_transcription(websocket, transcription)
             else:
                 transcription[-1] = text
 

@@ -39,7 +39,7 @@ const App: React.FC = () => {
           if (event.wasClean) {
             console.log('WebSocket closed cleanly:', event);
           } else {
-            console.error('WebSocket connection closed unexpectedly:', event);
+            console.log('WebSocket connection closed unexpectedly:', event);
           }
         };
     
