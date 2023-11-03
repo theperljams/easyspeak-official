@@ -34,6 +34,8 @@ from tempfile import NamedTemporaryFile
 from time import sleep
 from sys import platform
 
+from mp import SignalCatcher
+
 SOURCE = None
 RECORDER = sr.Recognizer()
 DATA_QUEUE = Queue()
@@ -69,87 +71,6 @@ qa = RetrievalQA.from_chain_type(
     chain_type_kwargs={"prompt": PROMPT}
  )
 
-async def record():
-   
-    record_timeout = 2
-
-    with SOURCE:
-        print(SOURCE)
-        RECORDER.adjust_for_ambient_noise(SOURCE)
-
-    def record_callback(_, audio:sr.AudioData) -> None:
-        """
-        Threaded callback function to receive audio data when recordings finish.
-        audio: An AudioData containing the recorded bytes.
-        """
-        # Grab the raw bytes and push it into the thread safe queue.
-        data = audio.get_raw_data()
-        DATA_QUEUE.put(data)
-        print("data added to queue")
-
-    # Create a background thread that will pass us raw audio bytes.
-    # We could do this manually but SpeechRecognizer provides a nice helper.
-    RECORDER.listen_in_background(SOURCE, record_callback, phrase_time_limit=record_timeout)
-
-    print("recorder thread started")
-    
-async def transcribe():
-
-    phrase_timeout = 3
-    last_sample = bytes()
-
-    temp_file = NamedTemporaryFile().name
-    transcription = ['']
-    phrase_time = None
-    
-    while True:
-        now = datetime.utcnow()
-        # Pull raw recorded audio from the queue.
-        if not DATA_QUEUE.empty():
-            print("has data")
-            phrase_complete = False
-            # If enough time has passed between recordings, consider the phrase complete.
-            # Clear the current working audio buffer to start over with the new data.
-            if phrase_time and now - phrase_time > timedelta(seconds=phrase_timeout):
-                last_sample = bytes()
-                phrase_complete = True
-            # This is the last time we received new audio data from the queue.
-            phrase_time = now
-
-            # Concatenate our current audio data with the latest audio data.
-            while not DATA_QUEUE.empty():
-                print("adding to last sample")
-                data = DATA_QUEUE.get()
-                last_sample += data
-
-            # Use AudioData to convert the raw data to wav data.
-            audio_data = sr.AudioData(last_sample, SOURCE.SAMPLE_RATE, SOURCE.SAMPLE_WIDTH)
-            wav_data = io.BytesIO(audio_data.get_wav_data())
-            print("converted audio and wav data")
-
-            # Write wav data to the temporary file as bytes.
-            with open(temp_file, 'w+b') as f:
-                f.write(wav_data.read())
-
-            print("made temp file")
-            # Read the transcription.
-            result = AUDIO_MODEL.transcribe(temp_file, fp16=torch.cuda.is_available())
-            text = result['text'].strip()
-            print("Made text: ", text)
-
-            # If we detected a pause between recordings, add a new item to our transcription.
-            # Otherwise edit the existing one.
-            if phrase_complete:
-                transcription.append(text)
-                print("Transcription: ", transcription)
-                return transcription
-            else:
-                transcription[-1] = text
-
-            # Infinite loops are bad for processors, must sleep.
-            sleep(0.25)
-
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from uvicorn.middleware import proxy_headers
@@ -169,62 +90,6 @@ cool_app.add_middleware(
     allow_headers=["*"],
 )
 
-class RecordMiddleware(proxy_headers.ProxyHeadersMiddleware):
-  async def __call__(self, scope, receive, send):
-    await record()
-    await super().__call__(scope, receive, send)
-
-class TranscribeMiddleware(proxy_headers.ProxyHeadersMiddleware):
-  async def __call__(self, scope, receive, send):
-    transcription = await transcribe()
-    return transcription
-
-uvicorn_config = {
-  "middleware": [
-    RecordMiddleware(app=cool_app),
-    TranscribeMiddleware(app=cool_app)
-  ],
-}
-
-
-cool_app.on_event("startup")
-async def setup_microphone():
-    RECORDER.energy_threshold = 1000
-    # Definitely do this, dynamic energy compensation lowers the energy threshold dramatically to a point where the SpeechRecognizer never stops recording.
-    RECORDER.dynamic_energy_threshold = False
-
-    # Important for linux users.
-    # Prevents permanent application hang and crash by using the wrong Microphone
-    if 'linux' in platform:
-        mic_name = 'pulse'
-        print(mic_name)
-        if not mic_name or mic_name == 'list':
-            print("Available microphone devices are: ")
-            for index, name in enumerate(sr.Microphone.list_microphone_names()):
-                print(f"Microphone with name \"{name}\" found")
-            return
-        else:
-            for index, name in enumerate(sr.Microphone.list_microphone_names()):
-                if mic_name in name:
-                    SOURCE = sr.Microphone(sample_rate=16000, device_index=index)
-                    print("Source: " , SOURCE)
-                    print(name)
-                    break
-    else:
-        SOURCE = sr.Microphone(sample_rate=16000)
-
-
-cool_app.on_event("startup")
-async def load_model():
-    # Load / Download model
-    model = "tiny"
-    non_english = False
-    if model != "large" and not non_english:
-        model = model + ".en"
-    AUDIO_MODEL = whisper.load_model(model)
-    
-    print("Model loaded")
-
 class Question(BaseModel):
     question: str
 
@@ -237,19 +102,38 @@ async def query_chain(question: Question):
         result = result[1:]
     return result
 
+async def print_and_return_alphabet():
+    alphabet = ''
+    for letter in range(ord('a'), ord('z')+1):
+        alphabet += chr(letter)
+        print(chr(letter), end=' ')
+    
+    return alphabet
+
 
 @cool_app.websocket("/transcribe")
-async def transcribe(websocket: WebSocket, transcription = Depends(TranscribeMiddleware)):
+async def transcribe(websocket: WebSocket):
 
-    await websocket.accept()
-    # for transcript in transcription():
-    #     if transcript != '':
-    #         await websocket.send_text(transcript)
-    #     else:
-    #         continue
-    await websocket.send_text("Hello world!")
+    text_queue = config['text_queue']
+    if not text_queue.empty():
+        await websocket.accept()
+        while not text_queue.empty():
+            transcription = text_queue.get()
+            for transcript in transcription:
+                if transcript != '':
+                    await websocket.send_text(transcript)
+                else:
+                    continue
+    else:
+        print("Transcribing...")
 
 if __name__ == '__main__':
-
-    uvicorn.run(app, host='127.0.0.1', port=8000, ws='websockets')
+    config = {
+        'audio_queue': Queue(),
+        'text_queue': Queue(),
+        'source': None,
+        'model': 'tiny'
+    }
+    signal_catcher = SignalCatcher()
+    uvicorn.run(cool_app, host='127.0.0.1', port=8000, ws='websockets')
 

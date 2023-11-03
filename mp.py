@@ -2,7 +2,9 @@
 import signal
 from time import sleep
 import multiprocessing as mp
-
+from queue import Queue
+from Transcriber import Transcriber
+from Recorder import Recorder
 
 """
 Multiprocessing code example
@@ -26,7 +28,7 @@ class SignalCatcher:
         self.killed = True
 
 
-def mp_transcribe_thread(aq, tq, config):
+def mp_transcribe_thread(config):
     """
     Function that is feed audio data and outputs transcription results.
 
@@ -38,54 +40,37 @@ def mp_transcribe_thread(aq, tq, config):
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
     signal.signal(signal.SIGHUP, signal.SIG_IGN)
 
-    transcriber = PearlTranscriber(config)
-    transcriber.start()
+    transcriber = Transcriber(config)
+    transcriber.load_model()
 
     while True:
-        indata = None
-        outdata = None
-
         try:
-            # get work message from incoming queue
-            audiodata = aq.get()
-
-            text = transcriber.transcribe(audiodata)
-
-            tq.put(text)
+            transcriber.transcribe()
         except BaseException as e:
             s = {'failure': str(e)}
             print(s)
+            continue
 
 
-def mp_textprocessor_thread(tq, cq, config):
-    """
-    Function to run in text threads sending messages back to rabbitMQ
+# def mp_textprocessor_thread(tq, cq, config):
+#     """
+#     Function to run in text threads sending messages back to rabbitMQ
 
-    :param tq: incoming text queue
-    :param cq: outgoing completion queue
-    :return:
-    """
-    signal.signal(signal.SIGINT, signal.SIG_IGN)
-    signal.signal(signal.SIGTERM, signal.SIG_IGN)
-    signal.signal(signal.SIGHUP, signal.SIG_IGN)
-    #TODO: setup rabbitMQ connection
-    while True:
-        indata = None
-        outdata = None
-        try:
-            # get reply message from incoming queue
-            indata = tq.get()
+#     :param tq: incoming text queue
+#     :param cq: outgoing completion queue
+#     :return:
+#     """
+#     signal.signal(signal.SIGINT, signal.SIG_IGN)
+#     signal.signal(signal.SIGTERM, signal.SIG_IGN)
+#     signal.signal(signal.SIGHUP, signal.SIG_IGN)
+#     #TODO: setup rabbitMQ connection
+#     while True:
+#         try:
+#             if not config['text_queue'].empty():
 
-            # TODO: send message to rabbitMQ
-            print(f"mp_reply_thread(): indata={indata} config={config}")
-
-            # put results on outgoing queue to confirm completion
-            # really just here in case we want to track how many actions we've completed through the whole process
-            outdata = {'exitcode': 0}
-            cq.put(outdata)
-        except BaseException as e:
-            s = {'failure': 'mp_reply_thread() failed', 'error': e}
-            print(s)
+#         except BaseException as e:
+#             s = {'failure': 'mp_reply_thread() failed', 'error': e}
+#             print(s)
 
 
 def mp_recorder_thread(aq, config):
@@ -96,13 +81,10 @@ def mp_recorder_thread(aq, config):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
     signal.signal(signal.SIGHUP, signal.SIG_IGN)
-    #TODO: setup rabbitMQ connection
 
-    recorder = PearlRecord(config)
-    recorder.start()
+    recorder = Recorder(config)
+    recorder.setup_mic()
 
-    # Just here to simulate messages coming in from rabbitMQ
-    i = 0
     while True:
         try:
             audiodata = recorder.get_audio()
@@ -121,16 +103,16 @@ def run_threads(config):
 
     sc = SignalCatcher()
 
-    aq = mp.Queue()    # action queue
-    rq = mp.Queue()    # reply queue
-    cq = mp.Queue()    # completion queue
+    # aq = mp.Queue()    # action queue
+    # rq = mp.Queue()    # reply queue
+    # cq = mp.Queue()    # completion queue
 
-    rp = mp.Process(target=mp_reciever_thread, name="mp_reciever_thread", args=(aq, config,))
+    rp = mp.Process(target=mp_recorder_thread, name="mp_recorder_thread", args=(config))
     rp.start()
-    ap = mp.Process(target=mp_action_thread, name="mp_action_thread", args=(aq, rq, config,))
+    ap = mp.Process(target=mp_transcribe_thread, name="mp_action_thread", args=(config))
     ap.start()
-    cp = mp.Process(target=mp_reply_thread, name="mp_reply_thread", args=(rq, cq, config,))
-    cp.start()
+    # cp = mp.Process(target=mp_reply_thread, name="mp_reply_thread", args=(rq, cq, config,))
+    # cp.start()
 
     i = 0
     while not sc.killed:
@@ -145,9 +127,14 @@ def run_threads(config):
 
     rp.kill()
     ap.kill()
-    cp.kill()
+    # cp.kill()
 
 
 if __name__ == "__main__":
-    config = {'config': 'stuff'}
+    config = {
+        'audio_queue': Queue(),
+        'text_queue': Queue(),
+        'source': None,
+        'model': 'tiny'
+    }
     run_threads(config)
