@@ -35,6 +35,7 @@ from time import sleep
 from sys import platform
 
 from mp import SignalCatcher
+import multiprocessing as mp
 
 SOURCE = None
 RECORDER = sr.Recognizer()
@@ -129,8 +130,8 @@ async def transcribe(websocket: WebSocket):
 
 if __name__ == '__main__':
     config = {
-        'audio_queue': Queue(),
-        'text_queue': Queue(),
+        'audio_queue': mp.Queue(),
+        'text_queue': mp.Queue(),
         'source': None,
         'model': 'tiny'
     }
