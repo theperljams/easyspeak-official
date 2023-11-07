@@ -34,13 +34,15 @@ from tempfile import NamedTemporaryFile
 from time import sleep
 from sys import platform
 
-from mp import SignalCatcher
-import multiprocessing as mp
+import mp
+import multiprocessing as multi_process
 
 SOURCE = None
 RECORDER = sr.Recognizer()
 DATA_QUEUE = Queue()
 AUDIO_MODEL = None
+
+text_queue = multi_process.Queue()
 
 dotenv.load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
@@ -74,7 +76,6 @@ qa = RetrievalQA.from_chain_type(
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from uvicorn.middleware import proxy_headers
 
 cool_app = FastAPI()
 
@@ -115,26 +116,26 @@ async def print_and_return_alphabet():
 @cool_app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
 
-    text_queue = config['text_queue']
+    print("text_queue: ", text_queue)
     if not text_queue.empty():
         await websocket.accept()
         while not text_queue.empty():
             transcription = text_queue.get()
-            for transcript in transcription:
-                if transcript != '':
-                    await websocket.send_text(transcript)
-                else:
-                    continue
+            if transcription != '':
+                await websocket.send_text(transcription)
+            else:
+                continue
     else:
+        await websocket.accept()
+        await websocket.send_text("Waiting for transcription...")
         print("Transcribing...")
 
 if __name__ == '__main__':
+    audio_queue = multi_process.Queue()
     config = {
-        'audio_queue': mp.Queue(),
-        'text_queue': mp.Queue(),
-        'source': None,
-        'model': 'tiny'
+        'audio_queue': audio_queue,
+        'text_queue': text_queue,
     }
-    signal_catcher = SignalCatcher()
-    uvicorn.run(cool_app, host='127.0.0.1', port=8000, ws='websockets')
+    mp.run_threads(config)
+   
 

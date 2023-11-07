@@ -1,15 +1,31 @@
 #!/usr/bin/env python3
+import atexit
 import platform
 import signal
+import io
 from time import sleep
 import multiprocessing as mp
 from Transcriber import Transcriber
 from Recorder import Recorder
 import speech_recognition as sr
+import uvicorn
+import api
 
 """
 Multiprocessing code example
 """
+
+
+def record_callback(_, audio: sr.AudioData) -> None:
+    """
+    Threaded callback function to receive audio data when recordings finish.
+    audio: An AudioData containing the recorded bytes.
+    """
+    print("record callback")
+    # Grab the raw bytes and push it into the thread-safe queue.
+    data = audio.get_raw_data()
+    audio_queue.put(data)
+    print("Data added to queue")
 
 
 class SignalCatcher:
@@ -23,44 +39,34 @@ class SignalCatcher:
         signal.signal(signal.SIGINT, self.process_signal)
         signal.signal(signal.SIGTERM, self.process_signal)
         signal.signal(signal.SIGHUP, self.process_signal)
-
+        
     def process_signal(self, signum, frame):
         print(f"Caught {signal.strsignal(signum)} signal")
         self.killed = True
 
 
-def mp_transcribe_thread(config):
-    """
-    Function that is feed audio data and outputs transcription results.
-
-    :param aq: incoming audio queue
-    :param tq: outgoing text queue
-    :return:
-    """
+def mp_transcribe_thread(audio_queue, text_queue):
+    
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
     signal.signal(signal.SIGHUP, signal.SIG_IGN)
 
-    transcriber = Transcriber(config)
-    transcriber.load_model()
+    transcriber = Transcriber("tiny")
 
     while True:
         try:
-            if config['audio_queue'].empty():
-                # print("no data")
-                continue
-            else: 
-                while not config['audio_queue'].empty():
-                    print("There's data!")
-                    audio_data = config['audio_queue'].get()
-                    transcription = transcriber.transcribe(curr_data=audio_data)
+            if audio_queue.empty():
+                print("Queue is empty")
+                sleep(2)
+            audio_data = audio_queue.get()
+            transcription = transcriber.transcribe(curr_data=audio_data)
             for transcript in transcription:
-                config['text_queue'].put(transcript)
+                text_queue.put(transcript)
         except BaseException as e:
             s = {'failure': str(e)}
             print(s)
             continue
-        sleep(0.25)
+        
 
 
 # def mp_textprocessor_thread(tq, cq, config):
@@ -108,11 +114,8 @@ def setup_microphone(recorder: sr.Recognizer):
             source = sr.Microphone(sample_rate=16000)
             return source
         
-def mp_recorder_thread(config):
-    """
-    Function to run in recieve threads listening for rabbitMQ messages
-    :param aq: outgoing action queue
-    """
+def mp_recorder_thread(audio_queue):
+   
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
     signal.signal(signal.SIGHUP, signal.SIG_IGN)
@@ -120,27 +123,34 @@ def mp_recorder_thread(config):
     recorder = sr.Recognizer()
     source = setup_microphone(recorder)
     record_timeout = 2
-
-    def record_callback(_, audio: sr.AudioData) -> None:
-            """
-            Threaded callback function to receive audio data when recordings finish.
-            audio: An AudioData containing the recorded bytes.
-            """
-            # Grab the raw bytes and push it into the thread-safe queue.
-            data = audio.get_raw_data()
-            config["audio_queue"].put(data)
-            print("Data added to queue")
-    try:
-        with source:
-            recorder.adjust_for_ambient_noise(source)
-        recorder.listen_in_background(source, record_callback, phrase_time_limit=record_timeout)
-        print("Listening for audio")
-    except BaseException as e:
+    while True: 
+        try:
+            with source:
+                recorder.adjust_for_ambient_noise(source)
+                data = recorder.listen(source, phrase_time_limit=record_timeout)
+                print("audio data recorded")
+                wav = data.get_wav_data()
+                print("calling get_wav_data()")
+                wav_data = io.BytesIO(wav)
+                print("wav data recorded")
+            print("converted audio and wav data")
+            audio_queue.put(wav_data)
+        except BaseException as e:
             s = {'failure':'mp_recorder_thread() failed', 'error': e}
             print(s)
-    
-        
 
+def mp_server_thread():
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    signal.signal(signal.SIGHUP, signal.SIG_IGN)
+
+    uvicorn.run(api.cool_app, host='127.0.0.1', port=8000, ws='websockets')
+
+def stop_uv_server():
+    # This function is called when the main process exits
+    print("Stopping the Uvicorn server")
+    uvicorn.stop()
+    
 
 def run_threads(config):
     """
@@ -151,38 +161,45 @@ def run_threads(config):
 
     sc = SignalCatcher()
 
-    # aq = mp.Queue()    # action queue
-    # rq = mp.Queue()    # reply queue
+
+
+    aq = config['audio_queue']  
+    tq = config['text_queue']   
     # cq = mp.Queue()    # completion queue
 
-    rp = mp.Process(target=mp_recorder_thread, name="mp_recorder_thread", args=(config,))
+    rp = mp.Process(target=mp_recorder_thread, name="mp_recorder_thread", args=(aq,))
     rp.start()
-    ap = mp.Process(target=mp_transcribe_thread, name="mp_transcribe_thread", args=(config,))
+    ap = mp.Process(target=mp_transcribe_thread, name="mp_transcribe_thread", args=(aq, tq,))
     ap.start()
-    # cp = mp.Process(target=mp_reply_thread, name="mp_reply_thread", args=(rq, cq, config,))
-    # cp.start()
+    cp = mp.Process(target=mp_server_thread, name="mp_server_thread", args=())
+    cp.start()
 
     i = 0
     while not sc.killed:
         try:
-            c = config["text_queue"].get(timeout=300)
+            c = text_queue.get(timeout=15)
             print(c)
             print()
             i += 1
         except mp.queues.Empty:
             print("timed out waiting for completion, retrying")
             pass
-
+    print("Killing processes")       
     rp.kill()
     ap.kill()
+    cp.kill()
+    print("Processes killed")
     # cp.kill()
 
 
 if __name__ == "__main__":
+    audio_queue = mp.Queue()
+    text_queue = mp.Queue()
     config = {
-        'audio_queue': mp.Queue(),
-        'text_queue': mp.Queue(),
-        'source': None,
-        'model': 'tiny'
+        'audio_queue': audio_queue,
+        'text_queue': text_queue,
     }
+
+    atexit.register(stop_uv_server)
+
     run_threads(config)
