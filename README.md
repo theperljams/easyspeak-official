@@ -12,7 +12,7 @@
 **Terminal 1:**
 1. If this is your first time running it, run the `venv_setup.sh` script
 2. Once you have done that, activate your virtual environment by running source venv/bin/activate
-3. Run the server by running the api script (python3 api.py)
+3. Run the server by running the api script (`python3 api.py`)
 
 **Terminal 2:**
 1. If this is your first time, run `npm install`
