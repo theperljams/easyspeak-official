@@ -142,12 +142,13 @@ def mp_recorder_thread(audio_queue):
             s = {'failure':'mp_recorder_thread() failed', 'error': e}
             print(s)
 
-def mp_server_thread():
+def mp_server_thread(tq):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
     signal.signal(signal.SIGHUP, signal.SIG_IGN)
-
-    uvicorn.run(api.cool_app, host='127.0.0.1', port=8000, ws='websockets')
+    cool_app = api.cool_app
+    cool_app.text_queue = tq
+    uvicorn.run(cool_app, host='127.0.0.1', port=8000, ws='websockets')
 
 # def stop_uv_server():
 #     # This function is called when the main process exits
@@ -174,23 +175,14 @@ def run_threads(config):
     rp.start()
     ap = mp.Process(target=mp_transcribe_thread, name="mp_transcribe_thread", args=(aq, tq,))
     ap.start()
-    cp = mp.Process(target=mp_server_thread, name="mp_server_thread", args=())
+    cp = mp.Process(target=mp_server_thread, name="mp_server_thread", args=(tq,))
     cp.start()
 
     while not sc.killed:
-        try:
-            if not text_queue.empty():
-                print("Text queue is not empty")
-            else:
-                print("Text queue is empty")
-            # c = text_queue.get(timeout=15)
-            # print(c)
-            # print()
-            # i += 1
-        except mp.queues.Empty:
-            print("timed out waiting for completion, retrying")
-            pass
-    print("Killing processes")       
+        sleep(1)
+        print("Queues: ", aq.qsize(), tq.qsize())
+
+    print("Killing processes")
     rp.kill()
     ap.kill()
     cp.kill()

@@ -115,7 +115,7 @@ async def print_and_return_alphabet():
 @cool_app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
 
-    print("text_queue: ", text_queue)
+    text_queue = cool_app.text_queue
     if not text_queue.empty():
         await websocket.accept()
         while not text_queue.empty():
