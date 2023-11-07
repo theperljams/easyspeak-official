@@ -34,12 +34,14 @@ from tempfile import NamedTemporaryFile
 from time import sleep
 from sys import platform
 
-from mp import SignalCatcher
+import mp
+import multiprocessing as multi_process
 
 SOURCE = None
 RECORDER = sr.Recognizer()
 DATA_QUEUE = Queue()
 AUDIO_MODEL = None
+
 
 dotenv.load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
@@ -73,7 +75,6 @@ qa = RetrievalQA.from_chain_type(
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from uvicorn.middleware import proxy_headers
 
 cool_app = FastAPI()
 
@@ -102,38 +103,31 @@ async def query_chain(question: Question):
         result = result[1:]
     return result
 
-async def print_and_return_alphabet():
-    alphabet = ''
-    for letter in range(ord('a'), ord('z')+1):
-        alphabet += chr(letter)
-        print(chr(letter), end=' ')
-    
-    return alphabet
-
-
 @cool_app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
 
-    text_queue = config['text_queue']
+    text_queue = cool_app.text_queue
     if not text_queue.empty():
         await websocket.accept()
         while not text_queue.empty():
             transcription = text_queue.get()
-            for transcript in transcription:
-                if transcript != '':
-                    await websocket.send_text(transcript)
-                else:
-                    continue
+            print("Transcription: ", transcription)
+            if transcription != '':
+                await websocket.send_text(transcription)
+            else:
+                continue
     else:
+        # await websocket.accept()
+        # await websocket.send_text("Waiting for transcription...")
         print("Transcribing...")
 
 if __name__ == '__main__':
+    text_queue = multi_process.Queue()
+    audio_queue = multi_process.Queue()
     config = {
-        'audio_queue': Queue(),
-        'text_queue': Queue(),
-        'source': None,
-        'model': 'tiny'
+        'audio_queue': audio_queue,
+        'text_queue': text_queue,
     }
-    signal_catcher = SignalCatcher()
-    uvicorn.run(cool_app, host='127.0.0.1', port=8000, ws='websockets')
+    mp.run_threads(config)
+   
 

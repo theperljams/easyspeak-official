@@ -20,21 +20,27 @@ const App: React.FC = () => {
     const [audioURL, setAudioURL] = useState<string | null>(null); // Initialize the state with a null value
 
     const doListen = async () => {
+      if (isListening) {
+        // If already listening, stop listening
+        webSocket?.close();
+        setListenBtn('Listen');
+      } else {
+        // If not listening, start listening
         const socket = new WebSocket(WEBSOCKET_URL);
-    
+  
         socket.onopen = (event) => {
           console.log('WebSocket connection opened:', event);
         };
-
+  
         setListenBtn('Stop Recording');
-    
+  
         socket.onmessage = (event) => {
           // Handle incoming transcription results
           const transcriptionResult = event.data;
           console.log('Transcription Result:', transcriptionResult);
-          setVoiceInput(transcriptionResult);
+          setVoiceInput((prevInput) => prevInput + " " + transcriptionResult);
         };
-    
+  
         socket.onclose = (event) => {
           if (event.wasClean) {
             console.log('WebSocket closed cleanly:', event);
@@ -42,9 +48,11 @@ const App: React.FC = () => {
             console.log('WebSocket connection closed unexpectedly:', event);
           }
         };
-    
+  
         setWebSocket(socket);
-    }
+      }
+      setIsListening((prevIsListening) => !prevIsListening); // Toggle listening state
+    };
     
     
     useEffect(() => {
