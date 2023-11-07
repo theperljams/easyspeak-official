@@ -33,16 +33,19 @@ class SignalCatcher:
     Class to handle graceful exit of the process by catching SIGINT and SIGTERM signals,
     and setting a flag to exit the process.
     """
-    killed = False
 
     def __init__(self):
         signal.signal(signal.SIGINT, self.process_signal)
         signal.signal(signal.SIGTERM, self.process_signal)
         signal.signal(signal.SIGHUP, self.process_signal)
+        self.killed = False
         
     def process_signal(self, signum, frame):
         print(f"Caught {signal.strsignal(signum)} signal")
         self.killed = True
+
+    def is_killed(self):
+        return self.killed
 
 
 def mp_transcribe_thread(audio_queue, text_queue):
@@ -60,8 +63,8 @@ def mp_transcribe_thread(audio_queue, text_queue):
                 sleep(2)
             audio_data = audio_queue.get()
             transcription = transcriber.transcribe(curr_data=audio_data)
-            for transcript in transcription:
-                text_queue.put(transcript)
+            text_queue.put(transcription)
+            print("text added to queue: ", text_queue.qsize())
         except BaseException as e:
             s = {'failure': str(e)}
             print(s)
@@ -146,10 +149,10 @@ def mp_server_thread():
 
     uvicorn.run(api.cool_app, host='127.0.0.1', port=8000, ws='websockets')
 
-def stop_uv_server():
-    # This function is called when the main process exits
-    print("Stopping the Uvicorn server")
-    uvicorn.stop()
+# def stop_uv_server():
+#     # This function is called when the main process exits
+#     print("Stopping the Uvicorn server")
+#     uvicorn.stop()
     
 
 def run_threads(config):
@@ -174,13 +177,16 @@ def run_threads(config):
     cp = mp.Process(target=mp_server_thread, name="mp_server_thread", args=())
     cp.start()
 
-    i = 0
     while not sc.killed:
         try:
-            c = text_queue.get(timeout=15)
-            print(c)
-            print()
-            i += 1
+            if not text_queue.empty():
+                print("Text queue is not empty")
+            else:
+                print("Text queue is empty")
+            # c = text_queue.get(timeout=15)
+            # print(c)
+            # print()
+            # i += 1
         except mp.queues.Empty:
             print("timed out waiting for completion, retrying")
             pass
@@ -189,7 +195,6 @@ def run_threads(config):
     ap.kill()
     cp.kill()
     print("Processes killed")
-    # cp.kill()
 
 
 if __name__ == "__main__":
@@ -199,7 +204,4 @@ if __name__ == "__main__":
         'audio_queue': audio_queue,
         'text_queue': text_queue,
     }
-
-    atexit.register(stop_uv_server)
-
     run_threads(config)

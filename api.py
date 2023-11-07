@@ -42,7 +42,6 @@ RECORDER = sr.Recognizer()
 DATA_QUEUE = Queue()
 AUDIO_MODEL = None
 
-text_queue = multi_process.Queue()
 
 dotenv.load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
@@ -131,6 +130,7 @@ async def transcribe(websocket: WebSocket):
         print("Transcribing...")
 
 if __name__ == '__main__':
+    text_queue = multi_process.Queue()
     audio_queue = multi_process.Queue()
     config = {
         'audio_queue': audio_queue,
