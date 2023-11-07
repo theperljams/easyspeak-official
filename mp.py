@@ -125,7 +125,7 @@ def mp_recorder_thread(audio_queue):
 
     recorder = sr.Recognizer()
     source = setup_microphone(recorder)
-    record_timeout = 2
+    record_timeout = 4
     while True: 
         try:
             with source:

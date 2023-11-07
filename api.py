@@ -103,15 +103,6 @@ async def query_chain(question: Question):
         result = result[1:]
     return result
 
-async def print_and_return_alphabet():
-    alphabet = ''
-    for letter in range(ord('a'), ord('z')+1):
-        alphabet += chr(letter)
-        print(chr(letter), end=' ')
-    
-    return alphabet
-
-
 @cool_app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
 
@@ -120,13 +111,14 @@ async def transcribe(websocket: WebSocket):
         await websocket.accept()
         while not text_queue.empty():
             transcription = text_queue.get()
+            print("Transcription: ", transcription)
             if transcription != '':
                 await websocket.send_text(transcription)
             else:
                 continue
     else:
-        await websocket.accept()
-        await websocket.send_text("Waiting for transcription...")
+        # await websocket.accept()
+        # await websocket.send_text("Waiting for transcription...")
         print("Transcribing...")
 
 if __name__ == '__main__':
