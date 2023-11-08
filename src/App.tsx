@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import MicInput from './MicInput';
 import dospeak from './speak';
 
 const SERVER_URL = `http://0.0.0.0:8000/query`;
@@ -14,7 +13,6 @@ const App: React.FC = () => {
     const [listenBtn, setListenBtn] = useState('Listen');
     const [isListening, setIsListening] = useState(false);
     const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
-    var input = MicInput();
     var blob: Blob;
 
     const [audioURL, setAudioURL] = useState<string | null>(null); // Initialize the state with a null value
@@ -51,7 +49,7 @@ const App: React.FC = () => {
   
         setWebSocket(socket);
       }
-      setIsListening((prevIsListening) => !prevIsListening); // Toggle listening state
+      // setIsListening((prevIsListening) => !prevIsListening); // Toggle listening state
     };
     
     

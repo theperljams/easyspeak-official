@@ -1,6 +1,7 @@
 import whisper
 import torch
 from tempfile import NamedTemporaryFile
+import os
 
 class Transcriber:
     def __init__(self, model):
@@ -34,7 +35,7 @@ class Transcriber:
         print("made temp file")
         # Read the transcription.
         result = self.audio_model.transcribe(temp_file, fp16=torch.cuda.is_available())
-        #delete temp file
+        os.remove(temp_file)
         text = result['text'].strip()
         print("Made text: ", text)
         return text
