@@ -1,47 +1,28 @@
 #!/usr/bin/env python3
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from pydantic import BaseModel
-import uvicorn
-import os
 import dotenv
 import langchain
 from langchain.embeddings import OpenAIEmbeddings
-from langchain.document_loaders import TextLoader, DirectoryLoader
+from langchain.document_loaders import DirectoryLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain import OpenAI
-from langchain.chat_models import ChatOpenAI
-from langchain.agents.agent_toolkits import create_retriever_tool
-from langchain.agents.agent_toolkits import create_conversational_retrieval_agent
-from langchain.agents.openai_functions_agent.agent_token_buffer_memory import AgentTokenBufferMemory
-from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
-from langchain.schema.messages import SystemMessage
-from langchain.prompts import MessagesPlaceholder
-from langchain.agents import AgentExecutor
 from langchain import PromptTemplate
 
-import io
 import os
-import speech_recognition as sr
-import whisper
-import torch
 from fastapi import WebSocket
-from datetime import datetime, timedelta
-from queue import Queue
-from tempfile import NamedTemporaryFile
-from time import sleep
-from sys import platform
+from bark import SAMPLE_RATE, generate_audio, preload_models
+from scipy.io.wavfile import write as write_wav
+import io
 
 import mp
 import multiprocessing as multi_process
 
-SOURCE = None
-RECORDER = sr.Recognizer()
-DATA_QUEUE = Queue()
-AUDIO_MODEL = None
-
+os.environ["SUNO_OFFLOAD_CPU"] = "True"
+os.environ["SUNO_USE_SMALL_MODELS"] = "True"
 
 dotenv.load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
@@ -75,6 +56,8 @@ qa = RetrievalQA.from_chain_type(
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from transformers import pipeline
+import scipy
 
 cool_app = FastAPI()
 
@@ -105,7 +88,6 @@ async def query_chain(question: Question):
 
 @cool_app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
-
     text_queue = cool_app.text_queue
     if not text_queue.empty():
         await websocket.accept()
@@ -120,6 +102,18 @@ async def transcribe(websocket: WebSocket):
         # await websocket.accept()
         # await websocket.send_text("Waiting for transcription...")
         print("Transcribing...")
+
+@cool_app.post("/speak")
+async def audio(response: Question):
+    synthesiser = pipeline("text-to-speech", "suno/bark-small")
+    speech = synthesiser(response.question, forward_params={"do_sample": True})
+
+    wav_bytes_io = io.BytesIO()
+    scipy.io.wavfile.write("bark_out.wav", rate=speech["sampling_rate"], data=speech["audio"])
+    wav_bytes = wav_bytes_io.getvalue()
+    wav_bytes_io.close()
+    return wav_bytes
+
 
 if __name__ == '__main__':
     text_queue = multi_process.Queue()
