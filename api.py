@@ -3,23 +3,21 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import dotenv
+
 import langchain
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.document_loaders import DirectoryLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
-from langchain import OpenAI
-from langchain import PromptTemplate
+from langchain.llms import OpenAI
+from langchain.prompts import PromptTemplate
 
 import os
 from fastapi import WebSocket
 from bark import SAMPLE_RATE, generate_audio, preload_models
 from scipy.io.wavfile import write as write_wav
 import io
-
-import mp
-import multiprocessing as multi_process
 
 os.environ["SUNO_OFFLOAD_CPU"] = "True"
 os.environ["SUNO_USE_SMALL_MODELS"] = "True"
@@ -113,15 +111,3 @@ async def audio(response: Question):
     wav_bytes = wav_bytes_io.getvalue()
     wav_bytes_io.close()
     return wav_bytes
-
-
-if __name__ == '__main__':
-    text_queue = multi_process.Queue()
-    audio_queue = multi_process.Queue()
-    config = {
-        'audio_queue': audio_queue,
-        'text_queue': text_queue,
-    }
-    mp.run_threads(config)
-   
-
