@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import signal
 from time import sleep
 import multiprocessing as mp
@@ -104,6 +105,8 @@ def run_threads(config):
 
 
 if __name__ == "__main__":
+    import torch
+    torch.multiprocessing.set_start_method('spawn')
     audio_queue = mp.Queue()
     text_queue = mp.Queue()
     config = {

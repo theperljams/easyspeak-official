@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import dospeak from './speak';
 
-const SERVER_URL = `http://0.0.0.0:8000/query`;
+const SERVER_URL = `http://0.0.0.0:8000`;
 
 const WEBSOCKET_URL = 'ws://0.0.0.0:8000/transcribe';
 
@@ -36,7 +36,7 @@ const App: React.FC = () => {
           // Handle incoming transcription results
           const transcriptionResult = event.data;
           console.log('Transcription Result:', transcriptionResult);
-          setVoiceInput((prevInput) => prevInput + " " + transcriptionResult);
+          setVoiceInput((prevInput) => prevInput + transcriptionResult);
         };
   
         socket.onclose = (event) => {
@@ -49,7 +49,7 @@ const App: React.FC = () => {
   
         setWebSocket(socket);
       }
-      // setIsListening((prevIsListening) => !prevIsListening); // Toggle listening state
+      setIsListening((prevIsListening) => !prevIsListening); // Toggle listening state
     };
     
     
@@ -62,35 +62,35 @@ const App: React.FC = () => {
         setVoiceInput('');
     };
 
+    const handleSpeak = async () => {
+      try {
+        const res = await fetch(SERVER_URL + "/speak", {
+          method: 'POST',
+          body: JSON.stringify({ e_string: responseValue }), // Assuming you want to send inputstr as a JSON payload
+          headers: {
+            'Content-Type': 'application/json',
+            'accept': 'audio/wav'
+          },
+        });
+    
+        if (res.status === 200) {
+          const audioData = await res.arrayBuffer();
+          const audioBlob = new Blob([audioData], { type: 'audio/wav' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+    
+          // Now you can use audioUrl to play the received WAV data
+          // For example, you can set it as the source for an <audio> element
+          setAudioURL(audioUrl);
+        } 
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
 
-    const handleSpeak = async (inputstr: string) => {
-        try {
-            blob = await dospeak(inputstr);
-            //console.log(data);
-            console.log("done speak");
-            //const blob = binarytoBlob(data);
-            console.log(blob);
-            const url = URL.createObjectURL(blob);
-            console.log(url);
-            setAudioURL(url); // Update the audioURL state with the returned URL
-        } catch (error) {
-            // Handle any errors that occurred during the dospeak function call
-            console.error('Error occurred while speaking:', error);
-        }
-    }
-
-    function speak() {
-        handleSpeak(voiceInput);
-    }
 
 
 async function generate(): Promise<void> {
-    console.log(voiceInput);
-    // input.stopRecording();
-    // setIsListening(false);
-    console.log(SERVER_URL);
-
-    const res = await fetch(SERVER_URL, {
+    const res = await fetch(SERVER_URL + "/query", {
       method: 'POST',
       body: "{\"question\": \"" + voiceInput + "\"}",
       headers: {
@@ -132,7 +132,7 @@ async function generate(): Promise<void> {
             <div className='btn-container'>
                 <button className="listen-btn large-btn"   onClick={doListen} >{listenBtn}</button>
                 <button className='generate-btn large-btn' onClick={generate} >Generate</button>
-                <button className='play-btn large-btn'     onClick={speak}    >Speak</button>
+                <button className='play-btn large-btn'     onClick={handleSpeak}    >Speak</button>
                 <button className='clear-btn large-btn'    onClick={clear}    >Clear</button>
 
             </div>
