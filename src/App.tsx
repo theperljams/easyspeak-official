@@ -66,7 +66,7 @@ const App: React.FC = () => {
       try {
         const res = await fetch(SERVER_URL + "/speak", {
           method: 'POST',
-          body: JSON.stringify({ e_string: responseValue }), // Assuming you want to send inputstr as a JSON payload
+          body: "{\"question\": \"" + responseValue + "\"}", 
           headers: {
             'Content-Type': 'application/json',
             'accept': 'audio/wav'
@@ -75,8 +75,11 @@ const App: React.FC = () => {
     
         if (res.status === 200) {
           const audioData = await res.arrayBuffer();
+          console.log(audioData);
           const audioBlob = new Blob([audioData], { type: 'audio/wav' });
+          console.log(audioBlob);
           const audioUrl = URL.createObjectURL(audioBlob);
+          console.log(audioUrl);
     
           // Now you can use audioUrl to play the received WAV data
           // For example, you can set it as the source for an <audio> element

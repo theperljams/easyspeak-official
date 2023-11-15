@@ -104,10 +104,12 @@ async def transcribe(websocket: WebSocket):
 @cool_app.post("/speak")
 async def audio(response: Question):
     synthesiser = pipeline("text-to-speech", "suno/bark-small")
+    print("Response: ", response.question)
     speech = synthesiser(response.question, forward_params={"do_sample": True})
 
     wav_bytes_io = io.BytesIO()
     scipy.io.wavfile.write("bark_out.wav", rate=speech["sampling_rate"], data=speech["audio"])
     wav_bytes = wav_bytes_io.getvalue()
+    print("Wav bytes: ", wav_bytes)
     wav_bytes_io.close()
     return wav_bytes
