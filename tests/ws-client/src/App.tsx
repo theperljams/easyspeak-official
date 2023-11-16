@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import './App.css';
 
-const WEBSOCKET_URL = 'ws://0.0.0.0:8000/ws';
+const WEBSOCKET_URL = 'ws://0.0.0.0:8000/transcribe';
 
 const MinimalClient: React.FC = () => {
   const [listenBtn, setListenBtn] = useState('Start Listening');
@@ -30,6 +30,7 @@ const MinimalClient: React.FC = () => {
         const transcriptionResult = event.data;
         console.log('Transcription Result:', transcriptionResult);
         setTranscription((prevTranscription) => prevTranscription + ' ' + transcriptionResult);
+        socket.send('ACK'); // Send acknowledgement back to server
       };
 
       socket.onclose = (event) => {

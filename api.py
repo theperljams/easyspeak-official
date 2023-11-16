@@ -14,7 +14,7 @@ from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 
 import os
-from fastapi import WebSocket
+from fastapi import WebSocket, WebSocketDisconnect
 from bark import SAMPLE_RATE, generate_audio, preload_models
 from scipy.io.wavfile import write as write_wav
 import io
@@ -86,21 +86,23 @@ async def query_chain(question: Question):
 
 @cool_app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
-    text_queue = cool_app.text_queue
-    if not text_queue.empty():
-        await websocket.accept()
-        while not text_queue.empty():
-            transcription = text_queue.get()
-            print("Transcription: ", transcription)
-            if transcription != '':
-                await websocket.send_text(transcription)
-            else:
-                continue
-    else:
-        # await websocket.accept()
-        # await websocket.send_text("Waiting for transcription...")
-        print("Transcribing...")
-
+    await websocket.accept()
+    try:
+        while True:
+            text = ""
+            while not cool_app.text_queue.empty():
+                part = cool_app.text_queue.get()
+                text += " " + part
+                print(f"[WEB]:\t Got {part}")
+            if text:
+                print(f"[WEB]:\t Sending: {text}")
+                await websocket.send_text(text.strip())
+                await websocket.receive()
+    except WebSocketDisconnect:
+        print(f"[WEB]:\t Closed Socket")
+        await websocket.close()
+    
+           
 @cool_app.post("/speak")
 async def audio(response: Question):
     synthesiser = pipeline("text-to-speech", "suno/bark-small")

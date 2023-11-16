@@ -37,6 +37,7 @@ const App: React.FC = () => {
           const transcriptionResult = event.data;
           console.log('Transcription Result:', transcriptionResult);
           setVoiceInput((prevInput) => prevInput + transcriptionResult);
+          socket.send('ACK'); // Send acknowledgement back to server
         };
   
         socket.onclose = (event) => {
