@@ -5,7 +5,7 @@ import numpy as np
 import time
 import os
 
-#os.environ["SUNO_OFFLOAD_CPU"] = "True"
+os.environ["SUNO_OFFLOAD_CPU"] = "False"
 os.environ["SUNO_USE_SMALL_MODELS"] = "1"
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -13,8 +13,8 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 modelname = "suno/bark-small"
 #modelname = "suno/bark"
 processor = AutoProcessor.from_pretrained(modelname)
-#model = BarkModel.from_pretrained(modelname, torch_dtype=torch.float16)
-model = BarkModel.from_pretrained(modelname, torch_dtype=torch.float16, use_flash_attention_2=True)
+model = BarkModel.from_pretrained(modelname, torch_dtype=torch.float16)
+# model = BarkModel.from_pretrained(modelname, torch_dtype=torch.float16, use_flash_attention_2=True)
 #model = BarkModel.from_pretrained(modelname)
 
 model.to(device)

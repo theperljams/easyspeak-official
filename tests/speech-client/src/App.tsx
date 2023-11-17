@@ -23,6 +23,7 @@ const SpeakClient: React.FC = () => {
         const audioUrl = URL.createObjectURL(audioBlob);
 
         setAudioURL(audioUrl);
+        console.log('Audio URL:', audioUrl);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -41,7 +42,7 @@ const SpeakClient: React.FC = () => {
         <div>
           {audioURL && (
             <audio autoPlay key={audioURL}>
-              <source src={audioURL} type='audio/mpeg' />
+              <source src={audioURL} type='audio/wav' />
             </audio>
           )}
         </div>
