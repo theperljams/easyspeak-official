@@ -95,7 +95,7 @@ def run_threads(config):
 
     while not sc.killed:
         sleep(1)
-        print("Queues: ", aq.qsize(), tq.qsize())
+        # print("Queues: ", aq.qsize(), tq.qsize())
 
     print("Killing processes")
     rp.kill()

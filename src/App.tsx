@@ -36,7 +36,7 @@ const App: React.FC = () => {
           // Handle incoming transcription results
           const transcriptionResult = event.data;
           console.log('Transcription Result:', transcriptionResult);
-          setVoiceInput((prevInput) => prevInput + transcriptionResult);
+          setVoiceInput((prevInput) => prevInput + ' ' + transcriptionResult);
           socket.send('ACK'); // Send acknowledgement back to server
         };
   
@@ -65,27 +65,23 @@ const App: React.FC = () => {
 
     const handleSpeak = async () => {
       try {
-        const res = await fetch(SERVER_URL + "/speak", {
+        const res = await fetch(SERVER_URL + '/speak', {
           method: 'POST',
-          body: "{\"question\": \"" + responseValue + "\"}", 
+          body: JSON.stringify({ question: responseValue }),
           headers: {
             'Content-Type': 'application/json',
-            'accept': 'audio/wav'
+            accept: 'audio/wav',
           },
         });
-    
+  
         if (res.status === 200) {
           const audioData = await res.arrayBuffer();
-          console.log(audioData);
           const audioBlob = new Blob([audioData], { type: 'audio/wav' });
-          console.log(audioBlob);
           const audioUrl = URL.createObjectURL(audioBlob);
-          console.log(audioUrl);
-    
-          // Now you can use audioUrl to play the received WAV data
-          // For example, you can set it as the source for an <audio> element
+  
           setAudioURL(audioUrl);
-        } 
+          console.log('Audio URL:', audioUrl);
+        }
       } catch (error) {
         console.error('Error:', error);
       }

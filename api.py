@@ -15,12 +15,17 @@ from langchain.prompts import PromptTemplate
 
 import os
 from fastapi import WebSocket, WebSocketDisconnect
-from bark import SAMPLE_RATE, generate_audio, preload_models
 from scipy.io.wavfile import write as write_wav
 import io
 
-os.environ["SUNO_OFFLOAD_CPU"] = "True"
-os.environ["SUNO_USE_SMALL_MODELS"] = "True"
+from transformers import AutoProcessor, BarkModel
+import torch
+import sounddevice as sd
+import time
+import numpy as np
+
+# os.environ["SUNO_OFFLOAD_CPU"] = "True"
+# os.environ["SUNO_USE_SMALL_MODELS"] = "True"
 
 dotenv.load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
@@ -101,17 +106,66 @@ async def transcribe(websocket: WebSocket):
     except WebSocketDisconnect:
         print(f"[WEB]:\t Closed Socket")
         await websocket.close()
-    
-           
+
+
 @cool_app.post("/speak")
 async def audio(response: Question):
-    synthesiser = pipeline("text-to-speech", "suno/bark-small")
-    print("Response: ", response.question)
-    speech = synthesiser(response.question, forward_params={"do_sample": True})
+    os.environ["SUNO_OFFLOAD_CPU"] = "False"
+    os.environ["SUNO_USE_SMALL_MODELS"] = "1"
 
-    wav_bytes_io = io.BytesIO()
-    scipy.io.wavfile.write("bark_out.wav", rate=speech["sampling_rate"], data=speech["audio"])
-    wav_bytes = wav_bytes_io.getvalue()
-    print("Wav bytes: ", wav_bytes)
-    wav_bytes_io.close()
-    return wav_bytes
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    modelname = "suno/bark-small"
+    #modelname = "suno/bark"
+    processor = AutoProcessor.from_pretrained(modelname)
+    model = BarkModel.from_pretrained(modelname, torch_dtype=torch.float16)
+    # model = BarkModel.from_pretrained(modelname, torch_dtype=torch.float16, use_flash_attention_2=True)
+    #model = BarkModel.from_pretrained(modelname)
+
+    model.to(device)
+
+    voice_preset = "v2/en_speaker_7"
+
+    # Measure the time to generate inputs
+    start_time_inputs = time.time()
+    inputs = processor(response.question, voice_preset=voice_preset)
+    end_time_inputs = time.time()
+
+    # Move inputs to the specified device
+    inputs = {key: value.to(device) for key, value in inputs.items()}
+
+    # Measure the time to generate audio_array
+    start_time_generate = time.time()
+    audio_array = model.generate(**inputs)
+    end_time_generate = time.time()
+
+    audio_array = audio_array.cpu().numpy().squeeze()
+    audio_array = audio_array.astype(np.float64)
+
+    sample_rate = model.generation_config.sample_rate
+
+    # Print timing information
+    print("Time to generate inputs:", end_time_inputs - start_time_inputs, "seconds")
+    print("Time to generate audio_array:", end_time_generate - start_time_generate, "seconds")
+
+    print(audio_array.shape)
+    print(audio_array.dtype)
+    print(sample_rate)
+
+    sd.play(audio_array, sample_rate)
+    status = sd.wait()
+
+    
+           
+# @cool_app.post("/speak")
+# async def audio(response: Question):
+#     synthesiser = pipeline("text-to-speech", "suno/bark-small")
+#     print("Response: ", response.question)
+#     speech = synthesiser(response.question, forward_params={"do_sample": True})
+
+#     wav_bytes_io = io.BytesIO()
+#     scipy.io.wavfile.write("bark_out.wav", rate=speech["sampling_rate"], data=speech["audio"])
+#     wav_bytes = wav_bytes_io.getvalue()
+#     print("Wav bytes: ", wav_bytes)
+#     wav_bytes_io.close()
+#     return wav_bytes
