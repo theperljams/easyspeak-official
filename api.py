@@ -12,6 +12,8 @@ from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
+import chromadb
+import csv
 
 import os
 from fastapi import WebSocket, WebSocketDisconnect
@@ -32,15 +34,15 @@ openai_api_key = os.environ.get("OPENAI_API_KEY")
 
 embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
 
-loader = DirectoryLoader('data', glob="**/*.txt")
+loader = DirectoryLoader('data', glob="**/*.csv")
 documents = loader.load()
 
 text_splitter = CharacterTextSplitter(chunk_size=2500, chunk_overlap=0)
 texts = text_splitter.split_documents(documents)
 
-docsearch = Chroma.from_documents(texts, embeddings)
+doc_db = Chroma.from_documents(texts, embeddings, persist_directory="data")
 
-template = """"You are Danny from the context given. Mimic his voice and way of speaking, try to be as convincing as possible. Use the context below to answer questions. Stay in character while answering questions. DO NOT refer to yourself in the third person. If you don't know the answer to something, just say that you don't know.
+template = """"You are Pearl from the context given. Mimic her voice and way of speaking, try to be as convincing as possible. Use the context below to answer questions. Stay in character while answering questions. DO NOT refer to yourself in the third person. DO NOT ask how you can help. If you don't know the answer to something, just say that you don't know.
 
 {context}
 
@@ -53,7 +55,7 @@ langchain.verbose = True
 qa = RetrievalQA.from_chain_type(
     llm=OpenAI(),
     chain_type="stuff",
-    retriever=docsearch.as_retriever(),
+    retriever=doc_db.as_retriever(),
     chain_type_kwargs={"prompt": PROMPT}
  )
 
@@ -84,6 +86,9 @@ class Question(BaseModel):
 async def query_chain(question: Question):
     print(f"Question: {question}")
     query = f"{question.question}"
+    with open("PersonalityQuestions.csv", "a", newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow([query])
     result = qa.run(query=query, verbose=False)
     if result[0] == '\n':
         result = result[1:]
@@ -101,6 +106,10 @@ async def transcribe(websocket: WebSocket):
                 print(f"[WEB]:\t Got {part}")
             if text:
                 print(f"[WEB]:\t Sending: {text}")
+                with open("PersonalityQuestions.csv", "a", newline='') as csvfile:
+                    writer = csv.writer(csvfile)
+                    writer.writerow([text.strip()])
+
                 await websocket.send_text(text.strip())
                 await websocket.receive()
     except WebSocketDisconnect:

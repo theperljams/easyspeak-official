@@ -15,4 +15,4 @@ sounddevice
 git+https://github.com/huggingface/transformers.git
 wheel
 ninja
-flash-attn
+# flash-attn
