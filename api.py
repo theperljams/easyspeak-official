@@ -12,13 +12,11 @@ from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
-import chromadb
 import csv
 
 import os
 from fastapi import WebSocket, WebSocketDisconnect
 from scipy.io.wavfile import write as write_wav
-import io
 
 from transformers import AutoProcessor, BarkModel
 import torch
@@ -40,7 +38,9 @@ documents = loader.load()
 text_splitter = CharacterTextSplitter(chunk_size=2500, chunk_overlap=0)
 texts = text_splitter.split_documents(documents)
 
-doc_db = Chroma.from_documents(texts, embeddings, persist_directory="data")
+# doc_db = Chroma.from_documents(texts, embeddings, persist_directory="data")
+
+docsearch = Chroma.from_documents(texts, embeddings)
 
 template = """"You are Pearl from the context given. Mimic her voice and way of speaking, try to be as convincing as possible. Use the context below to answer questions. Stay in character while answering questions. DO NOT refer to yourself in the third person. DO NOT ask how you can help. If you don't know the answer to something, just say that you don't know.
 
@@ -51,11 +51,12 @@ Answer: """
 
 PROMPT = PromptTemplate(template=template, input_variables=["context", "question"])
 
-langchain.verbose = True
+langchain.debug = True
+#debug
 qa = RetrievalQA.from_chain_type(
     llm=OpenAI(),
     chain_type="stuff",
-    retriever=doc_db.as_retriever(),
+    retriever=docsearch.as_retriever(),
     chain_type_kwargs={"prompt": PROMPT}
  )
 
@@ -86,9 +87,6 @@ class Question(BaseModel):
 async def query_chain(question: Question):
     print(f"Question: {question}")
     query = f"{question.question}"
-    with open("PersonalityQuestions.csv", "a", newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow([query])
     result = qa.run(query=query, verbose=False)
     if result[0] == '\n':
         result = result[1:]
@@ -97,6 +95,7 @@ async def query_chain(question: Question):
 @cool_app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
     await websocket.accept()
+    # cool_app.is_listening = True
     try:
         while True:
             text = ""
@@ -106,10 +105,6 @@ async def transcribe(websocket: WebSocket):
                 print(f"[WEB]:\t Got {part}")
             if text:
                 print(f"[WEB]:\t Sending: {text}")
-                with open("PersonalityQuestions.csv", "a", newline='') as csvfile:
-                    writer = csv.writer(csvfile)
-                    writer.writerow([text.strip()])
-
                 await websocket.send_text(text.strip())
                 await websocket.receive()
     except WebSocketDisconnect:
@@ -117,7 +112,18 @@ async def transcribe(websocket: WebSocket):
         await websocket.close()
 
 
-@cool_app.post("/speak")
+@cool_app.post("/speak") 
+async def handle_audio(response: Question):
+    with open("./data/Personality Questions.csv", "a", newline='') as csvfile:
+                    writer = csv.writer(csvfile)
+                    writer.writerow([response.question])
+
+    if cool_app.speak:
+        await audio(response)
+    else:
+        print("Speech: ", response.question)
+    
+
 async def audio(response: Question):
     os.environ["SUNO_OFFLOAD_CPU"] = "False"
     os.environ["SUNO_USE_SMALL_MODELS"] = "1"
@@ -125,14 +131,16 @@ async def audio(response: Question):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     modelname = "suno/bark-small"
-    #modelname = "suno/bark"
+
     processor = AutoProcessor.from_pretrained(modelname)
     model = BarkModel.from_pretrained(modelname, torch_dtype=torch.float16)
+
+
+    #modelname = "suno/bark"
     # model = BarkModel.from_pretrained(modelname, torch_dtype=torch.float16, use_flash_attention_2=True)
     #model = BarkModel.from_pretrained(modelname)
 
     model.to(device)
-
     voice_preset = "v2/en_speaker_7"
 
     # Measure the time to generate inputs
@@ -163,8 +171,7 @@ async def audio(response: Question):
 
     sd.play(audio_array, sample_rate)
     status = sd.wait()
-
-    
+     
            
 # @cool_app.post("/speak")
 # async def audio(response: Question):
