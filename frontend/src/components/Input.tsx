@@ -18,7 +18,7 @@ const Input = () => {
             padding: '10px',
 
         }}>
-            <CircleWithIcon icon={Pencil} clicked={openKeyboard} />
+            {/*<CircleWithIcon icon={Pencil} clicked={openKeyboard} />*/}
             <input type={'text'} style={{
                 fontSize: '.5em',
                 borderRadius: '15px',
