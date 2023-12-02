@@ -4,7 +4,9 @@ import CircleWithIcon from "./CircleWithIcon";
 const Input = () => {
 
     const openKeyboard = () => { }
-    const send = () => { }
+    const send = () => {
+        alert('You should probably change this!')
+    }
 
     return (
         <div style={{
