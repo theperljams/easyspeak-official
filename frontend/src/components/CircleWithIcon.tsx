@@ -1,5 +1,5 @@
-import React, {CSSProperties, FC} from 'react';
-
+import React, { CSSProperties, FC } from 'react';
+import styles from './CircleWithIcon.module.css';
 interface CircleWithIconProps {
     icon: string; // Path to the SVG file
 }
@@ -9,31 +9,23 @@ const CircleWithIcon: FC<CircleWithIconProps> = ({ icon }) => {
         width: '75px',
         height: '75px',
         borderRadius: '50%',
-        overflow: 'hidden',
         backgroundColor: '#007AFF',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-    };
-
-    const iconContainerStyle = {
-        width: '80%',
-        height: '80%',
         overflow: 'hidden',
+        cursor: 'pointer',
     };
 
     const iconStyle: CSSProperties = {
         width: '100%',
         height: '100%',
-        objectFit: 'cover',
-        borderRadius: '50%',
+        objectFit: 'contain',
     };
 
     return (
-        <div style={containerStyle}>
-            <div style={iconContainerStyle}>
-                <img src={icon} alt="icon" style={iconStyle} />
-            </div>
+        <div className={styles.hover_darken} style={containerStyle} onClick={clicked}>
+            <img src={icon} alt="icon" style={iconStyle} />
         </div>
     );
 };
