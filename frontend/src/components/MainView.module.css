@@ -2,14 +2,16 @@
 /* Main Container Grid */
 .layout {
 
-    border: 1px solid white;
+    /*border: 1px solid white;*/
+
+    background-color: #F7F7F7;
 
     height: 100%;
 
     display: grid;
     grid-template-columns: 1.4fr 0.6fr;
     grid-template-rows: 0.3fr 2.4fr 0.3fr;
-    gap: 3px 3px;
+    gap: 2px 1px;
     grid-auto-flow: row;
     grid-template-areas:
     "options responses-label"
@@ -33,7 +35,6 @@
 
 .grid_conversation {
     grid-area: conversation;
-    background-color: blue;
 }
 
 .grid_options {
