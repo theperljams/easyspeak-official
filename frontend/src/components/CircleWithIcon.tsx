@@ -10,7 +10,7 @@ const CircleWithIcon: FC<CircleWithIconProps> = ({ icon }) => {
         height: '75px',
         borderRadius: '50%',
         overflow: 'hidden',
-        backgroundColor: '#3498db',
+        backgroundColor: '#007AFF',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
