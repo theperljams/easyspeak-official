@@ -1,6 +1,7 @@
 import styles from './MainView.module.css';
 import Options from "./Options";
 import Input from "./Input";
+import Responses from "./Responses";
 
 const MainView = () => {
     return (
@@ -10,7 +11,9 @@ const MainView = () => {
                 <div className={styles.grid_options}>
                     <Options />
                 </div>
-                <div className={styles.grid_responses}></div>
+                <div className={styles.grid_responses}>
+                    <Responses />
+                </div>
                 <div className={styles.grid_responsesLabel}>Responses</div>
             </div>
     );
