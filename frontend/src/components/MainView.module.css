@@ -29,8 +29,6 @@
 .grid_input {
     grid-area: input;
 
-    background-color: aqua;
-
 }
 
 .grid_conversation {
