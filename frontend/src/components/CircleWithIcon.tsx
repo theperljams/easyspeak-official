@@ -2,11 +2,12 @@ import React, { CSSProperties, FC } from 'react';
 import styles from './CircleWithIcon.module.css';
 interface CircleWithIconProps {
     icon: string; // Path to the SVG file
+    clicked?: () => void;
 }
 
-const CircleWithIcon: FC<CircleWithIconProps> = ({ icon }) => {
-    const containerStyle = {
-        width: '75px',
+const CircleWithIcon: FC<CircleWithIconProps> = ({ icon, clicked }) => {
+    const containerStyle: CSSProperties = {
+        width: '85px',
         height: '75px',
         borderRadius: '50%',
         backgroundColor: '#007AFF',
