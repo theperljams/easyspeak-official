@@ -91,8 +91,7 @@ def mp_speech_thread(config, generated_queue, speech_queue, threaded=True):
             txt = generated_queue.get()
             wav_data = speecher.synthesize(txt)
             # we have the wav data, but we don't want to send it to the client yet
-            speech_queue.put(wav_data)
-            print("wav data: ", len(wav_data))
+            #speech_queue.put(wav_data)
         except BaseException as e:
             s = {'failure':'mp_speech_thread() failed', 'error': e}
             print(s)
@@ -160,7 +159,7 @@ def selftest(queues, config):
     if not queues['speech_queue'].empty():
         wav_data = queues['speech_queue'].get()
         with open('tests/output.wav', 'wb') as f:
-            f.write(wav_data.read())
+            f.write(wav_data)
 
 
 if __name__ == "__main__":
