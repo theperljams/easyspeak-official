@@ -44,4 +44,7 @@ class Recorder:
             wav_data = io.BytesIO(wav)
         print("wav data recorded")
         print("converted audio and wav data")
-        return wav_data
+        # converts the file like object to bytes
+        output = wav_data.getvalue()
+        wav_data.close()
+        return output
