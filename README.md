@@ -18,4 +18,8 @@
 1. If this is your first time, run `npm install`
 2. Just run `npm start`
 
+**Notes**:
+If you run into issues running pyaudio, try installing this `sudo apt-get install portaudio19-dev`
+If torch takes too long to install, try installing it this way `pip3 install torch --index-url=https://pypi.org/simple/`
+
 The app should run on http://localhost:3000
