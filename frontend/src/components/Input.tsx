@@ -2,6 +2,10 @@ import Pencil from '../assets/pencil-solid.svg';
 import Send from '../assets/paper-plane-regular.svg';
 import CircleWithIcon from "./CircleWithIcon";
 const Input = () => {
+
+    const openKeyboard = () => { }
+    const send = () => { }
+
     return (
         <div style={{
             display: 'flex',
@@ -14,7 +18,7 @@ const Input = () => {
             padding: '10px',
 
         }}>
-            <CircleWithIcon icon={Pencil} />
+            <CircleWithIcon icon={Pencil} clicked={openKeyboard} />
             <input type={'text'} style={{
                 fontSize: '.5em',
                 borderRadius: '15px',
@@ -23,7 +27,7 @@ const Input = () => {
                 height: '75%',
                 width: '100%',
             }}/>
-            <CircleWithIcon icon={Send} />
+            <CircleWithIcon icon={Send} clicked={send} />
         </div>
     )
 }
