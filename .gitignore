@@ -1,7 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-node_modules
 /.pnp
 .pnp.js
 
@@ -20,11 +19,6 @@ models/
 .env.test.local
 .env.production.local
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-package-lock.json
 # for the openai api key should contain:
 # { "apikey": "SUPERSECRETKEY" }
 /src/openAIkey.json
