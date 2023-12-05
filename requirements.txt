@@ -22,3 +22,4 @@ piper-tts
 # these do not work on my machine for the cuda stuff but CPU is enough for now
 #onnxruntime-gpu
 #nvidia_cublas_cu11
+

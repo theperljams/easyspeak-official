@@ -29,6 +29,8 @@ class SignalCatcher:
         print(f"Caught {signal.strsignal(signum)} signal")
         self.killed = True
 
+cool_app = api.cool_app
+# cool_app.is_listening = False
 
 def mp_transcribe_thread(config, audio_queue, text_queue, threaded=True):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -99,7 +101,6 @@ def mp_speech_thread(config, generated_queue, speech_queue, threaded=True):
         if not threaded:
             break
 
-
 def mp_server_thread(config, text_queue):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
@@ -107,7 +108,6 @@ def mp_server_thread(config, text_queue):
     cool_app = api.cool_app
     cool_app.text_queue = text_queue
     uvicorn.run(cool_app, host='0.0.0.0', port=8000, ws='websockets')
-
 
 def run_threads(queues, config):
     """
@@ -123,7 +123,7 @@ def run_threads(queues, config):
     gq = queues['generated_queue']
     sq = queues['speech_queue']
     # cq = mp.Queue()    # completion queue
-
+    
     rp = mp.Process(target=mp_recorder_thread, name="mp_recorder_thread", args=(config, aq,))
     rp.start()
     tp = mp.Process(target=mp_transcribe_thread, name="mp_transcribe_thread", args=(config, aq, tq,))
@@ -178,14 +178,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # hack to get around multiprocessing not working with torch
-    torch.multiprocessing.set_start_method('spawn')
-    audio_queue = mp.Queue()
-    text_queue = mp.Queue()
-    generated_queue = mp.Queue()
-    speech_queue = mp.Queue()
-    queues = {
-        'audio_queue': audio_queue,
-        'text_queue': text_queue,
         'generated_queue': generated_queue,
         'speech_queue': speech_queue,
     }
