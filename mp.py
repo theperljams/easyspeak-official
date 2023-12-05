@@ -25,6 +25,8 @@ class SignalCatcher:
         print(f"Caught {signal.strsignal(signum)} signal")
         self.killed = True
 
+cool_app = api.cool_app
+# cool_app.is_listening = False
 
 def mp_transcribe_thread(audio_queue, text_queue):
     
@@ -64,12 +66,12 @@ def mp_recorder_thread(audio_queue):
             s = {'failure':'mp_recorder_thread() failed', 'error': e}
             print(s)
 
-def mp_server_thread(tq):
+def mp_server_thread(tq, speak):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
     signal.signal(signal.SIGHUP, signal.SIG_IGN)
-    cool_app = api.cool_app
     cool_app.text_queue = tq
+    cool_app.speak = speak
     uvicorn.run(cool_app, host='127.0.0.1', port=8000, ws='websockets')
 
 
@@ -83,14 +85,15 @@ def run_threads(config):
     sc = SignalCatcher()
 
     aq = config['audio_queue']  
-    tq = config['text_queue']   
+    tq = config['text_queue']  
+    speak = config['speak'] 
     # cq = mp.Queue()    # completion queue
 
     rp = mp.Process(target=mp_recorder_thread, name="mp_recorder_thread", args=(aq,))
     rp.start()
     ap = mp.Process(target=mp_transcribe_thread, name="mp_transcribe_thread", args=(aq, tq,))
     ap.start()
-    cp = mp.Process(target=mp_server_thread, name="mp_server_thread", args=(tq,))
+    cp = mp.Process(target=mp_server_thread, name="mp_server_thread", args=(tq, speak,))
     cp.start()
 
     while not sc.killed:
@@ -106,11 +109,17 @@ def run_threads(config):
 
 if __name__ == "__main__":
     import torch
+    import argparse
     torch.multiprocessing.set_start_method('spawn')
+    parser = argparse.ArgumentParser(description="Speak or not speak.")
+    
+    parser.add_argument('--speak', action='store_true', help='Enable speaking')
+    args = parser.parse_args()
     audio_queue = mp.Queue()
     text_queue = mp.Queue()
     config = {
         'audio_queue': audio_queue,
         'text_queue': text_queue,
+        'speak': args.speak
     }
     run_threads(config)
