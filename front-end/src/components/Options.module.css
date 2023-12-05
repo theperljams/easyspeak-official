@@ -1,0 +1,21 @@
+.vertically_centered_children_row {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+}
+
+.vertically_centered_children_column {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+}
+
+/*
+.listen_toggle:hover {
+    background-color: #0063cc;
+}
+*/
