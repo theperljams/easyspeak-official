@@ -5,9 +5,10 @@
 	"type": "module",
 	"author": "Paul Hathaway, Justin McBride",
 	"scripts": {
+		"lint": "eslint .",
+		"test": "vitest",
 		"dev": "vite",
 		"build": "tsc && vite build",
-		"lint": "eslint .",
 		"preview": "vite preview"
 	},
 	"dependencies": {
@@ -16,6 +17,7 @@
 		"web-vitals": "^3.5.0"
 	},
 	"devDependencies": {
+		"@types/node": "^20.10.3",
 		"@types/react": "^18.2.42",
 		"@types/react-dom": "^18.2.17",
 		"@typescript-eslint/eslint-plugin": "^6.13.2",
