@@ -178,6 +178,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # hack to get around multiprocessing not working with torch
+    torch.multiprocessing.set_start_method('spawn')
+    audio_queue = mp.Queue()
+    text_queue = mp.Queue()
+    generated_queue = mp.Queue()
+    speech_queue = mp.Queue()
+    queues = {
+        'audio_queue': audio_queue,
+        'text_queue': text_queue,
         'generated_queue': generated_queue,
         'speech_queue': speech_queue,
     }
