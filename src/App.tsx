@@ -5,7 +5,7 @@ import dospeak from './speak';
 
 const SERVER_URL = `http://0.0.0.0:8000`;
 
-const WEBSOCKET_URL = 'ws://0.0.0.0:8000/transcribe';
+const WEBSOCKET_URL = 'ws://0.0.0.0:8000';
 
 const App: React.FC = () => {
     const [voiceInput, setVoiceInput] = useState('');
@@ -24,7 +24,7 @@ const App: React.FC = () => {
         setListenBtn('Listen');
       } else {
         // If not listening, start listening
-        const socket = new WebSocket(WEBSOCKET_URL);
+        const socket = new WebSocket(WEBSOCKET_URL + 'transcribe');
   
         socket.onopen = (event) => {
           console.log('WebSocket connection opened:', event);
@@ -65,27 +65,45 @@ const App: React.FC = () => {
 
     const handleSpeak = async () => {
       try {
-        const res = await fetch(SERVER_URL + '/speak', {
-          method: 'POST',
-          body: JSON.stringify({ question: responseValue }),
-          headers: {
-            'Content-Type': 'application/json',
-            accept: 'audio/wav',
-          },
-        });
-  
-        if (res.status === 200) {
-          const audioData = await res.arrayBuffer();
+        // Initialize a WebSocket connection
+        const socket = new WebSocket(WEBSOCKET_URL + '/speak');
+    
+        // Event handler for when the WebSocket connection is opened
+        socket.onopen = (event) => {
+          console.log('WebSocket connection opened:', event);
+    
+          // Send the question to the server
+          const message = { question: responseValue };
+          socket.send(JSON.stringify(message));
+        };
+    
+        // Event handler for when the WebSocket receives a message
+        socket.onmessage = async (event) => {
+          // Handle incoming audio data
+          const audioData = await event.data.arrayBuffer();
           const audioBlob = new Blob([audioData], { type: 'audio/wav' });
           const audioUrl = URL.createObjectURL(audioBlob);
-  
+    
           setAudioURL(audioUrl);
           console.log('Audio URL:', audioUrl);
-        }
+    
+          // Close the WebSocket connection after receiving the audio
+          socket.close();
+        };
+    
+        // Event handler for when the WebSocket connection is closed
+        socket.onclose = (event) => {
+          if (event.wasClean) {
+            console.log('WebSocket closed cleanly:', event);
+          } else {
+            console.log('WebSocket connection closed unexpectedly:', event);
+          }
+        };
       } catch (error) {
         console.error('Error:', error);
       }
     };
+    
 
 
 

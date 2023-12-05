@@ -93,7 +93,7 @@ def mp_speech_thread(config, generated_queue, speech_queue, threaded=True):
             txt = generated_queue.get()
             wav_data = speecher.synthesize(txt)
             # we have the wav data, but we don't want to send it to the client yet
-            #speech_queue.put(wav_data)
+            speech_queue.put(wav_data)
         except BaseException as e:
             s = {'failure':'mp_speech_thread() failed', 'error': e}
             print(s)
@@ -101,12 +101,14 @@ def mp_speech_thread(config, generated_queue, speech_queue, threaded=True):
         if not threaded:
             break
 
-def mp_server_thread(config, text_queue):
+def mp_server_thread(config, text_queue, speech_queue, generated_queue):
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     signal.signal(signal.SIGTERM, signal.SIG_IGN)
     signal.signal(signal.SIGHUP, signal.SIG_IGN)
     cool_app = api.cool_app
     cool_app.text_queue = text_queue
+    cool_app.speech_queue = speech_queue
+    cool_app.generated_queue = generated_queue
     uvicorn.run(cool_app, host='0.0.0.0', port=8000, ws='websockets')
 
 def run_threads(queues, config):
@@ -130,7 +132,7 @@ def run_threads(queues, config):
     tp.start()
     spchp = mp.Process(target=mp_speech_thread, name="mp_speech_thread", args=(config, gq, sq,))
     spchp.start()
-    srvrp = mp.Process(target=mp_server_thread, name="mp_server_thread", args=(config, tq, gq,))
+    srvrp = mp.Process(target=mp_server_thread, name="mp_server_thread", args=(config, tq, sq, gq,))
     srvrp.start()
 
     while not sc.killed:
