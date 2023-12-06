@@ -6,9 +6,46 @@ import styles from "./Options.module.css";
 
 export function Options () {
 	const [listen, setListen] = useState(false);
+	const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
+	
+
+	const doListen = async () => {
+		if (listen) {
+		  // If already listening, stop listening
+		  webSocket?.close();
+		} else {
+		  // If not listening, start listening
+		  const socket = new WebSocket(WEBSOCKET_URL + '/transcribe');
+	
+		  socket.onopen = (event) => {
+			console.log('WebSocket connection opened:', event);
+		  };
+
+	
+		  socket.onmessage = (event) => {
+			// Handle incoming transcription results
+			const transcriptionResult = event.data;
+			console.log('Transcription Result:', transcriptionResult);
+			setVoiceInput((prevInput) => prevInput + ' ' + transcriptionResult);
+			socket.send('ACK'); // Send acknowledgement back to server
+		  };
+	
+		  socket.onclose = (event) => {
+			if (event.wasClean) {
+			  console.log('WebSocket closed cleanly:', event);
+			} else {
+			  console.log('WebSocket connection closed unexpectedly:', event);
+			}
+		  };
+	
+		  setWebSocket(socket);
+		}
+	  };
+	  
 
 	const toggleListen = () => {
 		setListen(!listen);
+		doListen();
 	};
 
 	return (
