@@ -1,0 +1,25 @@
+uvicorn
+fastapi
+python-dotenv
+langchain
+openai
+chromadb
+tiktoken
+unstructured
+pyaudio
+SpeechRecognition
+--extra-index-url https://download.pytorch.org/whl/cu116
+torch
+git+https://github.com/openai/whisper.git
+sounddevice
+git+https://github.com/huggingface/transformers.git
+wheel
+ninja
+#flash-attn
+
+# for the piper-tts model
+piper-tts
+# these do not work on my machine for the cuda stuff but CPU is enough for now
+#onnxruntime-gpu
+#nvidia_cublas_cu11
+
