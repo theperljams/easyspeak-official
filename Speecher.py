@@ -14,7 +14,7 @@ import json
 
 class Speecher:
 
-    def __init__(self, model="en_US-amy-medium", use_cuda=False, play_audio=True, download_dir="./models/piper"):
+    def __init__(self, model="en_US-amy-medium", use_cuda=False, play_audio=False, download_dir="./models/piper"):
         self.model = model
         self.config = None
         self.sample_rate = None
@@ -81,9 +81,9 @@ class Speecher:
         for audio_bytes in audio_stream:
             c = np.frombuffer(audio_bytes, dtype=np.int16)
             # optionally play audio
-            if self.play_audio:
-                sd.play(c, samplerate=self.sample_rate)
-                sd.wait()
+            # if self.play_audio:
+            #     sd.play(c, samplerate=self.sample_rate)
+            #     sd.wait()
             # write data to wav file
             wave_file.writeframes(audio_bytes)
         wave_file.close()

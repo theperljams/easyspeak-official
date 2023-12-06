@@ -30,7 +30,7 @@ dotenv.load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 
 embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
-loader = MyDataLoader('../data/data_with_prefixes.csv')
+loader = MyDataLoader('data/data_with_prefixes.csv')
 documents = loader.split_by_rows()
 # for doc in documents:
 #     print(doc)
@@ -40,6 +40,7 @@ for doc in documents:
     # print(curr_doc)
     docs.append(curr_doc)
 
+print("created docs", len(docs))
 
 ids = [str(i) for i in range(1, len(docs) + 1)]
 
@@ -55,6 +56,7 @@ If you don't know the answer to something, just say that you don't know.
 User: {question}
 Pearl: """
 PROMPT = PromptTemplate(template=template, input_variables=["context", "question"])
+print("created prompt")
 
 # langchain.debug = True
 qa = RetrievalQA.from_chain_type(
@@ -100,7 +102,6 @@ async def query_chain(question: Question):
 @cool_app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
     await websocket.accept()
-    # cool_app.is_listening = True
     try:
         while True:
             text = ""
@@ -123,7 +124,7 @@ async def handle_audio(websocket: WebSocket):
 
     try:
         while True:
-            audio_data = b""  # Initialize audio_data
+            audio_data = b"" 
 
             while not cool_app.speech_queue.empty():
                 audio_part = cool_app.speech_queue.get()
@@ -132,7 +133,7 @@ async def handle_audio(websocket: WebSocket):
 
             if audio_data:
                 print("[WEB]:\t Sending audio")
-                await websocket.send_data(audio_data)
+                await websocket.send_bytes(audio_data)
                 await websocket.receive()
 
     except WebSocketDisconnect:

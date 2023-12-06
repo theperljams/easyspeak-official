@@ -24,7 +24,7 @@ const App: React.FC = () => {
         setListenBtn('Listen');
       } else {
         // If not listening, start listening
-        const socket = new WebSocket(WEBSOCKET_URL + 'transcribe');
+        const socket = new WebSocket(WEBSOCKET_URL + '/transcribe');
   
         socket.onopen = (event) => {
           console.log('WebSocket connection opened:', event);
