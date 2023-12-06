@@ -12,6 +12,8 @@ from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
+from learning.MyDataLoader import MyDataLoader
+from langchain.docstore.document import Document
 import csv
 
 import os
@@ -24,35 +26,39 @@ import sounddevice as sd
 import time
 import numpy as np
 
-# os.environ["SUNO_OFFLOAD_CPU"] = "True"
-# os.environ["SUNO_USE_SMALL_MODELS"] = "True"
-
 dotenv.load_dotenv()
 openai_api_key = os.environ.get("OPENAI_API_KEY")
 
 embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
+loader = MyDataLoader('data/data_with_prefixes.csv')
+documents = loader.split_by_rows()
+# for doc in documents:
+#     print(doc)
+docs = []
+for doc in documents:
+    curr_doc = Document(page_content=doc, metadata={"source": "../data/data_with_prefixes.csv"})
+    # print(curr_doc)
+    docs.append(curr_doc)
 
-loader = DirectoryLoader('data', glob="**/*.csv")
-documents = loader.load()
+print("created docs", len(docs))
 
-text_splitter = CharacterTextSplitter(chunk_size=2500, chunk_overlap=0)
-texts = text_splitter.split_documents(documents)
+ids = [str(i) for i in range(1, len(docs) + 1)]
 
-# doc_db = Chroma.from_documents(texts, embeddings, persist_directory="data")
+docsearch = Chroma.from_documents(docs, embeddings, ids=ids)
 
-docsearch = Chroma.from_documents(texts, embeddings)
-
-template = """"You are Pearl from the context given. Mimic her voice and way of speaking, try to be as convincing as possible. Use the context below to answer questions. Stay in character while answering questions. DO NOT refer to yourself in the third person. DO NOT ask how you can help. If you don't know the answer to something, just say that you don't know.
+template = """"You are Pearl from the context given. Mimic her voice and way of speaking, try to be as convincing as possible. Use the context below to answer questions. Answer each question as if you were Pearl. 
+Assume any question you are asked is a question you are answering for Pearl. You = Pearl. For example, if someone asks: \"What you are studying?\" think of the question as: \"What does Pearl say she is studying?\"
+Stay in character while answering questions. DO NOT refer to yourself in the third person. DO NOT ask how you can help. 
+If you don't know the answer to something, just say that you don't know.
 
 {context}
 
-Question: {question}
-Answer: """
-
+User: {question}
+Pearl: """
 PROMPT = PromptTemplate(template=template, input_variables=["context", "question"])
+print("created prompt")
 
-langchain.debug = True
-#debug
+# langchain.debug = True
 qa = RetrievalQA.from_chain_type(
     llm=OpenAI(),
     chain_type="stuff",
@@ -90,12 +96,12 @@ async def query_chain(question: Question):
     result = qa.run(query=query, verbose=False)
     if result[0] == '\n':
         result = result[1:]
+    cool_app.generated_queue.put(result)
     return result
 
 @cool_app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
     await websocket.accept()
-    # cool_app.is_listening = True
     try:
         while True:
             text = ""
@@ -112,16 +118,27 @@ async def transcribe(websocket: WebSocket):
         await websocket.close()
 
 
-@cool_app.post("/speak") 
-async def handle_audio(response: Question):
-    with open("./data/Personality Questions.csv", "a", newline='') as csvfile:
-                    writer = csv.writer(csvfile)
-                    writer.writerow([response.question])
+@cool_app.websocket("/speak") 
+async def handle_audio(websocket: WebSocket):
+    await websocket.accept()
 
-    if cool_app.speak:
-        await audio(response)
-    else:
-        print("Speech: ", response.question)
+    try:
+        while True:
+            audio_data = b"" 
+
+            while not cool_app.speech_queue.empty():
+                audio_part = cool_app.speech_queue.get()
+                audio_data += audio_part
+                print("[WEB]:\t Got audio")
+
+            if audio_data:
+                print("[WEB]:\t Sending audio")
+                await websocket.send_bytes(audio_data)
+                await websocket.receive()
+
+    except WebSocketDisconnect:
+        print(f"[WEB]:\t Closed Socket")
+        await websocket.close()
     
 
 async def audio(response: Question):
