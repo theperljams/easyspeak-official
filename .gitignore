@@ -5,7 +5,6 @@
 .pnp.js
 
 models/
-og-frontend/node_modules
 
 # testing
 /coverage
