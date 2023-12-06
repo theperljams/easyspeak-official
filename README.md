@@ -15,8 +15,9 @@
 3. Run the server by running the api script (`python3 mp.py`)
 
 **Terminal 2:**
-1. If this is your first time, run `npm install`
-2. Just run `npm start`
+1. `cd front-end`
+2. If this is your first time, run `npm install`
+3. Just run `npm run dev`
 
 **Notes**:
 If you run into issues running pyaudio, try installing this `sudo apt-get install portaudio19-dev`
