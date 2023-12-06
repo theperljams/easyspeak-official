@@ -1,0 +1,57 @@
+/* Main Container Grid */
+
+.layout {
+
+	/*border: 1px solid white;*/
+
+	background-color: #F7F7F7;
+
+	height: 100%;
+
+	display: grid;
+	grid-template-columns: 1.4fr 0.6fr;
+	grid-template-rows: 0.3fr 2.4fr 0.3fr;
+	gap: 2px 1px;
+	grid-auto-flow: row;
+	grid-template-areas:
+	"options responses-label"
+	"conversation responses"
+	"input input";
+}
+
+.layout > div {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 3em;
+}
+
+.grid_input {
+	grid-area: input;
+
+}
+
+.grid_conversation {
+	grid-area: conversation;
+}
+
+.grid_options {
+	grid-area: options;
+	background-color: black;
+
+	color: white;
+}
+
+.grid_responses {
+	grid-area: responses;
+	background-color: #D9D9D9;
+}
+
+.grid_responsesLabel {
+	grid-area: responses-label;
+	background-color: black;
+
+	color: white;
+}
+
+/* End Main Container Grid */

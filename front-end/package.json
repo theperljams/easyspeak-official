@@ -1,0 +1,37 @@
+{
+	"name": "front-end",
+	"private": true,
+	"version": "0.1.0",
+	"type": "module",
+	"author": "Paul Hathaway, Justin McBride",
+	"scripts": {
+		"lint": "eslint .",
+		"test": "vitest",
+		"dev": "vite",
+		"build": "tsc && vite build",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"web-vitals": "^3.5.0"
+	},
+	"devDependencies": {
+		"@types/node": "^20.10.3",
+		"@types/react": "^18.2.42",
+		"@types/react-dom": "^18.2.17",
+		"@typescript-eslint/eslint-plugin": "^6.13.2",
+		"@typescript-eslint/parser": "^6.13.2",
+		"@vitejs/plugin-react-swc": "^3.5.0",
+		"eslint": "^8.55.0",
+		"typescript": "^5.2.2",
+		"vite": "^5.0.0",
+		"vitest": "^1.0.1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/pearlhulbert/easyspeak-official.git"
+	},
+	"bugs": "https://github.com/pearlhulbert/easyspeak-official/issues",
+	"homepage": "https://github.com/pearlhulbert/easyspeak-official"
+}
