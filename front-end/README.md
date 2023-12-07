@@ -26,7 +26,7 @@ npm install
 
 To see your changes, use
 ```sh
-npm run dev
+npm start
 ```
 and `vite` will host the website locally.
 

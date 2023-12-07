@@ -7,7 +7,7 @@
 	"scripts": {
 		"lint": "eslint .",
 		"test": "vitest",
-		"dev": "vite",
+		"start": "vite",
 		"build": "tsc && vite build",
 		"preview": "vite preview"
 	},
