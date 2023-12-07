@@ -1,26 +1,24 @@
-**How to run locally**
+# Easy Speak
 
-**Prequisites:** 
-1. Create a .env file in the root directory.
-3. Put provided credentials in file
+## Back-end
 
-**To Start**
+1. `cd back-end`
+2. Create a `.env` file and add the provided credentials
+3. If this is your first time running it, run the `setup/venv_setup.sh` script
+4. Activate your virtual environment by running `source venv/bin/activate`
+5. Start the server by running the api script with `python3 mp.py`
 
-1. Start by opening up 2 terminals
-2. cd into easyspeak-official in both
+### Notes
 
-**Terminal 1:**
-1. If this is your first time running it, run the `venv_setup.sh` script
-2. Once you have done that, activate your virtual environment by running source venv/bin/activate
-3. Run the server by running the api script (`python3 mp.py`)
+If you run into issues running `pyaudio`, try installing this `sudo apt-get install portaudio19-dev`
 
-**Terminal 2:**
+If `torch` takes too long to install, try installing it this way `pip3 install torch --index-url=https://pypi.org/simple/`
+
+## Front-end
+
 1. `cd front-end`
 2. If this is your first time, run `npm install`
-3. Just run `npm run dev`
+3. Run the dev server with `npm start`
+4. Click on the `localhost` link in the terminal to view the website
 
-**Notes**:
-If you run into issues running pyaudio, try installing this `sudo apt-get install portaudio19-dev`
-If torch takes too long to install, try installing it this way `pip3 install torch --index-url=https://pypi.org/simple/`
-
-The app should run on http://localhost:3000
+See the [front-end README](./front-end/README.md) for more details.
