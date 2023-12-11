@@ -6,9 +6,11 @@ import { Conversation } from "./Conversation.jsx";
 
 import { useState } from "react";
 
-const MainView = () => {
+export const MainView: React.FC = () => {
+
   const [listen, setListen] = useState(false);
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
+  const [transcription, setTranscription] = useState("");
 
   return (
     <div className={styles.layout}>
@@ -16,10 +18,10 @@ const MainView = () => {
         <Input />
       </div>
       <div className={styles.grid_conversation}>
-        <Conversation />
+        <Conversation transcription={transcription}/>
       </div>
       <div className={styles.grid_options}>
-        <Options listen={listen} setListen={setListen} webSocket={webSocket} setWebSocket={setWebSocket}/>
+        <Options listen={listen} setListen={setListen} webSocket={webSocket} setWebSocket={setWebSocket} transcription={transcription} setTranscription={setTranscription}/>
       </div>
       <div className={styles.grid_responses}>
         <Responses />
@@ -29,4 +31,3 @@ const MainView = () => {
   );
 };
 
-export default MainView;

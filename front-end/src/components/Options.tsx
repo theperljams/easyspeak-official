@@ -1,6 +1,27 @@
 import styles from "./Options.module.css";
+import VolumeHigh from "../assets/volume-high-solid.svg";
+import VolumeMute from "../assets/volume-xmark-solid.svg";
+import { addNewMessage } from "./Conversation";
 
-export function Options({ listen, setListen, webSocket, setWebSocket}) {
+const WEBSOCKET_URL = "ws://0.0.0.0:8000";
+
+type Props = {
+  listen: boolean;
+  setListen: (val: boolean) => void;
+  webSocket: WebSocket | null;
+  setWebSocket: (val: WebSocket | null) => void;
+  transcription: string;
+  setTranscription: (val: string) => void;
+};
+
+export const Options: React.FC<Props> = ({
+  listen,
+  setListen,
+  webSocket,
+  setWebSocket,
+  transcription,
+  setTranscription,
+}) => { 
 	
   const doListen = async () => {
     if (listen) {
@@ -14,11 +35,13 @@ export function Options({ listen, setListen, webSocket, setWebSocket}) {
         console.log("WebSocket connection opened:", event);
       };
 
+      addNewMessage(transcription, "left");
+
       socket.onmessage = (event) => {
         // Handle incoming transcription results
         const transcriptionResult = event.data;
         console.log("Transcription Result:", transcriptionResult);
-        setVoiceInput((prevInput) => prevInput + " " + transcriptionResult);
+        setTranscription(transcription + " " + transcriptionResult);
         socket.send("ACK"); // Send acknowledgement back to server
       };
 
@@ -29,6 +52,8 @@ export function Options({ listen, setListen, webSocket, setWebSocket}) {
           console.log("WebSocket connection closed unexpectedly:", event);
         }
       };
+
+      
 
       setWebSocket(socket);
     }
