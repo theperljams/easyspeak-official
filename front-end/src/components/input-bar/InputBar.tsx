@@ -13,9 +13,9 @@ export function InputBar () {
 	}
 
 	return (
-		<div className={styles.input_bar}>
+		<div className={styles.inputBar}>
 			<InputButton icon={pencil} clicked={openKeyboard} />
-			<input type="text" placeholder="Type anything here..." className={styles.text_box}/>
+			<input type="text" placeholder="Type anything here..." className={styles.textBox}/>
 			<InputButton icon={paperAirplane} clicked={send} />
 		</div>
 	);

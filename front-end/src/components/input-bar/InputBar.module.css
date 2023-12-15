@@ -1,4 +1,4 @@
-.input_bar {
+.inputBar {
 	background-color: #F7F7F7;
 
 	position: fixed;
@@ -31,12 +31,12 @@
 	filter: brightness(0.8);
 }
 
-.button_icon {
+.buttonIcon {
 	width: 45%;
 	height: 45%;
 }
 
-.text_box {
+.textBox {
 	background-color: #E5E5EA;
 	border: none;
 	

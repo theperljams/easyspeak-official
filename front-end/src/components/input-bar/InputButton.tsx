@@ -8,7 +8,7 @@ interface Props {
 export function InputButton ({ icon, clicked }: Props) {
 	return (
 		<div className={styles.button} onClick={clicked}>
-			<img src={icon} alt="icon" className={styles.button_icon} />
+			<img src={icon} alt="icon" className={styles.buttonIcon} />
 		</div>
 	);
 }
