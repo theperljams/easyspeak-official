@@ -1,8 +1,9 @@
-import styles from "./MainView.module.css";
 import { Options } from "./Options.js";
-import { InputBar } from "./input-bar/InputBar.js";
+import { InputBar } from "./InputBar.js";
 import { Responses } from "./Responses.js";
 import { Conversation } from "./Conversation.js";
+
+import styles from "./MainView.module.css";
 
 export function MainView () {
 	return (
