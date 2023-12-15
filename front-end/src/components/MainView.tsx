@@ -23,17 +23,22 @@ export function MainView () {
 			// If not listening, start listening
 			const socket = new WebSocket(WEBSOCKET_URL + "/transcribe");
 
-			socket.onopen = function (event) {
-				console.log("WebSocket connection opened:", event);
+			socket.onerror = function (event) {
+				console.error("WebSocket error:", event);
+				alert("There was an error connecting to the transcription server");
 			};
 
-			setMessages((prevMessages) => [
-				...prevMessages,
-				{
-					message: transcription,
-					side: "left",
-				},
-			]);
+			socket.onopen = function (event) {
+				console.log("WebSocket connection opened:", event);
+
+				setMessages((prevMessages) => [
+					...prevMessages,
+					{
+						message: transcription,
+						side: "left",
+					},
+				]);
+			};
 
 			socket.onmessage = function (event) {
 				// Handle incoming transcription results
@@ -45,15 +50,9 @@ export function MainView () {
 				socket.send("ACK");
 			};
 
-			socket.onclose = function (event) {
-				if (event.wasClean) {
-					console.log("WebSocket closed cleanly:", event);
-				}
-				else {
-					console.log("WebSocket connection closed unexpectedly:", event);
-				}
+			socket.onclose = function () {
+				setListen(false);
 			};
-
 
 			setWebSocket(socket);
 		}
