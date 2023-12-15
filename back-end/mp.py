@@ -6,11 +6,11 @@ import os
 import io
 import sys
 import multiprocessing as mp
-from Transcriber import Transcriber
-from Recorder import Recorder
-from Speecher import Speecher
+from backend.Transcriber import Transcriber
+from backend.Recorder import Recorder
+from backend.Speecher import Speecher
 import uvicorn
-import api
+import backend.api as api
 
 
 class SignalCatcher:

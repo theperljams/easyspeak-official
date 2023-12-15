@@ -38,6 +38,9 @@ jobs:
       
   back-end:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./back-end
 
     steps:
       - name: Checkout repository
