@@ -1,9 +1,9 @@
-interface ChatBubbleProps {
+interface Props {
     side: "left" | "right";
     message: string;
 }
 
-export function ChatBubble ({ side, message }: ChatBubbleProps) {
+export function ChatBubble ({ side, message }: Props) {
 	return (
 		<div style={{
 			display: "flex",
