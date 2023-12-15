@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { ChatBubble } from "./ChatBubble.jsx";
+import { ChatBubble } from "./ChatBubble.js";
 
 /** Type for message, has a message and a side */
 interface Message {
