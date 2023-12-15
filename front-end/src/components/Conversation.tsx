@@ -1,44 +1,16 @@
-import { useState } from "react";
-
 import { ChatBubble } from "./ChatBubble.jsx";
 
-interface Props {
-	transcription: string;
-}
-
 /** Type for message, has a message and a side */
-interface Message {
-    message: string;
-    side: "left" | "right";
+export interface Message {
+	message: string;
+	side: "left" | "right";
 }
 
-const [messages, setMessages] = useState<Message[]>([
-	{
-		message: "I am a chatbot",
-		side: "left",
-	},
-	{
-		message: "I would like to know more about chatbots",
-		side: "right",
-	},
-	{
-		message: "Chatbots are cool",
-		side: "left",
-	},
-]);
+interface Props {
+	messages: Message[];
+}
 
-export const addNewMessage = (newMessage: string, side: "left" | "right") => {
-	setMessages((prevMessages) => [
-		...prevMessages,
-		{
-			message: newMessage,
-			side: side,
-		},
-	]);
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function Conversation ({ transcription }: Props) {
+export function Conversation ({ messages }: Props) {
 	return (
 		<div style={{
 			display: "flex",
