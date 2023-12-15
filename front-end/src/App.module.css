@@ -1,0 +1,20 @@
+.app {
+	width: 100vw;
+	/* Makes the app take up the entire screen height, so the InputBar is on the bottom */
+	height: 100vh;
+
+	display: flex;
+	flex-direction: column;
+	/* Pushes the InputBar to the bottom */
+	justify-content: space-between;
+}
+
+.mainView {
+	/* Makes the view grow to fit the space not used by the InputBar */
+	flex-grow: 1;
+	/* Makes the view shrink instead of hiding the InputBar when the screen height is small */
+	min-height: 0px;
+
+	display: flex;
+	flex-direction: row;
+}

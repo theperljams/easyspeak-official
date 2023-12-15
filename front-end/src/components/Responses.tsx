@@ -54,17 +54,19 @@ export function Responses () {
 	}, []);
 
 	return (
-		<div className={styles.boxContainer}>
-			{responses.map((response, index) => (
-				<input
-					key={index}
-					type="text"
-					className={styles.styledBox}
-					placeholder={`Textbox ${index + 1}`}
-					value={response}
-					readOnly
-				/>
-			))}
+		<div className={styles.responses}>
+			<div className={styles.titleBar}>
+				Responses
+			</div>
+			<div className={styles.responsesList}>
+				{responses.map((response) => (
+					<button
+						className={styles.response}
+					>
+						{response}
+					</button>
+				))}
+			</div>
 		</div>
 	);
 }

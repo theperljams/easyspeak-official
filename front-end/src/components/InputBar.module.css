@@ -1,23 +1,22 @@
 .inputBar {
 	background-color: #F7F7F7;
 
-	position: fixed;
-	bottom: 0;
 	width: 100%;
 	height: 100px;
-	box-sizing: border-box;
+	/* Should always stay the same size */
+	min-height: 100px;
 	padding: 20px;
-	gap: 20px;
+	box-sizing: border-box;
 
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-around;
+	gap: 20px;
 }
 
 .button {
 	background-color: #007AFF;
-	cursor: pointer;
 
 	height: 100%;
 	aspect-ratio: 1/1;
@@ -26,6 +25,8 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
+	cursor: pointer;
 }
 .button:hover {
 	filter: brightness(0.8);
@@ -40,12 +41,11 @@
 	background-color: #E5E5EA;
 	color: #515151;
 	border: none;
+	font-size: 16px;
 	
 	width: 100%;
 	height: 100%;
 	border-radius: 30px;
 	padding-left: 50px;
 	padding-right: 50px;
-
-	font-size: 14px;
 }
