@@ -2,9 +2,9 @@ import { useState } from "react";
 
 import { ChatBubble } from "./ChatBubble.jsx";
 
-type Props = {
+interface Props {
 	transcription: string;
-  };
+}
 
 /** Type for message, has a message and a side */
 interface Message {
@@ -29,17 +29,16 @@ const [messages, setMessages] = useState<Message[]>([
 
 export const addNewMessage = (newMessage: string, side: "left" | "right") => {
 	setMessages((prevMessages) => [
-	  ...prevMessages,
-	  {
-		message: newMessage,
-		side: side,
-	  },
+		...prevMessages,
+		{
+			message: newMessage,
+			side: side,
+		},
 	]);
-  };
-  
+};
 
-export const Conversation: React.FC<Props> =  ({}) => {
-	
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function Conversation ({ transcription }: Props) {
 	return (
 		<div style={{
 			display: "flex",
