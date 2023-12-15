@@ -12,16 +12,12 @@ interface Message {
 export function Chat () {
 	const [messages] = useState<Message[]>([
 		{
-			message: "Hello, I am a chatbot. How can I help you?",
+			message: "How are you doing?",
 			side: "left",
 		},
 		{
-			message: "I would like to know more about chatbots",
+			message: "Doing well, thanks! How about yourself?",
 			side: "right",
-		},
-		{
-			message: "Chatbots are cool",
-			side: "left",
 		},
 	]);
 

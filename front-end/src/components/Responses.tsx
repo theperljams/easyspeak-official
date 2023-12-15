@@ -5,7 +5,12 @@ import styles from "./Responses.module.css";
 const SERVER_URL = "http://0.0.0.0:8000";
 
 export function Responses () {
-	const [responses, setResponses] = useState(["", "", "", ""]);
+	const [responses, setResponses] = useState([
+		"Doing well, thanks! How about yourself?",
+		"I'm great, full of energy today!",
+		"Not bad, just taking things one day at a time.",
+		"Feeling fantastic, so productive!",
+	]);
 
 	async function generate (voiceInput: string, index: number): Promise<void> {
 		try {
