@@ -1,4 +1,4 @@
-import { MainView } from "./components/MainView.jsx";
+import { MainView } from "./components/MainView.js";
 import "./App.css";
 
 export function App () {
