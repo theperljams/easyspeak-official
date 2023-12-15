@@ -10,13 +10,12 @@
 
 	display: grid;
 	grid-template-columns: 1.4fr 0.6fr;
-	grid-template-rows: 0.3fr 2.4fr 0.3fr;
+	grid-template-rows: 0.3fr 2.4fr;
 	gap: 2px 1px;
 	grid-auto-flow: row;
 	grid-template-areas:
 	"options responses-label"
-	"conversation responses"
-	"input input";
+	"conversation responses";
 }
 
 .layout > div {
@@ -24,11 +23,6 @@
 	justify-content: center;
 	align-items: center;
 	font-size: 3em;
-}
-
-.grid_input {
-	grid-area: input;
-
 }
 
 .grid_conversation {
