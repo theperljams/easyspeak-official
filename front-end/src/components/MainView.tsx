@@ -16,9 +16,7 @@ export function MainView () {
 			<div className={styles.grid_responses}>
 				<Responses />
 			</div>
-			<div className={styles.grid_responsesLabel}>
-				Responses
-			</div>
+			<div className={styles.grid_responsesLabel}>Responses</div>
 			<InputBar/>
 		</div>
 	);

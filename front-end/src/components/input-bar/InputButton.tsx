@@ -1,9 +1,6 @@
-import React from "react";
-
 import styles from "./InputBar.module.css";
 
 interface Props {
-    /** Path to the SVG file */
     icon: string;
     clicked?: () => void;
 }

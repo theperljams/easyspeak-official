@@ -5,9 +5,9 @@ import pencil from "../../assets/pencil.svg";
 import paperAirplane from "../../assets/paper-airplane.svg";
 
 export function InputBar () {
-	const openKeyboard = () => {
+	function openKeyboard () {
 		alert("You should probably change this!");
-	};
+	}
 	function send () {
 		alert("You should probably change this!");
 	}
