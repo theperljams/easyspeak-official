@@ -1,5 +1,3 @@
-import React from "react";
-
 import { MainView } from "./components/MainView.jsx";
 import "./App.css";
 
