@@ -1,14 +1,19 @@
-import React from "react";
+import { Listen } from "./components/Listen.js";
+import { Chat } from "./components/Chat.js";
+import { Responses } from "./components/Responses.js";
+import { InputBar } from "./components/InputBar.js";
 
-import { MainView } from "./components/MainView.jsx";
-import "./App.css";
+import styles from "./App.module.css";
 
 export function App () {
 	return (
-		<div className="App">
-			<div className="App-container">
-				<MainView />
+		<div className={styles.app}>
+			<Listen/>
+			<div className={styles.mainView}>
+				<Chat/>
+				<Responses/>
 			</div>
+			<InputBar/>
 		</div>
 	);
 }

@@ -1,0 +1,29 @@
+.listenButton {
+	background-color: #007AFF;
+	font-size: 20px;
+	color: white;
+
+	/* Fixed in the top left corner so the Chat title can be centered */
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 200px;
+	height: 80px;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+
+	cursor: pointer;
+}
+
+.volumeIcon {
+	height: 45%;
+	aspect-ratio: 1/1;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

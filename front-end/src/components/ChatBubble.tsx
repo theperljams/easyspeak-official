@@ -1,32 +1,19 @@
-interface ChatBubbleProps {
+import styles from "./ChatBubble.module.css";
+
+interface Props {
     side: "left" | "right";
     message: string;
 }
 
-export function ChatBubble ({ side, message }: ChatBubbleProps) {
+export function ChatBubble ({ side, message }: Props) {
 	return (
-		<div style={{
-			display: "flex",
-			flexDirection: "row",
-			justifyContent: side === "left" ? "flex-start" : "flex-end",
-			width: "100%",
-		}}>
+		<div
+			className={styles.messageBar + " " + (side === "left" ? styles.messageBar_left : styles.messageBar_right)}
+		>
 			<div
-				style={{
-					backgroundColor: side === "left" ? "#007AFF" : "#DCE7F9",
-					color: side === "left" ? "#F2F2F2" : "#007AFF",
-					borderRadius: "20px",
-					margin: "0",
-					maxWidth: "70%",
-				}}>
-				<p
-					style={{
-						margin: "10px",
-						padding: "10px 0",
-						textAlign: "center",
-						fontSize: ".5em",
-
-					}}>{message}</p>
+				className={styles.chatBubble + " " + (side === "left" ? styles.chatBubble_left : styles.chatBubble_right)}
+			>
+				{message}
 			</div>
 		</div>
 	);
