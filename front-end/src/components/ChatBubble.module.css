@@ -1,0 +1,29 @@
+.messageBar {
+	width: 100%;
+
+	display: flex;
+	flex-direction: row;
+}
+.messageBar_left {
+	justify-content: flex-start;
+}
+.messageBar_right {
+	justify-content: flex-end;
+}
+
+.chatBubble {
+	font-size: 20px;
+
+	max-width: 70%;
+	border-radius: 20px;
+	padding: 20px;
+	box-sizing: border-box;
+}
+.chatBubble_left {
+	background-color: black;
+	color: white;
+}
+.chatBubble_right {
+	background-color: #DCE7F9;
+	color: #007AFF;
+}

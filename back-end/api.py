@@ -12,7 +12,7 @@ from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
-from learning.MyDataLoader import MyDataLoader
+from MyDataLoader import MyDataLoader
 from langchain.docstore.document import Document
 import csv
 
