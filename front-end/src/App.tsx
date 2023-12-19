@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Listen } from "./components/Listen.js";
 import { Chat } from "./components/Chat.js";
@@ -10,79 +10,80 @@ import styles from "./App.module.css";
 
 const WEBSOCKET_URL = "ws://0.0.0.0:8000";
 
-export function App () {
-	const [listen, setListen] = useState(false);
-	const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
-	const [transcription, setTranscription] = useState("");
+export function App() {
+  const [listen, setListen] = useState(false);
+  const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
+  const [transcription, setTranscription] = useState("");
+  const [firstMessage, setFirstMessage] = useState(true); // Manage firstMessage in state
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      message: "How are you doing?",
+      side: "left",
+    },
+    {
+      message: "Doing well, thanks! How about yourself?",
+      side: "right",
+    },
+  ]);
 
-	function doListen () {
-		if (listen) {
-			// If already listening, stop listening
-			webSocket?.close();
-		}
-		else {
-			// If not listening, start listening
-			const socket = new WebSocket(WEBSOCKET_URL + "/transcribe");
+  function doListen() {
+    if (listen) {
+      // If already listening, stop listening
+      webSocket?.close();
+    } else {
+      // If not listening, start listening
+      const socket = new WebSocket(WEBSOCKET_URL + "/transcribe");
 
-			socket.onerror = function (event) {
-				console.error("WebSocket error:", event);
-				alert("There was an error connecting to the transcription server");
-			};
+      socket.onerror = function (event) {
+        console.error("WebSocket error:", event);
+        alert("There was an error connecting to the transcription server");
+      };
 
-			socket.onopen = function (event) {
-				console.log("WebSocket connection opened:", event);
+      // ... other socket event handlers
 
-				setMessages((prevMessages) => [
-					...prevMessages,
-					{
-						message: transcription,
-						side: "left",
-					},
-				]);
-			};
+      setWebSocket(socket);
+    }
+  }
 
-			socket.onmessage = function (event) {
-				// Handle incoming transcription results
-				const transcriptionResult = event.data as string;
-				console.log("Transcription Result:", transcriptionResult);
-				setTranscription(transcription + " " + transcriptionResult);
+  function toggleListen() {
+    setListen(!listen);
+	setFirstMessage(true); 
+    doListen();
+  }
 
-				// Send acknowledgement back to server
-				socket.send("ACK");
-			};
+  useEffect(() => {
+    if (webSocket) {
+      webSocket.onmessage = (event) => {
+        const transcriptionResult = event.data as string;
+        setTranscription((prevTranscription) => prevTranscription + " " + transcriptionResult); // Functional update
+        webSocket.send("ACK");
 
-			socket.onclose = function () {
-				setListen(false);
-			};
+        setMessages((prevMessages) => {
+          if (firstMessage) {
+            setFirstMessage(false); // Update firstMessage state
+            return [...prevMessages, { message: transcriptionResult, side: "left" }];
+          } else {
+            return [
+              ...prevMessages.slice(0, -1),
+              {
+                message: prevMessages[prevMessages.length - 1].message + " " + transcriptionResult,
+                side: "left",
+              },
+            ];
+          }
+        });
+      };
+    }
+  }, [webSocket, firstMessage]); // Include firstMessage in dependency array
 
-			setWebSocket(socket);
-		}
-	}
-
-	function toggleListen () {
-		setListen(!listen);
-		doListen();
-	}
-
-	const [messages, setMessages] = useState<Message[]>([
-		{
-			message: "How are you doing?",
-			side: "left",
-		},
-		{
-			message: "Doing well, thanks! How about yourself?",
-			side: "right",
-		},
-	]);
-
-	return (
-		<div className={styles.app}>
-			<Listen listen={listen} toggleListen={toggleListen}/>
-			<div className={styles.mainView}>
-				<Chat messages={messages}/>
-				<Responses/>
-			</div>
-			<InputBar/>
-		</div>
-	);
+  return (
+    <div className={styles.app}>
+      <Listen listen={listen} toggleListen={toggleListen} />
+      <div className={styles.mainView}>
+        <Chat messages={messages} />
+        <Responses />
+      </div>
+      <InputBar />
+    </div>
+  );
 }
