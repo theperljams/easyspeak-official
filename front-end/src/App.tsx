@@ -162,6 +162,7 @@ const speak = () => {
 	  socket.onclose = function (event) {
 		// Reset webSocket state to null when connection closes
 		setSpeakSocket(null);
+		setInputText("");
   
 		if (event.wasClean) {
 		  console.log("WebSocket closed cleanly:", event);
@@ -170,7 +171,7 @@ const speak = () => {
 		}
 	  };
 	}
-  }, [speakSocket, inputText]); // Dependency array ensures effect runs when socket or inputText changes
+  }, [speakSocket, inputText]); 
   
 
 
@@ -181,7 +182,7 @@ const speak = () => {
         <Chat messages={messages} />
         <Responses generate={generate} responses={responses} setInputText={setInputText}/>
       </div>
-      <InputBar inputText={inputText} speak={speak}/>
+      <InputBar inputText={inputText} speak={speak} audioURL={audioURL}/>
     </div>
   );
 }
