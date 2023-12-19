@@ -9,12 +9,17 @@ import { InputBar } from "./components/InputBar.js";
 import styles from "./App.module.css";
 
 const WEBSOCKET_URL = "ws://0.0.0.0:8000";
+const SERVER_URL = "http://0.0.0.0:8000";
+
 
 export function App() {
   const [listen, setListen] = useState(false);
-  const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
+  const [listenSocket, setListenSocket] = useState<WebSocket | null>(null);
+  const [speakSocket, setSpeakSocket] = useState<WebSocket | null>(null);
   const [transcription, setTranscription] = useState("");
-  const [firstMessage, setFirstMessage] = useState(true); // Manage firstMessage in state
+  const [firstMessage, setFirstMessage] = useState(true);
+  const [inputText, setInputText] = useState("");
+  const [audioURL, setAudioURL] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       message: "How are you doing?",
@@ -29,7 +34,7 @@ export function App() {
   function doListen() {
     if (listen) {
       // If already listening, stop listening
-      webSocket?.close();
+      listenSocket?.close();
     } else {
       // If not listening, start listening
       const socket = new WebSocket(WEBSOCKET_URL + "/transcribe");
@@ -41,7 +46,7 @@ export function App() {
 
       // ... other socket event handlers
 
-      setWebSocket(socket);
+      setListenSocket(socket);
     }
   }
 
@@ -52,11 +57,11 @@ export function App() {
   }
 
   useEffect(() => {
-    if (webSocket) {
-      webSocket.onmessage = (event) => {
+    if (listenSocket) {
+      listenSocket.onmessage = (event) => {
         const transcriptionResult = event.data as string;
         setTranscription((prevTranscription) => prevTranscription + " " + transcriptionResult); // Functional update
-        webSocket.send("ACK");
+        listenSocket.send("ACK");
 
         setMessages((prevMessages) => {
           if (firstMessage) {
@@ -74,16 +79,109 @@ export function App() {
         });
       };
     }
-  }, [webSocket, firstMessage]); // Include firstMessage in dependency array
+  }, [listenSocket, firstMessage]); // Include firstMessage in dependency array
+
+  const [responses, setResponses] = useState([
+	"Doing well, thanks! How about yourself?",
+	"I'm great, full of energy today!",
+	"Not bad, just taking things one day at a time.",
+	"Feeling fantastic, so productive!",
+]);
+
+async function generate (voiceInput: string, index: number): Promise<void> {
+	try {
+		const res = await fetch(`${SERVER_URL}/query`, {
+			method: "POST",
+			body: JSON.stringify({ question: voiceInput }),
+			headers: {
+				"Content-Type": "application/json",
+				accept: "application/json",
+			},
+		});
+
+		const data = await res.text();
+		console.log(res);
+
+		if (res.status === 200) {
+			setResponses((prevResponses) => {
+				const newResponses = [...prevResponses];
+				newResponses[index] = data;
+				return newResponses;
+			});
+		}
+		else {
+			setResponses((prevResponses) => {
+				const newResponses = [...prevResponses];
+				newResponses[index] = "I don't know";
+				return newResponses;
+			});
+		}
+	}
+	catch (error) {
+		console.error("Error fetching response:", error);
+	}
+}
+
+const speak = () => {
+	setMessages((prevMessages) => [...prevMessages, { message: inputText, side: "right" }]);
+  
+	// Store the socket reference for later use
+	setSpeakSocket(new WebSocket(WEBSOCKET_URL + "/speak"));
+  };
+  
+  useEffect(() => {
+	const socket = speakSocket;
+  
+	if (socket) {
+	  socket.onerror = function (event) {
+		console.error("WebSocket error:", event);
+		alert("There was an error connecting to the speech server");
+	  };
+  
+	  socket.onopen = (event) => {
+		console.log("WebSocket connection opened:", event);
+  
+		// Send the question to the server
+		const message = { question: inputText };
+		socket.send(JSON.stringify(message));
+	  };
+  
+	  socket.onmessage = (event) => {
+		// Handle incoming audio data
+		const audioData = event.data; // Assuming audio data is already in ArrayBuffer format
+		const audioBlob = new Blob([audioData], { type: "audio/wav" });
+		const audioUrl = URL.createObjectURL(audioBlob);
+  
+		setAudioURL(audioUrl);
+		console.log("Audio URL:", audioUrl);
+  
+		// Close the WebSocket connection after receiving the audio
+		socket.close();
+	  };
+  
+	  socket.onclose = function (event) {
+		// Reset webSocket state to null when connection closes
+		setSpeakSocket(null);
+  
+		if (event.wasClean) {
+		  console.log("WebSocket closed cleanly:", event);
+		} else {
+		  console.log("WebSocket connection closed unexpectedly:", event);
+		}
+	  };
+	}
+  }, [speakSocket, inputText]); // Dependency array ensures effect runs when socket or inputText changes
+  
+
 
   return (
     <div className={styles.app}>
       <Listen listen={listen} toggleListen={toggleListen} />
       <div className={styles.mainView}>
         <Chat messages={messages} />
-        <Responses />
+        <Responses generate={generate} responses={responses} setInputText={setInputText}/>
       </div>
-      <InputBar />
+      <InputBar inputText={inputText} speak={speak}/>
     </div>
   );
 }
