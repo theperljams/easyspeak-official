@@ -64,9 +64,10 @@ export function Responses () {
 				Responses
 			</div>
 			<div className={styles.responsesList}>
-				{responses.map((response) => (
+				{responses.map((response, index) => (
 					<button
 						className={styles.response}
+						key={index}
 					>
 						{response}
 					</button>

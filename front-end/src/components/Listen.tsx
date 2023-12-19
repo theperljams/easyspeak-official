@@ -1,16 +1,13 @@
-import { useState } from "react";
-
 import VolumeHigh from "../assets/volume-high-solid.svg";
 import VolumeMute from "../assets/volume-xmark-solid.svg";
 import styles from "./Listen.module.css";
 
-export function Listen () {
-	const [listen, setListen] = useState(false);
+interface Props {
+	listen: boolean;
+	toggleListen: () => void;
+}
 
-	function toggleListen () {
-		setListen(!listen);
-	}
-
+export function Listen ({ listen, toggleListen }: Props) {
 	return (
 		<div
 			className={styles.listenButton}
