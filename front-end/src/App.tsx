@@ -20,16 +20,7 @@ export function App() {
   const [firstMessage, setFirstMessage] = useState(true);
   const [inputText, setInputText] = useState("");
   const [audioURL, setAudioURL] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      message: "How are you doing?",
-      side: "left",
-    },
-    {
-      message: "Doing well, thanks! How about yourself?",
-      side: "right",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   function doListen() {
     if (listen) {
