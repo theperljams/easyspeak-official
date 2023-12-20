@@ -45,6 +45,7 @@ export function App() {
     setListen(!listen);
 	setFirstMessage(true); 
     doListen();
+	generate(transcription, 0);
   }
 
   useEffect(() => {
