@@ -45,7 +45,6 @@ export function App() {
     setListen(!listen);
 	setFirstMessage(true); 
     doListen();
-	generate(transcription, 0);
   }
 
   useEffect(() => {
@@ -70,6 +69,8 @@ export function App() {
           }
         });
       };
+
+	  console.log("firstMessage: ", firstMessage);
     }
   }, [listenSocket, firstMessage]); // Include firstMessage in dependency array
 
@@ -80,7 +81,37 @@ export function App() {
 	"Feeling fantastic, so productive!",
 ]);
 
-async function generate (voiceInput: string, index: number): Promise<void> {
+useEffect(() => {
+	if (!listen && !firstMessage) {
+	  console.log("in generate")
+	  setResponses([]); // Clear responses when listen is false
+	  Promise.all([generate(transcription), generate(transcription), generate(transcription), generate(transcription)])
+		.then((responses) => {
+		  setResponses(responses);
+		})
+		.catch((error) => {
+		  console.error("Error generating responses:", error);
+		});
+	}
+  }, [listen, firstMessage]);
+  
+
+// useEffect(() => {
+// 	// Call generate when listen changes to false (or your desired trigger condition)
+// 	if (!listen) {
+// 	  setResponses([]); // Clear responses when listen is false
+// 	  generate(transcription)
+// 		.then((newResponse) => {
+// 		  setResponses((prevResponses) => [...prevResponses, newResponse]); // Update responses in a separate effect
+// 		})
+// 		.catch((error) => {
+// 		  // Handle errors during generation
+// 		  console.error("Error generating response:", error);
+// 		});
+// 	}
+//   }, [listen]); // Adjust the dependency array based on your trigger
+  
+  async function generate(voiceInput: string): Promise<string> {
 	try {
 		const res = await fetch(`${SERVER_URL}/query`, {
 			method: "POST",
@@ -93,26 +124,46 @@ async function generate (voiceInput: string, index: number): Promise<void> {
 
 		const data = await res.text();
 		console.log(res);
+		return data;
+	} catch (error) {
+	  throw error; // Rethrow the error for handling in the useEffect
+	}
+  }
+  
 
-		if (res.status === 200) {
-			setResponses((prevResponses) => {
-				const newResponses = [...prevResponses];
-				newResponses[index] = data;
-				return newResponses;
-			});
-		}
-		else {
-			setResponses((prevResponses) => {
-				const newResponses = [...prevResponses];
-				newResponses[index] = "I don't know";
-				return newResponses;
-			});
-		}
-	}
-	catch (error) {
-		console.error("Error fetching response:", error);
-	}
-}
+// async function generate (voiceInput: string, index: number): Promise<void> {
+// 	try {
+// 		const res = await fetch(`${SERVER_URL}/query`, {
+// 			method: "POST",
+// 			body: JSON.stringify({ question: voiceInput }),
+// 			headers: {
+// 				"Content-Type": "application/json",
+// 				accept: "application/json",
+// 			},
+// 		});
+
+// 		const data = await res.text();
+// 		console.log(res);
+
+// 		if (res.status === 200) {
+// 			setResponses((prevResponses) => {
+// 				const newResponses = [...prevResponses];
+// 				newResponses[index] = data;
+// 				return newResponses;
+// 			});
+// 		}
+// 		else {
+// 			setResponses((prevResponses) => {
+// 				const newResponses = [...prevResponses];
+// 				newResponses[index] = "I don't know";
+// 				return newResponses;
+// 			});
+// 		}
+// 	}
+// 	catch (error) {
+// 		console.error("Error fetching response:", error);
+// 	}
+// }
 
 const speak = () => {
 	setMessages((prevMessages) => [...prevMessages, { message: inputText, side: "right" }]);
@@ -172,7 +223,7 @@ const speak = () => {
       <Listen listen={listen} toggleListen={toggleListen} />
       <div className={styles.mainView}>
         <Chat messages={messages} />
-        <Responses generate={generate} responses={responses} setInputText={setInputText}/>
+        <Responses responses={responses} setInputText={setInputText}/>
       </div>
       <InputBar inputText={inputText} speak={speak} audioURL={audioURL}/>
     </div>

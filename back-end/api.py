@@ -76,6 +76,7 @@ cool_app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:3000",
+    "http://localhost:5173"
 ]
 
 cool_app.add_middleware(
