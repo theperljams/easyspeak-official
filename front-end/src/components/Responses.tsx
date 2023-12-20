@@ -1,16 +1,15 @@
-import { useState, useEffect } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import { useEffect } from "react";
 
 import styles from "./Responses.module.css";
 
 interface Props {
 	generate: (value: string, index: number) => Promise<void>;
 	responses: string[];
-	setInputText: React.Dispatch<React.SetStateAction<string>>;
+	setInputText: Dispatch<SetStateAction<string>>;
 }
 
-
-export function Responses ({ generate, responses , setInputText}: Props) {
-	
+export function Responses ({ generate, responses, setInputText }: Props) {
 
 	// Run this effect only once on mount
 	useEffect(() => {
@@ -34,7 +33,9 @@ export function Responses ({ generate, responses , setInputText}: Props) {
 					<button
 						className={styles.response}
 						key={index}
-						onClick={() => setInputText(response)}
+						onClick={() => {
+							setInputText(response);
+						}}
 					>
 						{response}
 					</button>
