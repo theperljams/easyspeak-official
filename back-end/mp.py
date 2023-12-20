@@ -90,7 +90,8 @@ def mp_speech_thread(config, generated_queue, speech_queue, threaded=True):
 
     while True:
         try:
-            txt = generated_queue.get()
+            # txt = generated_queue.get()
+            txt = "Feeling fantastic, so productive!"
             wav_data = speecher.synthesize(txt)
             # we have the wav data, but we don't want to send it to the client yet
             speech_queue.put(wav_data)

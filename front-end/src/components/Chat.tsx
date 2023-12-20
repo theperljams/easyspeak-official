@@ -1,26 +1,17 @@
-import { useState } from "react";
-
 import { ChatBubble } from "./ChatBubble";
 
 import styles from "./Chat.module.css";
 
-interface Message {
+export interface Message {
     message: string;
     side: "left" | "right";
 }
 
-export function Chat () {
-	const [messages] = useState<Message[]>([
-		{
-			message: "How are you doing?",
-			side: "left",
-		},
-		{
-			message: "Doing well, thanks! How about yourself?",
-			side: "right",
-		},
-	]);
+interface Props {
+	messages: Message[];
+}
 
+export function Chat ({ messages }: Props) {
 	return (
 		<div className={styles.chat}>
 			<div className={styles.titleBar}>
