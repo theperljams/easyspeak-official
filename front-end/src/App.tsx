@@ -82,56 +82,21 @@ export function App() {
 ]);
 
 useEffect(() => {
-	if (!listen && !firstMessage) {
+	if (!listen && transcription != '') {
 	  console.log("in generate")
 	  setResponses([]); // Clear responses when listen is false
-	  Promise.all([generate(transcription), generate(transcription), generate(transcription), generate(transcription)])
-		.then((responses) => {
+	  generate(transcription).then((responses) => {
 		  setResponses(responses);
 		})
 		.catch((error) => {
 		  console.error("Error generating responses:", error);
 		});
 	}
-  }, [listen, firstMessage]);
+  }, [listen, transcription]);
   
 
-// useEffect(() => {
-// 	// Call generate when listen changes to false (or your desired trigger condition)
-// 	if (!listen) {
-// 	  setResponses([]); // Clear responses when listen is false
-// 	  generate(transcription)
-// 		.then((newResponse) => {
-// 		  setResponses((prevResponses) => [...prevResponses, newResponse]); // Update responses in a separate effect
-// 		})
-// 		.catch((error) => {
-// 		  // Handle errors during generation
-// 		  console.error("Error generating response:", error);
-// 		});
-// 	}
-//   }, [listen]); // Adjust the dependency array based on your trigger
-  
-  async function generate(voiceInput: string): Promise<string> {
-	try {
-		const res = await fetch(`${SERVER_URL}/query`, {
-			method: "POST",
-			body: JSON.stringify({ question: voiceInput }),
-			headers: {
-				"Content-Type": "application/json",
-				accept: "application/json",
-			},
-		});
 
-		const data = await res.text();
-		console.log(res);
-		return data;
-	} catch (error) {
-	  throw error; // Rethrow the error for handling in the useEffect
-	}
-  }
-  
-
-// async function generate (voiceInput: string, index: number): Promise<void> {
+//   async function generate(voiceInput: string): Promise<string> {
 // 	try {
 // 		const res = await fetch(`${SERVER_URL}/query`, {
 // 			method: "POST",
@@ -144,26 +109,31 @@ useEffect(() => {
 
 // 		const data = await res.text();
 // 		console.log(res);
+// 		return data;
+// 	} catch (error) {
+// 	  throw error; // Rethrow the error for handling in the useEffect
+// 	}
+//   }
 
-// 		if (res.status === 200) {
-// 			setResponses((prevResponses) => {
-// 				const newResponses = [...prevResponses];
-// 				newResponses[index] = data;
-// 				return newResponses;
-// 			});
-// 		}
-// 		else {
-// 			setResponses((prevResponses) => {
-// 				const newResponses = [...prevResponses];
-// 				newResponses[index] = "I don't know";
-// 				return newResponses;
-// 			});
-// 		}
-// 	}
-// 	catch (error) {
-// 		console.error("Error fetching response:", error);
-// 	}
-// }
+  async function generate(voiceInput: string): Promise<string[]> {
+	try {
+	  const res = await fetch(`${SERVER_URL}/query`, {
+		method: "POST",
+		body: JSON.stringify({ question: voiceInput}), // Assuming the server expects an array of questions
+		headers: {
+		  "Content-Type": "application/json",
+		  accept: "application/json",
+		},
+	  });
+  
+	  const data = await res.json();
+	  console.log("response: ", data);
+	  return data;
+	} catch (error) {
+	  throw error; // Rethrow the error for handling in the useEffect
+	}
+  }
+  
 
 const speak = () => {
 	setMessages((prevMessages) => [...prevMessages, { message: inputText, side: "right" }]);
