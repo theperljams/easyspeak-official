@@ -14,7 +14,7 @@ const SERVER_URL = "http://0.0.0.0:8000";
 
 export function App() {
   const [listen, setListen] = useState(false);
-  const [listenSocket, setListenSocket] = useState(new WebSocket(WEBSOCKET_URL + "/transcribe"));
+  const [listenSocket, setListenSocket] = useState<WebSocket | null>();
   const [speakSocket, setSpeakSocket] = useState<WebSocket | null>(null);
   const [transcription, setTranscription] = useState("");
   const [firstMessage, setFirstMessage] = useState(true);
@@ -24,56 +24,60 @@ export function App() {
 
 
   function doListen() { 
-    
-    if (listen) {
-      // If already listening, stop listening
-      setListen(false);
-    } else {
-      // If not listening, start listening
+    console.log("doListen");
+    if (!listenSocket) {
+      const socket = new WebSocket(WEBSOCKET_URL + "/transcribe");
       
-      listenSocket.onerror = function (event) {
+      socket.onerror = function (event) {
         console.error("WebSocket error:", event);
         alert("There was an error connecting to the transcription server");
       };
 
-
-      // ... other socket event handlers
-      
-    }
+      setListenSocket(socket);
+    } 
   }
 
   function toggleListen() {
+    console.log("toggleListen"); 
     setListen(!listen);
-	setFirstMessage(true); 
+	  setFirstMessage(true); 
     doListen();
   }
 
   useEffect(() => {
-    if (listenSocket && listen) {
+    if (!listenSocket) {
+      console.log("no listenSocket");
+    } else {
       listenSocket.onmessage = (event) => {
+        console.log("listen: ", listen);
         const transcriptionResult = event.data as string;
-        setTranscription((prevTranscription) => prevTranscription + " " + transcriptionResult); // Functional update
-        listenSocket.send("ACK");
+        if (listen) {
+          setTranscription((prevTranscription) => prevTranscription + " " + transcriptionResult); // Functional update
+          listenSocket.send("ACK");
 
-        setMessages((prevMessages) => {
-          if (firstMessage) {
-            setFirstMessage(false); // Update firstMessage state
-            return [...prevMessages, { message: transcriptionResult, side: "left" }];
-          } else {
-            return [
-              ...prevMessages.slice(0, -1),
-              {
-                message: prevMessages[prevMessages.length - 1].message + " " + transcriptionResult,
-                side: "left",
-              },
-            ];
-          }
-        });
+          setMessages((prevMessages) => {
+            if (firstMessage) {
+              setFirstMessage(false); // Update firstMessage state
+              return [...prevMessages, { message: transcriptionResult, side: "left" }];
+            } else {
+              return [
+                ...prevMessages.slice(0, -1),
+                {
+                  message: prevMessages[prevMessages.length - 1].message + " " + transcriptionResult,
+                  side: "left",
+                },
+              ];
+            }
+          });
+        }
+        else {
+          setTranscription("");
+          listenSocket.send("ACK");
+        }
       };
-
 	  console.log("firstMessage: ", firstMessage);
     }
-  }, [listenSocket, firstMessage]); // Include firstMessage in dependency array
+  }, [listenSocket, firstMessage, listen]); // Include firstMessage in dependency array
 
   const [responses, setResponses] = useState([
 	"Doing well, thanks! How about yourself?",
@@ -169,7 +173,7 @@ const speak = () => {
 		setAudioURL(audioUrl);
 		console.log("Audio URL:", audioUrl);
     
-    socket.close();
+    // socket.close();
 
 	  };
   
