@@ -14,7 +14,7 @@ const SERVER_URL = "http://0.0.0.0:8000";
 
 export function App() {
   const [listen, setListen] = useState(false);
-  const [listenSocket, setListenSocket] = useState<WebSocket | null>(null);
+  const [listenSocket, setListenSocket] = useState(new WebSocket(WEBSOCKET_URL + "/transcribe"));
   const [speakSocket, setSpeakSocket] = useState<WebSocket | null>(null);
   const [transcription, setTranscription] = useState("");
   const [firstMessage, setFirstMessage] = useState(true);
@@ -22,22 +22,23 @@ export function App() {
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
-  function doListen() {
+
+  function doListen() { 
+    
     if (listen) {
       // If already listening, stop listening
-      listenSocket?.close();
+      setListen(false);
     } else {
       // If not listening, start listening
-      const socket = new WebSocket(WEBSOCKET_URL + "/transcribe");
-
-      socket.onerror = function (event) {
+      
+      listenSocket.onerror = function (event) {
         console.error("WebSocket error:", event);
         alert("There was an error connecting to the transcription server");
       };
 
-      // ... other socket event handlers
 
-      setListenSocket(socket);
+      // ... other socket event handlers
+      
     }
   }
 
@@ -48,7 +49,7 @@ export function App() {
   }
 
   useEffect(() => {
-    if (listenSocket) {
+    if (listenSocket && listen) {
       listenSocket.onmessage = (event) => {
         const transcriptionResult = event.data as string;
         setTranscription((prevTranscription) => prevTranscription + " " + transcriptionResult); // Functional update
@@ -167,9 +168,9 @@ const speak = () => {
   
 		setAudioURL(audioUrl);
 		console.log("Audio URL:", audioUrl);
-  
-		// Close the WebSocket connection after receiving the audio
-		socket.close();
+    
+    socket.close();
+
 	  };
   
 	  socket.onclose = function (event) {

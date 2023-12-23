@@ -110,6 +110,7 @@ def mp_server_thread(config, text_queue, speech_queue, generated_queue):
     cool_app.text_queue = text_queue
     cool_app.speech_queue = speech_queue
     cool_app.generated_queue = generated_queue
+    # cool_app.is_listening = is_listening
     uvicorn.run(cool_app, host='0.0.0.0', port=8000, ws='websockets')
 
 def run_threads(queues, config):
@@ -186,6 +187,7 @@ if __name__ == "__main__":
     text_queue = mp.Queue()
     generated_queue = mp.Queue()
     speech_queue = mp.Queue()
+    # is_listening = False
     queues = {
         'audio_queue': audio_queue,
         'text_queue': text_queue,

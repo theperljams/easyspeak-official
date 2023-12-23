@@ -16,6 +16,7 @@ from MyDataLoader import MyDataLoader
 from langchain.docstore.document import Document
 import csv
 import json
+import multiprocessing as mp
 
 import os
 from fastapi import WebSocket, WebSocketDisconnect
@@ -51,7 +52,7 @@ template = """"You are Pearl from the context given. Mimic her voice and way of 
 Assume any question you are asked is a question you are answering for Pearl. You = Pearl. For example, if someone asks: \"What you are studying?\" think of the question as: \"What does Pearl say she is studying?\"
 Stay in character while answering questions. DO NOT refer to yourself in the third person. DO NOT ask how you can help. 
 If you don't know the answer to something, just say that you don't know.
-Come up with 4 possible responses to the given question and put them as a numbered list. Each element in the list should end in a newline character. Treat them as 4 separate sentences in different contexts.
+Come up with 4 possible responses to the given question and format them as a numbered list like so: 1. \n 2. \n 3. \n 4. Treat them as 4 separate sentences in different contexts.
 
 {context}
 
@@ -73,7 +74,13 @@ qa = RetrievalQA.from_chain_type(
     chain_type_kwargs={"prompt": PROMPT}
  )
 
+def has_numerical_character(text):
+    return any(char.isdigit() for char in text)
+
 def parse_numbered_list(input_string):
+
+    if not has_numerical_character(input_string):
+        return [input_string]
     # Split the input string into lines
     lines = input_string.strip().split('\n')
 
@@ -93,7 +100,6 @@ def parse_numbered_list(input_string):
             items.append(item_content)
 
     return items
-
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -137,6 +143,7 @@ async def transcribe(websocket: WebSocket):
     try:
         while True:
             text = ""
+            # try:
             while not cool_app.text_queue.empty():
                 part = cool_app.text_queue.get()
                 text += " " + part
@@ -145,10 +152,14 @@ async def transcribe(websocket: WebSocket):
                 print(f"[WEB]:\t Sending: {text}")
                 await websocket.send_text(text.strip())
                 await websocket.receive()
+            # except Exception as e:  # Catch other errors during reception
+            #     print(f"[WEB]:\t Error receiving data: {e}")
+            #     cool_app.text_queue = mp.Queue()
+            #     break  # Exit the loop to handle the error
     except WebSocketDisconnect:
         print(f"[WEB]:\t Closed Socket")
         await websocket.close()
-
+    
 
 @cool_app.websocket("/speak")
 async def handle_audio(websocket: WebSocket):
