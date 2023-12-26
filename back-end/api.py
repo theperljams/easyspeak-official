@@ -4,24 +4,17 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import dotenv
 
-import langchain
 from langchain.embeddings import OpenAIEmbeddings
-from langchain.document_loaders import DirectoryLoader
-from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from MyDataLoader import MyDataLoader
 from langchain.docstore.document import Document
-import csv
 import json
-import multiprocessing as mp
 
 import os
 from fastapi import WebSocket, WebSocketDisconnect
-from scipy.io.wavfile import write as write_wav
-
 from transformers import AutoProcessor, BarkModel
 import torch
 import sounddevice as sd
@@ -103,8 +96,6 @@ def parse_numbered_list(input_string):
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from transformers import pipeline
-import scipy
 
 cool_app = FastAPI()
 
@@ -159,6 +150,9 @@ async def transcribe(websocket: WebSocket):
     except WebSocketDisconnect:
         print(f"[WEB]:\t Closed Socket")
         await websocket.close()
+    except Exception as e:
+        print(f"[WEB]:\t Error receiving data (transcriber): {e}")
+        await websocket.close()
     
 
 @cool_app.websocket("/speak")
@@ -190,6 +184,9 @@ async def handle_audio(websocket: WebSocket):
 
     except WebSocketDisconnect:
         print(f"[WEB]:\t Closed Socket")
+        await websocket.close()
+    except Exception as e:
+        print(f"[WEB]:\t Error receiving data (speak): {e}")
         await websocket.close()
     
 

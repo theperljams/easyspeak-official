@@ -78,17 +78,12 @@ export function App() {
     }
   }, [listenSocket, firstMessage, listen]); // Include firstMessage in dependency array
 
-  const [responses, setResponses] = useState([
-	"Doing well, thanks! How about yourself?",
-	"I'm great, full of energy today!",
-	"Not bad, just taking things one day at a time.",
-	"Feeling fantastic, so productive!",
-]);
+  const [responses, setResponses] = useState(["", "", "", ""]);
 
 useEffect(() => {
 	if (!listen && transcription != '') {
 	  console.log("in generate")
-	  setResponses([]); // Clear responses when listen is false
+	  setResponses(["", "", "", ""]); // Clear responses when listen is false
 	  generate(transcription).then((responses) => {
 		  setResponses(responses);
 		})
@@ -123,40 +118,44 @@ const speak = () => {
 	setMessages((prevMessages) => [...prevMessages, { message: inputText, side: "right" }]);
   
 	// Store the socket reference for later use
-	setSpeakSocket(new WebSocket(WEBSOCKET_URL + "/speak"));
+  if (!speakSocket) {
+    setSpeakSocket(new WebSocket(WEBSOCKET_URL + "/speak"));
+  }
+
   };
   
   useEffect(() => {
-	const socket = speakSocket;
-  
-	if (socket) {
-	  socket.onerror = function (event) {
+
+	if (speakSocket) {
+    console.log("speakSocket");
+	  speakSocket.onerror = function (event) {
 		console.error("WebSocket error:", event);
 		alert("There was an error connecting to the speech server");
 	  };
   
-	  socket.onopen = (event) => {
+	  speakSocket.onopen = (event) => {
 		console.log("WebSocket connection opened:", event);
   
 		// Send the question to the server
 		const message = { question: inputText };
-		socket.send(JSON.stringify(message));
+		speakSocket.send(JSON.stringify(message));
 	  };
   
-	  socket.onmessage = (event) => {
+	  speakSocket.onmessage = (event) => {
 		// Handle incoming audio data
 		const audioData = event.data; // Assuming audio data is already in ArrayBuffer format
 		const audioBlob = new Blob([audioData], { type: "audio/wav" });
 		const audioUrl = URL.createObjectURL(audioBlob);
   
 		setAudioURL(audioUrl);
+    speakSocket.send("ACK");
 		console.log("Audio URL:", audioUrl);
     
     // socket.close();
 
 	  };
   
-	  socket.onclose = function (event) {
+	  speakSocket.onclose = function (event) {
 		// Reset webSocket state to null when connection closes
 		setSpeakSocket(null);
 		setInputText("");
@@ -167,8 +166,12 @@ const speak = () => {
 		  console.log("WebSocket connection closed unexpectedly:", event);
 		}
 	  };
-	}
-  }, [speakSocket, inputText]); 
+  }
+}, [speakSocket, inputText]); 
+
+  const onInputChange = (newText: string) => {
+    setInputText(newText);
+  };
   
 
 
@@ -179,7 +182,7 @@ const speak = () => {
         <Chat messages={messages} />
         <Responses responses={responses} setInputText={setInputText}/>
       </div>
-      <InputBar inputText={inputText} speak={speak} audioURL={audioURL}/>
+      <InputBar inputText={inputText} onInputChange={onInputChange} speak={speak} audioURL={audioURL}/>
     </div>
   );
 }

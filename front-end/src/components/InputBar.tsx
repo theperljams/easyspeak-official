@@ -2,30 +2,16 @@ import styles from "./InputBar.module.css";
 import pencil from "../assets/pencil.svg";
 import paperAirplane from "../assets/paper-airplane.svg";
 
-interface Message {
-    message: string;
-    side: "left" | "right";
-}
-
 interface Props {
     inputText: string;
+    onInputChange: (newText: string) => void;
     speak: () => void;
     audioURL: string | null;
 }
 
-export function InputBar({ inputText, speak, audioURL }: Props) {
+export function InputBar({ inputText, onInputChange, speak, audioURL }: Props) {
     function openKeyboard() {
         alert("You should probably change this!");
-    }
-
-    function playAudio() {
-        if (audioURL) {
-            const audioElement = document.querySelector("audio");
-			if (audioElement) {
-				audioElement.play();
-			}
-            
-        }
     }
 
     return (
@@ -37,6 +23,7 @@ export function InputBar({ inputText, speak, audioURL }: Props) {
                 className={styles.textBox}
                 type="text"
                 value={inputText}
+                onChange={(e) => onInputChange(e.target.value)}
                 placeholder="Type anything here..."
             />
             {audioURL && ( // Conditionally render audio player

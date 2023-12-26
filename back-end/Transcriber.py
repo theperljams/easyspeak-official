@@ -42,8 +42,6 @@ class Transcriber:
             with NamedTemporaryFile(delete=False) as temp_file:
                 temp_file.write(data_bytes)
 
-            print("made temp file:", temp_file.name)
-
             # Read the transcription.
             result = self.audio_model.transcribe(temp_file.name, fp16=torch.cuda.is_available())
             os.remove(temp_file.name)
