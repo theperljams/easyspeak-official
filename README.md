@@ -4,7 +4,7 @@
 
 1. `cd back-end`
 2. Create a `.env` file and add the provided credentials
-3. If this is your first time running it, run the `setup/venv_setup.sh` script
+3. If this is your first time running it, run the commands from the `setup/venv_setup.sh` manually (for some reason the second command won't actually run sometimes, which will install the dependencies outside the venv)
 4. Activate your virtual environment by running `source venv/bin/activate`
 5. Start the server by running the api script with `python3 mp.py`
 

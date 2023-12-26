@@ -11,7 +11,6 @@ import styles from "./App.module.css";
 const WEBSOCKET_URL = "ws://0.0.0.0:8000";
 const SERVER_URL = "http://0.0.0.0:8000";
 
-
 export function App() {
   const [listen, setListen] = useState(false);
   const [listenSocket, setListenSocket] = useState<WebSocket | null>();
@@ -99,26 +98,6 @@ useEffect(() => {
 	}
   }, [listen, transcription]);
   
-
-
-//   async function generate(voiceInput: string): Promise<string> {
-// 	try {
-// 		const res = await fetch(`${SERVER_URL}/query`, {
-// 			method: "POST",
-// 			body: JSON.stringify({ question: voiceInput }),
-// 			headers: {
-// 				"Content-Type": "application/json",
-// 				accept: "application/json",
-// 			},
-// 		});
-
-// 		const data = await res.text();
-// 		console.log(res);
-// 		return data;
-// 	} catch (error) {
-// 	  throw error; // Rethrow the error for handling in the useEffect
-// 	}
-//   }
 
   async function generate(voiceInput: string): Promise<string[]> {
 	try {
