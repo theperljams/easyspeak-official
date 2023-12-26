@@ -15,6 +15,8 @@ from langchain.prompts import PromptTemplate
 from MyDataLoader import MyDataLoader
 from langchain.docstore.document import Document
 import csv
+import json
+import multiprocessing as mp
 
 import os
 from fastapi import WebSocket, WebSocketDisconnect
@@ -50,21 +52,54 @@ template = """"You are Pearl from the context given. Mimic her voice and way of 
 Assume any question you are asked is a question you are answering for Pearl. You = Pearl. For example, if someone asks: \"What you are studying?\" think of the question as: \"What does Pearl say she is studying?\"
 Stay in character while answering questions. DO NOT refer to yourself in the third person. DO NOT ask how you can help. 
 If you don't know the answer to something, just say that you don't know.
+Come up with 4 possible responses to the given question and format them as a numbered list like so: 1. \n 2. \n 3. \n 4. Treat them as 4 separate sentences in different contexts.
 
 {context}
 
 User: {question}
-Pearl: """
+Pearl:
+Pearl:\n
+Pearl:\n
+Pearl:"""
 PROMPT = PromptTemplate(template=template, input_variables=["context", "question"])
 print("created prompt")
 
 # langchain.debug = True
+retriever=docsearch.as_retriever(search_type="similarity", search_kwargs={'k': 2})
+#debug
 qa = RetrievalQA.from_chain_type(
     llm=OpenAI(),
     chain_type="stuff",
-    retriever=docsearch.as_retriever(),
+    retriever=retriever,
     chain_type_kwargs={"prompt": PROMPT}
  )
+
+def has_numerical_character(text):
+    return any(char.isdigit() for char in text)
+
+def parse_numbered_list(input_string):
+
+    if not has_numerical_character(input_string):
+        return [input_string]
+    # Split the input string into lines
+    lines = input_string.strip().split('\n')
+
+    # Initialize an empty array to store the items
+    items = []
+
+    # Iterate through each line and extract the item content
+    for line in lines:
+        # Split the line into the number and the item content
+        parts = line.split('. ', 1)
+        
+        # Check if the line is a valid numbered item
+        if len(parts) == 2 and parts[0].isdigit():
+            item_content = parts[1].strip()
+            
+            # Append the item content to the array
+            items.append(item_content)
+
+    return items
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -76,6 +111,7 @@ cool_app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:3000",
+    "http://localhost:5173"
 ]
 
 cool_app.add_middleware(
@@ -96,8 +132,10 @@ async def query_chain(question: Question):
     result = qa.run(query=query, verbose=False)
     if result[0] == '\n':
         result = result[1:]
-    cool_app.generated_queue.put(result)
-    return result
+    print(f"Result: {result}")
+    result_list = parse_numbered_list(result)
+    print(result_list)
+    return result_list
 
 @cool_app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
@@ -105,6 +143,7 @@ async def transcribe(websocket: WebSocket):
     try:
         while True:
             text = ""
+            # try:
             while not cool_app.text_queue.empty():
                 part = cool_app.text_queue.get()
                 text += " " + part
@@ -113,14 +152,27 @@ async def transcribe(websocket: WebSocket):
                 print(f"[WEB]:\t Sending: {text}")
                 await websocket.send_text(text.strip())
                 await websocket.receive()
+            # except Exception as e:  # Catch other errors during reception
+            #     print(f"[WEB]:\t Error receiving data: {e}")
+            #     cool_app.text_queue = mp.Queue()
+            #     break  # Exit the loop to handle the error
     except WebSocketDisconnect:
         print(f"[WEB]:\t Closed Socket")
         await websocket.close()
+    
 
-
-@cool_app.websocket("/speak") 
+@cool_app.websocket("/speak")
 async def handle_audio(websocket: WebSocket):
     await websocket.accept()
+
+    # Receive the initial message containing the question text
+    message = await websocket.receive_text()  # Use receive_text() for text messages
+    question_data = json.loads(message)  # Deserialize JSON if applicable
+    question_text = question_data.get("question")  # Extract the question from the parsed data
+    print("[WEB]:\t Received question: ", question_text)
+
+    # Put the question text in the queue
+    cool_app.generated_queue.put(question_text)
 
     try:
         while True:

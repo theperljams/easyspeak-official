@@ -90,8 +90,8 @@ def mp_speech_thread(config, generated_queue, speech_queue, threaded=True):
 
     while True:
         try:
-            # txt = generated_queue.get()
-            txt = "Feeling fantastic, so productive!"
+            txt = generated_queue.get()
+            print("text from queue: ", txt)
             wav_data = speecher.synthesize(txt)
             # we have the wav data, but we don't want to send it to the client yet
             speech_queue.put(wav_data)
@@ -110,6 +110,7 @@ def mp_server_thread(config, text_queue, speech_queue, generated_queue):
     cool_app.text_queue = text_queue
     cool_app.speech_queue = speech_queue
     cool_app.generated_queue = generated_queue
+    # cool_app.is_listening = is_listening
     uvicorn.run(cool_app, host='0.0.0.0', port=8000, ws='websockets')
 
 def run_threads(queues, config):
@@ -186,6 +187,7 @@ if __name__ == "__main__":
     text_queue = mp.Queue()
     generated_queue = mp.Queue()
     speech_queue = mp.Queue()
+    # is_listening = False
     queues = {
         'audio_queue': audio_queue,
         'text_queue': text_queue,
