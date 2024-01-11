@@ -7,7 +7,7 @@ import dotenv
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
-from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from MyDataLoader import MyDataLoader
 from langchain.docstore.document import Document
@@ -31,7 +31,7 @@ documents = loader.split_by_rows()
 #     print(doc)
 docs = []
 for doc in documents:
-    curr_doc = Document(page_content=doc, metadata={"source": "../data/data_with_prefixes.csv"})
+    curr_doc = Document(page_content=doc, metadata={"source": "../data/danny_prefixes.csv"})
     # print(curr_doc)
     docs.append(curr_doc)
 
@@ -41,8 +41,8 @@ ids = [str(i) for i in range(1, len(docs) + 1)]
 
 docsearch = Chroma.from_documents(docs, embeddings, ids=ids)
 
-template = """"You are Pearl from the context given. Mimic her voice and way of speaking, try to be as convincing as possible. Use the context below to answer questions. Answer each question as if you were Pearl. 
-Assume any question you are asked is a question you are answering for Pearl. You = Pearl. For example, if someone asks: \"What you are studying?\" think of the question as: \"What does Pearl say she is studying?\"
+template = """"You are Danny from the context given. Mimic his voice and way of speaking, try to be as convincing as possible. Use the context below to answer questions. Answer each question as if you were Danny. 
+Assume any question you are asked is a question you are answering for Danny. You = Danny. For example, if someone asks: \"What you are studying?\" think of the question as: \"What does Danny say he is studying?\"
 Stay in character while answering questions. DO NOT refer to yourself in the third person. DO NOT ask how you can help. 
 If you don't know the answer to something, just say that you don't know.
 Come up with 4 possible responses to the given question and format them as a numbered list like so: 1. \n 2. \n 3. \n 4. Treat them as 4 separate sentences in different contexts.
@@ -50,10 +50,10 @@ Come up with 4 possible responses to the given question and format them as a num
 {context}
 
 User: {question}
-Pearl:
-Pearl:\n
-Pearl:\n
-Pearl:"""
+Danny:
+Danny:\n
+Danny:\n
+Danny:"""
 PROMPT = PromptTemplate(template=template, input_variables=["context", "question"])
 print("created prompt")
 
@@ -61,7 +61,7 @@ print("created prompt")
 retriever=docsearch.as_retriever(search_type="similarity", search_kwargs={'k': 2})
 #debug
 qa = RetrievalQA.from_chain_type(
-    llm=OpenAI(),
+    llm=ChatOpenAI(model_name='gpt-3.5-turbo'),
     chain_type="stuff",
     retriever=retriever,
     chain_type_kwargs={"prompt": PROMPT}

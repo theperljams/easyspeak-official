@@ -8,8 +8,8 @@ import { InputBar } from "./components/InputBar.js";
 
 import styles from "./App.module.css";
 
-const WEBSOCKET_URL = "ws://0.0.0.0:8000";
-const SERVER_URL = "http://0.0.0.0:8000";
+const WEBSOCKET_URL = "ws://localhost:8000";
+const SERVER_URL = "http://localhost:8000";
 
 export function App() {
   const [listen, setListen] = useState(false);
@@ -116,6 +116,7 @@ useEffect(() => {
 
 const speak = () => {
 	setMessages((prevMessages) => [...prevMessages, { message: inputText, side: "right" }]);
+  setInputText("");
   
 	// Store the socket reference for later use
   if (!speakSocket) {
