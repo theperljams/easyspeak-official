@@ -1,15 +1,14 @@
 import type { Dispatch, SetStateAction } from "react";
-import { useEffect } from "react";
 
 import styles from "./Responses.module.css";
 
 interface Props {
 	responses: string[];
-	setInputText: React.Dispatch<React.SetStateAction<string>>;
+	setInputText: Dispatch<SetStateAction<string>>;
 }
 
 
-export function Responses ({ responses , setInputText}: Props) {
+export function Responses ({ responses, setInputText }: Props) {
 
 	return (
 		<div className={styles.responses}>
@@ -21,7 +20,9 @@ export function Responses ({ responses , setInputText}: Props) {
 					<button
 						className={styles.response}
 						key={index}
-						onClick={() => setInputText(response)}
+						onClick={() => {
+							setInputText(response);
+						}}
 					>
 						{response}
 					</button>
