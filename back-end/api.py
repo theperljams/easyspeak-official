@@ -128,6 +128,20 @@ async def query_chain(question: Question):
     print(result_list)
     return result_list
 
+@cool_app.websocket("/record")
+async def record(websocket: WebSocket):
+    try:
+        await websocket.accept()
+        message = websocket.receive_bytes()
+        print("[WEB]:\t Received message")
+        cool_app.audio_queue.put(message)
+    except WebSocketDisconnect:
+        print(f"[WEB]:\t Closed Socket")
+        await websocket.close()
+    except Exception as e:
+        print(f"[WEB]:\t Error receiving data (transcriber): {e}")
+        await websocket.close()
+
 @cool_app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
     await websocket.accept()

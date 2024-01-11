@@ -127,9 +127,10 @@ def run_threads(queues, config):
     gq = queues['generated_queue']
     sq = queues['speech_queue']
     # cq = mp.Queue()    # completion queue
-    
-    rp = mp.Process(target=mp_recorder_thread, name="mp_recorder_thread", args=(config, aq,))
-    rp.start()
+
+    if config['record-thread']:  
+        rp = mp.Process(target=mp_recorder_thread, name="mp_recorder_thread", args=(config, aq,))
+        rp.start()
     tp = mp.Process(target=mp_transcribe_thread, name="mp_transcribe_thread", args=(config, aq, tq,))
     tp.start()
     spchp = mp.Process(target=mp_speech_thread, name="mp_speech_thread", args=(config, gq, sq,))
@@ -177,6 +178,7 @@ if __name__ == "__main__":
     parser.add_argument("--models_dir", default="./models/", help="Directory to download models")
     parser.add_argument("--use_cuda", default=False, help="Use CUDA")
     parser.add_argument("--play_audio", default=True, help="Play audio")
+    parser.add_argument("-record-thread", default=False, help="Run recorder thread")
     ## make selftest store on true
     parser.add_argument("--selftest", action="store_true", help="Run selftest")
     args = parser.parse_args()
@@ -200,6 +202,7 @@ if __name__ == "__main__":
         'models_dir': args.models_dir,
         'use_cuda': args.use_cuda,
         'play_audio': args.play_audio,
+        'record-thread': args.record_thread,
     }
     if args.selftest:
         selftest(queues, config)
