@@ -17,13 +17,15 @@
 		"web-vitals": "^3.5.0"
 	},
 	"devDependencies": {
+		"@stylistic/eslint-plugin": "^1.5.3",
 		"@types/node": "^20.10.3",
 		"@types/react": "^18.2.42",
 		"@types/react-dom": "^18.2.17",
-		"@typescript-eslint/eslint-plugin": "^6.13.2",
-		"@typescript-eslint/parser": "^6.13.2",
+		"@typescript-eslint/eslint-plugin": "^6.19.0",
+		"@typescript-eslint/parser": "^6.19.0",
 		"@vitejs/plugin-react-swc": "^3.5.0",
-		"eslint": "^8.55.0",
+		"eslint": "^8.56.0",
+		"eslint-plugin-react": "^7.33.2",
 		"typescript": "^5.2.2",
 		"vite": "^5.0.0",
 		"vitest": "^1.0.1"

@@ -1,15 +1,13 @@
-import type { Dispatch, SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from 'react';
 
-import styles from "./Responses.module.css";
+import styles from './Responses.module.css';
 
 interface Props {
 	responses: string[];
 	setInputText: Dispatch<SetStateAction<string>>;
 }
 
-
-export function Responses ({ responses, setInputText }: Props) {
-
+export function Responses({ responses, setInputText }: Props) {
 	return (
 		<div className={styles.responses}>
 			<div className={styles.titleBar}>

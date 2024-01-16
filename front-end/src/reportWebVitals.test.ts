@@ -1,7 +1,7 @@
-import { basename } from "node:path";
-import { describe, expect, test, vi } from "vitest";
+import { basename } from 'node:path';
+import { describe, expect, test, vi } from 'vitest';
 
-import { reportWebVitals } from "./reportWebVitals";
+import { reportWebVitals } from './reportWebVitals';
 
 const mockWebVitals = vi.hoisted(() => ({
 	onCLS: vi.fn(),
@@ -10,10 +10,10 @@ const mockWebVitals = vi.hoisted(() => ({
 	onLCP: vi.fn(),
 	onTTFB: vi.fn(),
 }));
-vi.mock("web-vitals", () => mockWebVitals);
+vi.mock('web-vitals', () => mockWebVitals);
 
 describe(basename(import.meta.url), () => {
-	test("registers onPerfEntry callback web-vitals event handlers", () => {
+	test('registers onPerfEntry callback web-vitals event handlers', () => {
 		const mockOnPerfEntry = vi.fn();
 
 		reportWebVitals(mockOnPerfEntry);
@@ -24,10 +24,9 @@ describe(basename(import.meta.url), () => {
 		expect(mockWebVitals.onTTFB).toHaveBeenCalledWith(mockOnPerfEntry);
 	});
 
-	test("does not throw an error when onPerfEntry is not provided", () => {
+	test('does not throw an error when onPerfEntry is not provided', () => {
 		expect(() => {
 			reportWebVitals();
 		}).not.toThrow();
 	});
 });
-
