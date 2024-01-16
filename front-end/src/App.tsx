@@ -11,7 +11,7 @@ import styles from "./App.module.css";
 const WEBSOCKET_URL = "ws://0.0.0.0:8000";
 const SERVER_URL = "http://0.0.0.0:8000";
 
-export function App () {
+export function App() {
 	const [listen, setListen] = useState(false);
 	const [listenSocket, setListenSocket] = useState<WebSocket | null>();
 	const [speakSocket, setSpeakSocket] = useState<WebSocket | null>(null);
@@ -21,8 +21,7 @@ export function App () {
 	const [audioURL, setAudioURL] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
 
-
-	function doListen () {
+	function doListen() {
 		console.log("doListen");
 		if (!listenSocket) {
 			const socket = new WebSocket(WEBSOCKET_URL + "/transcribe");
@@ -36,7 +35,7 @@ export function App () {
 		}
 	}
 
-	function toggleListen () {
+	function toggleListen() {
 		console.log("toggleListen");
 		setListen(!listen);
 		setFirstMessage(true);
@@ -53,7 +52,7 @@ export function App () {
 				const transcriptionResult = event.data as string;
 				if (listen) {
 					// Functional update
-					setTranscription((prevTranscription) => prevTranscription + " " + transcriptionResult);
+					setTranscription(prevTranscription => prevTranscription + " " + transcriptionResult);
 					listenSocket.send("ACK");
 
 					setMessages((prevMessages) => {
@@ -100,15 +99,14 @@ export function App () {
 		}
 	}, [listen, transcription]);
 
-
-	async function generate (voiceInput: string): Promise<string[]> {
+	async function generate(voiceInput: string): Promise<string[]> {
 		const res = await fetch(`${SERVER_URL}/query`, {
 			method: "POST",
 			// Assuming the server expects an array of questions
 			body: JSON.stringify({ question: voiceInput }),
 			headers: {
 				"Content-Type": "application/json",
-				accept: "application/json",
+				"accept": "application/json",
 			},
 		});
 
@@ -117,20 +115,17 @@ export function App () {
 		return data;
 	}
 
-
 	const speak = () => {
-		setMessages((prevMessages) => [...prevMessages, { message: inputText, side: "right" }]);
+		setMessages(prevMessages => [...prevMessages, { message: inputText, side: "right" }]);
 		setInputText("");
 
 		// Store the socket reference for later use
 		if (!speakSocket) {
 			setSpeakSocket(new WebSocket(WEBSOCKET_URL + "/speak"));
 		}
-
 	};
 
 	useEffect(() => {
-
 		if (speakSocket) {
 			console.log("speakSocket");
 			speakSocket.onerror = function (event) {
@@ -184,9 +179,9 @@ export function App () {
 			<Listen listen={listen} toggleListen={toggleListen} />
 			<div className={styles.mainView}>
 				<Chat messages={messages} />
-				<Responses responses={responses} setInputText={setInputText}/>
+				<Responses responses={responses} setInputText={setInputText} />
 			</div>
-			<InputBar inputText={inputText} onInputChange={onInputChange} speak={speak} audioURL={audioURL}/>
+			<InputBar inputText={inputText} onInputChange={onInputChange} speak={speak} audioURL={audioURL} />
 		</div>
 	);
 }

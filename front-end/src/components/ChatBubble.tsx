@@ -1,11 +1,11 @@
 import styles from "./ChatBubble.module.css";
 
 interface Props {
-    side: "left" | "right";
-    message: string;
+	side: "left" | "right";
+	message: string;
 }
 
-export function ChatBubble ({ side, message }: Props) {
+export function ChatBubble({ side, message }: Props) {
 	return (
 		<div
 			className={styles.messageBar + " " + (side === "left" ? styles.messageBar_left : styles.messageBar_right)}

@@ -3,14 +3,14 @@ import pencil from "../assets/pencil.svg";
 import paperAirplane from "../assets/paper-airplane.svg";
 
 interface Props {
-    inputText: string;
-    onInputChange: (newText: string) => void;
-    speak: () => void;
-    audioURL: string | null;
+	inputText: string;
+	onInputChange: (newText: string) => void;
+	speak: () => void;
+	audioURL: string | null;
 }
 
-export function InputBar ({ inputText, onInputChange, speak, audioURL }: Props) {
-	function openKeyboard () {
+export function InputBar({ inputText, onInputChange, speak, audioURL }: Props) {
+	function openKeyboard() {
 		alert("You should probably change this!");
 	}
 

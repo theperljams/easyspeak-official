@@ -7,9 +7,7 @@ interface Props {
 	setInputText: Dispatch<SetStateAction<string>>;
 }
 
-
-export function Responses ({ responses, setInputText }: Props) {
-
+export function Responses({ responses, setInputText }: Props) {
 	return (
 		<div className={styles.responses}>
 			<div className={styles.titleBar}>

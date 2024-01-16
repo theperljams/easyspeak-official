@@ -30,4 +30,3 @@ describe(basename(import.meta.url), () => {
 		}).not.toThrow();
 	});
 });
-

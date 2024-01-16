@@ -7,14 +7,14 @@ interface Props {
 	toggleListen: () => void;
 }
 
-export function Listen ({ listen, toggleListen }: Props) {
+export function Listen({ listen, toggleListen }: Props) {
 	return (
 		<div
 			className={styles.listenButton}
 			onClick={toggleListen}
 		>
-			<img className={styles.volumeIcon} src={listen ? VolumeHigh : VolumeMute}/>
-			Listen: {listen ? "On" : "Off"}
+			<img className={styles.volumeIcon} src={listen ? VolumeHigh : VolumeMute} />
+			{`Listen: ${listen ? "On" : "Off"}`}
 		</div>
 	);
 }

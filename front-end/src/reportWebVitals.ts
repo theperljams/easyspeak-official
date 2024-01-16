@@ -1,7 +1,7 @@
 import { onCLS, onFID, onFCP, onLCP, onTTFB } from "web-vitals";
 import type { ReportCallback } from "web-vitals";
 
-export function reportWebVitals (onPerfEntry?: ReportCallback) {
+export function reportWebVitals(onPerfEntry?: ReportCallback) {
 	if (onPerfEntry && onPerfEntry instanceof Function) {
 		onCLS(onPerfEntry);
 		onFID(onPerfEntry);
