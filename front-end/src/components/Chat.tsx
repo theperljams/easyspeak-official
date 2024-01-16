@@ -1,10 +1,10 @@
-import { ChatBubble } from "./ChatBubble";
+import { ChatBubble } from './ChatBubble';
 
-import styles from "./Chat.module.css";
+import styles from './Chat.module.css';
 
 export interface Message {
 	message: string;
-	side: "left" | "right";
+	side: 'left' | 'right';
 }
 
 interface Props {

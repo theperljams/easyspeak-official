@@ -1,6 +1,6 @@
-import type { Dispatch, SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from 'react';
 
-import styles from "./Responses.module.css";
+import styles from './Responses.module.css';
 
 interface Props {
 	responses: string[];

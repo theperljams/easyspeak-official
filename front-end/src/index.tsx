@@ -1,13 +1,13 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 
-import "./index.css";
-import { App } from "./App.js";
-import { reportWebVitals } from "./reportWebVitals.js";
+import './index.css';
+import { App } from './App.js';
+import { reportWebVitals } from './reportWebVitals.js';
 
 const root = createRoot(
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	document.getElementById("root")!,
+	document.getElementById('root')!,
 );
 root.render(
 	<StrictMode>

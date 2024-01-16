@@ -1,6 +1,6 @@
-import styles from "./InputBar.module.css";
-import pencil from "../assets/pencil.svg";
-import paperAirplane from "../assets/paper-airplane.svg";
+import styles from './InputBar.module.css';
+import pencil from '../assets/pencil.svg';
+import paperAirplane from '../assets/paper-airplane.svg';
 
 interface Props {
 	inputText: string;
@@ -11,7 +11,7 @@ interface Props {
 
 export function InputBar({ inputText, onInputChange, speak, audioURL }: Props) {
 	function openKeyboard() {
-		alert("You should probably change this!");
+		alert('You should probably change this!');
 	}
 
 	return (
