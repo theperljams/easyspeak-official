@@ -21,6 +21,7 @@ export default [
 			globals: {
 				...globals.node,
 				...globals.es2021, // es2022 is not available (https://github.com/sindresorhus/globals/issues/183)
+				...globals.browser,
 				NodeJS: true,
 			},
 		},
@@ -71,9 +72,6 @@ export default [
 				ecmaFeatures: {
 					jsx: true,
 				},
-			},
-			globals: {
-				...globals.browser,
 			},
 		},
 		settings: {

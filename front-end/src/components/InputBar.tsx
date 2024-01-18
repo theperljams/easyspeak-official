@@ -1,3 +1,5 @@
+import type { FormEvent } from 'react';
+
 import styles from './InputBar.module.css';
 import pencil from '../assets/pencil.svg';
 import paperAirplane from '../assets/paper-airplane.svg';
@@ -14,11 +16,18 @@ export function InputBar({ inputText, onInputChange, speak, audioURL }: Props) {
 		alert('You should probably change this!');
 	}
 
+	function onFormSubmit(e: FormEvent<HTMLFormElement>) {
+		// So the page doesn't reload
+		e.preventDefault();
+
+		speak();
+	}
+
 	return (
-		<div className={styles.inputBar}>
-			<div className={styles.button} onClick={openKeyboard}>
+		<form className={styles.inputBar} onSubmit={onFormSubmit}>
+			<button className={styles.button} type="button" onClick={openKeyboard}>
 				<img src={pencil} alt="icon" className={styles.buttonIcon} />
-			</div>
+			</button>
 			<input
 				className={styles.textBox}
 				type="text"
@@ -36,9 +45,9 @@ export function InputBar({ inputText, onInputChange, speak, audioURL }: Props) {
 					</audio>
 				)
 			}
-			<div className={styles.button} onClick={speak}>
+			<button className={styles.button} type="submit">
 				<img src={paperAirplane} alt="icon" className={styles.buttonIcon} />
-			</div>
-		</div>
+			</button>
+		</form>
 	);
 }
