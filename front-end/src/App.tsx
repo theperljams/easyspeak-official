@@ -115,7 +115,7 @@ export function App() {
 		return data;
 	}
 
-	const speak = () => {
+	function speak() {
 		setMessages(prevMessages => [...prevMessages, { message: inputText, side: 'right' }]);
 		setInputText('');
 
@@ -123,7 +123,7 @@ export function App() {
 		if (!speakSocket) {
 			setSpeakSocket(new WebSocket(WEBSOCKET_URL + '/speak'));
 		}
-	};
+	}
 
 	useEffect(() => {
 		if (speakSocket) {
