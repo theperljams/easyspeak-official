@@ -1,13 +1,26 @@
 
-from fastapi import FastAPI
+import asyncio
+import random
+import wave
+from fastapi import FastAPI, websockets
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import WebSocket, WebSocketDisconnect
+from pydantic import BaseModel
+import os
 
 cool_app = FastAPI()
+
+async def generate_random_words(websocket: WebSocket):
+    while True:
+        await asyncio.sleep(1)  # Wait for one second
+        random_word = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(5))
+        print("Random word: ", random_word)
+        await websocket.send_text(random_word)
 
 origins = [
     "http://localhost",
     "http://localhost:3000",
+    "http://localhost:5173",
 ]
 
 cool_app.add_middleware(
@@ -27,31 +40,27 @@ async def query_chain(question: Question):
     print(f"Question: {question}")
     
     # Modify this part to return hardcoded text
-    return {"message": "This is a hardcoded response for the query endpoint." + question.question}
+    responses = ["This is a hardcoded response for the query endpoint." + question.question, "Another hardcoded response for the query endpoint." + question.question]
+    return responses
 
 @cool_app.websocket("/transcribe")
 async def transcribe(websocket: WebSocket):
     await websocket.accept()
-    
-    # Modify this part to send hardcoded text
-    try:
-        while True:
-            text = "This is a hardcoded message."
-            print(f"[WEB]:\t Sending: {text}")
-            await websocket.send_text(text)
-            await websocket.receive()
-    except WebSocketDisconnect:
-        print(f"[WEB]:\t Closed Socket")
-        await websocket.close()
+    await generate_random_words(websocket)
 
-@cool_app.post("/speak") 
-async def handle_audio(response: Question):
-    # Modify this part to return hardcoded text
-    return {"message": "This is a hardcoded response for the speak endpoint." + response.question }
+
+@cool_app.websocket("/speak")  # Use @cool_app.websocket for WebSockets
+async def handle_audio(websocket: WebSocket):  # Accept a WebSocket object
+    await websocket.accept()  # Accept the WebSocket connection
+
+    with wave.open("data/indigo.wav", "rb") as wav_file:  # Open the WAV file
+        frames = wav_file.readframes(wav_file.getnframes())  # Read the audio frames
+        await websocket.send_bytes(frames)  # Send the frames over the WebSocket
+
 
 # ... (other existing routes)
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(cool_app, host="127.0.0.1", port=8000)
+    uvicorn.run(cool_app, host="0.0.0.0", port=8000)
