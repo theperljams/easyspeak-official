@@ -45,7 +45,8 @@ def mp_transcribe_thread(config, audio_queue, text_queue, threaded=True):
                 print("Queue is empty")
                 sleep(2)
             audio_data = audio_queue.get()
-            audio_data = io.BytesIO(audio_data)
+            # audio_data = io.BytesIO(audio_data)
+            print("audio data: ",type(audio_data))
             transcription = transcriber.transcribe(curr_data=audio_data)
             text_queue.put(transcription)
             print("text added to queue: ", text_queue.qsize())
@@ -68,6 +69,7 @@ def mp_recorder_thread(config, audio_queue, threaded=True):
     while True:
         try:
             wav_data = recorder.record()
+            print("wav data: ",type(wav_data))
             audio_queue.put(wav_data)
         except BaseException as e:
             s = {'failure':'mp_recorder_thread() failed', 'error': e}
@@ -128,8 +130,8 @@ def run_threads(queues, config):
     sq = queues['speech_queue']
     # cq = mp.Queue()    # completion queue
 
-    if config['record-thread']:  
-        rp = mp.Process(target=mp_recorder_thread, name="mp_recorder_thread", args=(config, aq,))
+    rp = mp.Process(target=mp_recorder_thread, name="mp_recorder_thread", args=(config, aq,))
+    if config['record-thread']: 
         rp.start()
     tp = mp.Process(target=mp_transcribe_thread, name="mp_transcribe_thread", args=(config, aq, tq,))
     tp.start()
@@ -143,7 +145,8 @@ def run_threads(queues, config):
         # print("Queues: ", aq.qsize(), tq.qsize())
 
     print("Killing processes")
-    rp.kill()
+    if config['record-thread']:
+        rp.kill()
     tp.kill()
     spchp.kill()
     srvrp.kill()
