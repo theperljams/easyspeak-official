@@ -34,4 +34,7 @@
 	flex-direction: column;
 	justify-content: flex-start;
 	gap: 15px;
+
+	/* Add a scrollbar when the message list overflows */
+	overflow-y: auto;
 }
