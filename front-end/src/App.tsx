@@ -1,105 +1,69 @@
-import { useState, useEffect } from 'react';
 
-import { Listen } from './components/Listen.js';
-import { Chat } from './components/Chat.js';
-import type { Message } from './components/Chat.jsx';
-import { Responses } from './components/Responses.js';
-import { InputBar } from './components/InputBar.js';
+import { useState, useEffect, useRef, useCallback } from "react";
+import useWebSocket, { ReadyState } from "react-use-websocket";
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
-import styles from './App.module.css';
+import { Listen } from "./components/Listen.js";
+import { Chat } from "./components/Chat.js";
+import type { Message } from "./components/Chat.jsx";
+import { Responses } from "./components/Responses.js";
+import { InputBar } from "./components/InputBar.js";
 
-const WEBSOCKET_URL = 'ws://0.0.0.0:8000';
-const SERVER_URL = 'http://0.0.0.0:8000';
+import styles from "./App.module.css";
 
-export function App() {
-	const [listen, setListen] = useState(false);
-	const [listenSocket, setListenSocket] = useState<WebSocket | null>();
-	const [speakSocket, setSpeakSocket] = useState<WebSocket | null>(null);
-	const [transcription, setTranscription] = useState('');
-	const [firstMessage, setFirstMessage] = useState(true);
-	const [inputText, setInputText] = useState('');
+const SERVER_URL = "http://0.0.0.0:8080";
+
+export function App () {
+	const [isListening, setIsListening] = useState(false);
+	const [initialLoad, setInitialLoad] = useState(false);
+	const [inputText, setInputText] = useState("");
 	const [audioURL, setAudioURL] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
-
-	function doListen() {
-		console.log('doListen');
-		if (!listenSocket) {
-			const socket = new WebSocket(WEBSOCKET_URL + '/transcribe');
-
-			socket.onerror = function (event) {
-				console.error('WebSocket error:', event);
-				alert('There was an error connecting to the transcription server');
-			};
-
-			setListenSocket(socket);
-		}
+	const [responses, setResponses] = useState(["", "", "", ""]);
+	const [speaking, setSpeaking] = useState(false);
+	const { transcript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
+	
+	if (!browserSupportsSpeechRecognition) {
+		return (<p>Browser does not support speech recognition...</p>)
 	}
-
-	function toggleListen() {
-		console.log('toggleListen');
-		setListen(!listen);
-		setFirstMessage(true);
-		doListen();
+	
+	const startListening = () => {
+		console.log("starting listening");
+		resetTranscript();
+		SpeechRecognition.startListening({continuous:true, language:"en-IN"});
 	}
-
-	useEffect(() => {
-		if (!listenSocket) {
-			console.log('no listenSocket');
-		}
-		else {
-			listenSocket.onmessage = (event) => {
-				console.log('listen: ', listen);
-				const transcriptionResult = event.data as string;
-				if (listen) {
-					// Functional update
-					setTranscription(prevTranscription => prevTranscription + ' ' + transcriptionResult);
-					listenSocket.send('ACK');
-
-					setMessages((prevMessages) => {
-						if (firstMessage) {
-							// Update firstMessage state
-							setFirstMessage(false);
-							return [...prevMessages, { message: transcriptionResult, side: 'left' }];
-						}
-						else {
-							return [
-								...prevMessages.slice(0, -1),
-								{
-									message: prevMessages[prevMessages.length - 1].message + ' ' + transcriptionResult,
-									side: 'left',
-								},
-							];
-						}
-					});
-				}
-				else {
-					setTranscription('');
-					listenSocket.send('ACK');
-				}
-			};
-			console.log('firstMessage: ', firstMessage);
-		}
-	}, [listenSocket, firstMessage, listen]);
-	// Include firstMessage in dependency array
-
-	const [responses, setResponses] = useState(['', '', '', '']);
-
-	useEffect(() => {
-		if (!listen && transcription != '') {
-			console.log('in generate');
-			// Clear responses when listen is false
+	
+	const stopListening = () => {
+		console.log("stopping listen");
+		SpeechRecognition.stopListening();
+		
+		if (transcript) {
+			setMessages((prev) => [...prev, { message: transcript, side: 'left'}]);
 			setResponses(['', '', '', '']);
-			generate(transcription)
+			generate(transcript)
 				.then((r) => {
+					console.log(r);
 					setResponses(r);
 				})
 				.catch((error) => {
 					console.error('Error generating responses:', error);
 				});
 		}
-	}, [listen, transcription]);
+	}
+	
+	useEffect(() => {
+		if (initialLoad) {
+			if (isListening) {
+				startListening();
+			} else {
+				stopListening();
+			}
+		} else {
+			setInitialLoad(true);
+		}
+	}, [isListening])
 
-	async function generate(voiceInput: string): Promise<string[]> {
+  async function generate(voiceInput: string): Promise<string[]> {
 		const res = await fetch(`${SERVER_URL}/query`, {
 			method: 'POST',
 			// Assuming the server expects an array of questions
@@ -114,74 +78,64 @@ export function App() {
 		console.log('response: ', data);
 		return data;
 	}
-
-	function speak() {
+	
+	function chooseResponse() {
+		console.log("we be speaking");
 		setMessages(prevMessages => [...prevMessages, { message: inputText, side: 'right' }]);
-		setInputText('');
-
-		// Store the socket reference for later use
-		if (!speakSocket) {
-			setSpeakSocket(new WebSocket(WEBSOCKET_URL + '/speak'));
-		}
+		setSpeaking(true);
 	}
 
+  async function speak(voiceInput: string): Promise<string | Blob> {
+    try {
+      const res = await fetch(`${SERVER_URL}/speak`, {
+        method: 'POST',
+        body: JSON.stringify({ question: voiceInput }),
+        headers: {
+          'Content-Type': 'application/json',
+          'accept': 'audio/wav', // Indicate expecting audio data
+        },
+      });
+  
+      if (res.ok) {
+        const audioData = await res.blob(); // Get audio bytes as a Blob
+        console.log('audio data:', audioData);
+        return audioData; // Return the audio data directly
+      } else {
+        console.error('Error fetching audio:', res.statusText);
+        return "No audio available";
+      }
+    } catch (error) {
+      console.error('Error generating audio:', error);
+      return "No audio available";
+    }
+  }
+
 	useEffect(() => {
-		if (speakSocket) {
-			console.log('speakSocket');
-			speakSocket.onerror = function (event) {
-				console.error('WebSocket error:', event);
-				alert('There was an error connecting to the speech server');
-			};
-
-			speakSocket.onopen = (event) => {
-				console.log('WebSocket connection opened:', event);
-
-				// Send the question to the server
-				const message = { question: inputText };
-				speakSocket.send(JSON.stringify(message));
-			};
-
-			// Handle incoming audio data
-			speakSocket.onmessage = (event) => {
-				// Assuming audio data is already in ArrayBuffer format
-				const audioData = event.data as ArrayBuffer;
-				const audioBlob = new Blob([audioData], { type: 'audio/wav' });
-				const audioUrl = URL.createObjectURL(audioBlob);
-
-				setAudioURL(audioUrl);
-				speakSocket.send('ACK');
-				console.log('Audio URL:', audioUrl);
-
-				// socket.close();
-			};
-
-			speakSocket.onclose = function (event) {
-				// Reset webSocket state to null when connection closes
-				setSpeakSocket(null);
-				setInputText('');
-
-				if (event.wasClean) {
-					console.log('WebSocket closed cleanly:', event);
-				}
-				else {
-					console.log('WebSocket connection closed unexpectedly:', event);
-				}
-			};
-		}
-	}, [speakSocket, inputText]);
-
-	const onInputChange = (newText: string) => {
-		setInputText(newText);
-	};
+    if (speaking) {
+		console.log('speaking');
+      speak(inputText).then((audioData) => {
+        if (audioData instanceof Blob) {
+          const audioURL = URL.createObjectURL(audioData);
+          console.log('audio URL:', audioURL);
+          setAudioURL(audioURL);
+		  setSpeaking(false);
+		  setInputText("");
+        } else {
+          console.error('Error generating audio:', audioData);
+        }
+      });
+    }
+		
+	}, [speaking]);
 
 	return (
 		<div className={styles.app}>
-			<Listen listen={listen} toggleListen={toggleListen} />
+			<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}} />
 			<div className={styles.mainView}>
-				<Chat messages={messages} />
-				<Responses responses={responses} setInputText={setInputText} />
+				<Chat messages={messages} loading={isListening} transcript={transcript}/>
+				<Responses responses={responses} setInputText={setInputText}/>
 			</div>
-			<InputBar inputText={inputText} onInputChange={onInputChange} speak={speak} audioURL={audioURL} />
+			<InputBar inputText={inputText} onInputChange={(s) => {setInputText(s)}} speak={chooseResponse} audioURL={audioURL}/>
 		</div>
 	);
 }

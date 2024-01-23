@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import 'regenerator-runtime/runtime'
 
 import './index.css';
 import { App } from './App.js';
@@ -9,6 +10,9 @@ const root = createRoot(
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	document.getElementById('root')!,
 );
+
+document.body.style.overflow = "hidden"
+
 root.render(
 	<StrictMode>
 		<App />
