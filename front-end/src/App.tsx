@@ -1,6 +1,5 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import useWebSocket, { ReadyState } from "react-use-websocket";
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
 import { Listen } from "./components/Listen.js";
@@ -9,6 +8,8 @@ import type { Message } from "./components/Chat.jsx";
 import { Responses } from "./components/Responses.js";
 import { InputBar } from "./components/InputBar.js";
 import { Training } from "./components/Training.js";
+
+import generateInitialQuestion from "./Api.js";
 
 import styles from "./App.module.css";
 
@@ -25,6 +26,7 @@ export function App () {
 	const [userGeneratedResponses, setUserGeneratedResponses] = useState(["", "", "", ""]);
 	
 	// TRAINING MODE
+	const [trainingSession, setTrainingSession] = useState(false);
 	const [isTraining, setIsTraining] = useState(false);
 	const [initialQuestion, setInitialQuestion] = useState(false);
 	const [trainingPrompt, setTrainingPrompt] = useState("");
@@ -74,7 +76,7 @@ export function App () {
 	
 	const handleSubmitInput = () => {
 		if (isTraining) {
-			console.log('do not say a word');
+			// 1. we need to send this to the gpt and get a new question
 		} else {
 			setMessages(prevMessages => [...prevMessages, { message: textInput, side: 'right' }]);
 			setIsSpeaking(true);
@@ -82,31 +84,33 @@ export function App () {
 	}
 
   const speak = async (input: string) => {
-		if (!isTraining) {
-			try {
-				const res = await fetch(`${SERVER_URL}/speak`, {
-					method: 'POST',
-					body: JSON.stringify({ question: input }),
-					headers: {
-						'Content-Type': 'application/json',
-						'accept': 'audio/wav',
-					},
-				});
-		
-				if (res.ok) {
-					const audioData = await res.blob(); // Get audio bytes as a Blob
-					console.log('audio data:', audioData);
-					return audioData; // Return the audio data directly
-				} else {
-					console.error('Error fetching audio:', res.statusText);
-					return "No audio available";
-				}
-			} catch (error) {
-				console.error('Error generating audio:', error);
+		try {
+			const res = await fetch(`${SERVER_URL}/speak`, {
+				method: 'POST',
+				body: JSON.stringify({ question: input }),
+				headers: {
+					'Content-Type': 'application/json',
+					'accept': 'audio/wav',
+				},
+			});
+	
+			if (res.ok) {
+				const audioData = await res.blob(); // Get audio bytes as a Blob
+				console.log('audio data:', audioData);
+				return audioData; // Return the audio data directly
+			} else {
+				console.error('Error fetching audio:', res.statusText);
 				return "No audio available";
 			}
+		} catch (error) {
+			console.error('Error generating audio:', error);
+			return "No audio available";
 		}
   }
+	
+	const onTrainingClicked = () => {
+		setIsTraining(prev => !prev);
+	}
 
 	useEffect(() => {
     if (isSpeaking) {
@@ -139,20 +143,23 @@ export function App () {
 	}, [isListening]);
 	
 	useEffect(() => {
-		if (isTraining) {
-			console.log('should be training now');
+		console.log('training session is being changed', trainingSession);
+		if (trainingSession) {
+			console.log('let us get some generated responses');
+			const generatedText = generateInitialQuestion();
+			console.log(generatedText);
 		}
-	}, [isTraining]);
+	}, [trainingSession]);
 
 	return (
 		<div className={styles.app}>
 			<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}} />
 			<div className={styles.mainView}>
 				{!isTraining && <Chat messages={messages} loading={isListening} transcript={transcript}/>}
-				{isTraining && <Training messages={trainingMessages} transcript={trainingPrompt}/>}
+				{isTraining && <Training messages={trainingMessages} transcript={trainingPrompt} session={trainingSession} setSessionStarted={() => setTrainingSession(true)}/>}
 				<Responses responses={userGeneratedResponses} setInputText={setTextInput} isTraining={isTraining}/>
 			</div>
-			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleSubmitInput} audioURL={audioURL} setIsTraining={() => {setIsTraining((prev) => !prev)}}/>
+			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleSubmitInput} audioURL={audioURL} setIsTraining={onTrainingClicked}/>
 		</div>
 	);
 }
