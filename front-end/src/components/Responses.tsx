@@ -5,11 +5,15 @@ import styles from './Responses.module.css';
 interface Props {
 	responses: string[];
 	setInputText: Dispatch<SetStateAction<string>>;
+	isTraining: boolean;
 }
 
-export function Responses({ responses, setInputText }: Props) {
+export function Responses({ responses, setInputText, isTraining }: Props) {
 	return (
 		<div className={styles.responses}>
+			{isTraining && <div className={styles.shroud}>
+				generated responses are disabled in training mode
+			</div>}
 			<div className={styles.titleBar}>
 				Responses
 			</div>
@@ -26,6 +30,7 @@ export function Responses({ responses, setInputText }: Props) {
 					</button>
 				))}
 			</div>
+			
 		</div>
 	);
 }

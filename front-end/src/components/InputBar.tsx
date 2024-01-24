@@ -1,4 +1,4 @@
-import type { FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 
 import styles from './InputBar.module.css';
 import pencil from '../assets/pencil.svg';
@@ -6,26 +6,22 @@ import paperAirplane from '../assets/paper-airplane.svg';
 
 interface Props {
 	inputText: string;
-	onInputChange: (newText: string) => void;
-	speak: () => void;
+	setInput: (newText: string) => void;
+	handleSubmitInput: () => void;
 	audioURL: string | null;
+	setIsTraining: () => void;
 }
 
-export function InputBar({ inputText, onInputChange, speak, audioURL }: Props) {
-	function openKeyboard() {
-		alert('You should probably change this!');
-	}
-
-	function onFormSubmit(e: FormEvent<HTMLFormElement>) {
-		// So the page doesn't reload
+export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, setIsTraining }: Props) {
+	const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-
-		speak();
+		handleSubmitInput();
+		setInput('');
 	}
 
 	return (
 		<form className={styles.inputBar} onSubmit={onFormSubmit}>
-			<button className={styles.button} type="button" onClick={openKeyboard}>
+			<button className={styles.button} type="button" onClick={setIsTraining}>
 				<img src={pencil} alt="icon" className={styles.buttonIcon} />
 			</button>
 			<input
@@ -33,7 +29,7 @@ export function InputBar({ inputText, onInputChange, speak, audioURL }: Props) {
 				type="text"
 				value={inputText}
 				onChange={(e) => {
-					onInputChange(e.target.value);
+					setInput(e.target.value);
 				}}
 				placeholder="Type anything here..."
 			/>

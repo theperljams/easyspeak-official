@@ -8,19 +8,28 @@ import { Chat } from "./components/Chat.js";
 import type { Message } from "./components/Chat.jsx";
 import { Responses } from "./components/Responses.js";
 import { InputBar } from "./components/InputBar.js";
+import { Training } from "./components/Training.js";
 
 import styles from "./App.module.css";
 
 const SERVER_URL = "http://0.0.0.0:8080";
 
 export function App () {
-	const [isListening, setIsListening] = useState(false);
 	const [initialLoad, setInitialLoad] = useState(false);
-	const [inputText, setInputText] = useState("");
+	const [isSpeaking, setIsSpeaking] = useState(false);
+	const [isListening, setIsListening] = useState(false);
+	
+	const [textInput, setTextInput] = useState("");
 	const [audioURL, setAudioURL] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
-	const [responses, setResponses] = useState(["", "", "", ""]);
-	const [speaking, setSpeaking] = useState(false);
+	const [userGeneratedResponses, setUserGeneratedResponses] = useState(["", "", "", ""]);
+	
+	// TRAINING MODE
+	const [isTraining, setIsTraining] = useState(false);
+	const [initialQuestion, setInitialQuestion] = useState(false);
+	const [trainingPrompt, setTrainingPrompt] = useState("");
+	const [trainingMessages, setTrainingMessages] = useState<Message[]>([]);
+	
 	const { transcript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
 	
 	if (!browserSupportsSpeechRecognition) {
@@ -28,46 +37,30 @@ export function App () {
 	}
 	
 	const startListening = () => {
-		console.log("starting listening");
 		resetTranscript();
 		SpeechRecognition.startListening({continuous:true, language:"en-IN"});
 	}
 	
 	const stopListening = () => {
-		console.log("stopping listen");
 		SpeechRecognition.stopListening();
 		
 		if (transcript) {
 			setMessages((prev) => [...prev, { message: transcript, side: 'left'}]);
-			setResponses(['', '', '', '']);
-			generate(transcript)
+			setUserGeneratedResponses(['', '', '', '']);
+			generateUserResponses(transcript)
 				.then((r) => {
-					console.log(r);
-					setResponses(r);
+					setUserGeneratedResponses(r);
 				})
 				.catch((error) => {
 					console.error('Error generating responses:', error);
 				});
 		}
 	}
-	
-	useEffect(() => {
-		if (initialLoad) {
-			if (isListening) {
-				startListening();
-			} else {
-				stopListening();
-			}
-		} else {
-			setInitialLoad(true);
-		}
-	}, [isListening])
 
-  async function generate(voiceInput: string): Promise<string[]> {
+  const generateUserResponses = async (input: string) => {
 		const res = await fetch(`${SERVER_URL}/query`, {
 			method: 'POST',
-			// Assuming the server expects an array of questions
-			body: JSON.stringify({ question: voiceInput }),
+			body: JSON.stringify({ question: input }),
 			headers: {
 				'Content-Type': 'application/json',
 				'accept': 'application/json',
@@ -79,63 +72,87 @@ export function App () {
 		return data;
 	}
 	
-	function chooseResponse() {
-		console.log("we be speaking");
-		setMessages(prevMessages => [...prevMessages, { message: inputText, side: 'right' }]);
-		setSpeaking(true);
+	const handleSubmitInput = () => {
+		if (isTraining) {
+			console.log('do not say a word');
+		} else {
+			setMessages(prevMessages => [...prevMessages, { message: textInput, side: 'right' }]);
+			setIsSpeaking(true);
+		}
 	}
 
-  async function speak(voiceInput: string): Promise<string | Blob> {
-    try {
-      const res = await fetch(`${SERVER_URL}/speak`, {
-        method: 'POST',
-        body: JSON.stringify({ question: voiceInput }),
-        headers: {
-          'Content-Type': 'application/json',
-          'accept': 'audio/wav', // Indicate expecting audio data
-        },
-      });
-  
-      if (res.ok) {
-        const audioData = await res.blob(); // Get audio bytes as a Blob
-        console.log('audio data:', audioData);
-        return audioData; // Return the audio data directly
-      } else {
-        console.error('Error fetching audio:', res.statusText);
-        return "No audio available";
-      }
-    } catch (error) {
-      console.error('Error generating audio:', error);
-      return "No audio available";
-    }
+  const speak = async (input: string) => {
+		if (!isTraining) {
+			try {
+				const res = await fetch(`${SERVER_URL}/speak`, {
+					method: 'POST',
+					body: JSON.stringify({ question: input }),
+					headers: {
+						'Content-Type': 'application/json',
+						'accept': 'audio/wav',
+					},
+				});
+		
+				if (res.ok) {
+					const audioData = await res.blob(); // Get audio bytes as a Blob
+					console.log('audio data:', audioData);
+					return audioData; // Return the audio data directly
+				} else {
+					console.error('Error fetching audio:', res.statusText);
+					return "No audio available";
+				}
+			} catch (error) {
+				console.error('Error generating audio:', error);
+				return "No audio available";
+			}
+		}
   }
 
 	useEffect(() => {
-    if (speaking) {
-		console.log('speaking');
-      speak(inputText).then((audioData) => {
-        if (audioData instanceof Blob) {
-          const audioURL = URL.createObjectURL(audioData);
-          console.log('audio URL:', audioURL);
-          setAudioURL(audioURL);
-		  setSpeaking(false);
-		  setInputText("");
-        } else {
-          console.error('Error generating audio:', audioData);
-        }
-      });
+    if (isSpeaking) {
+      speak(textInput)
+				.then((audioData) => {
+					if (audioData instanceof Blob) {
+						const audioURL = URL.createObjectURL(audioData);
+						console.log('audio URL:', audioURL);
+						setAudioURL(audioURL);
+						setIsSpeaking(false);
+						setTextInput("");
+					}
+				})
+				.catch((error) => {
+					console.error('Error speaking:', error);
+				});
     }
-		
-	}, [speaking]);
+	}, [isSpeaking]);
+	
+	useEffect(() => {
+		if (initialLoad) {
+			if (isListening) {
+				startListening();
+			} else {
+				stopListening();
+			}
+		} else {
+			setInitialLoad(true);
+		}
+	}, [isListening]);
+	
+	useEffect(() => {
+		if (isTraining) {
+			console.log('should be training now');
+		}
+	}, [isTraining]);
 
 	return (
 		<div className={styles.app}>
 			<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}} />
 			<div className={styles.mainView}>
-				<Chat messages={messages} loading={isListening} transcript={transcript}/>
-				<Responses responses={responses} setInputText={setInputText}/>
+				{!isTraining && <Chat messages={messages} loading={isListening} transcript={transcript}/>}
+				{isTraining && <Training messages={trainingMessages} transcript={trainingPrompt}/>}
+				<Responses responses={userGeneratedResponses} setInputText={setTextInput} isTraining={isTraining}/>
 			</div>
-			<InputBar inputText={inputText} onInputChange={(s) => {setInputText(s)}} speak={chooseResponse} audioURL={audioURL}/>
+			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleSubmitInput} audioURL={audioURL} setIsTraining={() => {setIsTraining((prev) => !prev)}}/>
 		</div>
 	);
 }

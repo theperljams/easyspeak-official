@@ -9,19 +9,21 @@ export interface Message {
 
 interface Props {
   messages: Message[];
-  loading: Boolean;
   transcript: string;
 }
 
-export function Chat({ loading, messages, transcript }: Props) {
+export function Training({ messages, transcript }: Props) {
+  const [trainingStarted, setTrainingStarted] = useState(false);
+
   return (
     <div className={styles.chat}>
       <div className={styles.titleBar}>Chat</div>
       <div className={styles.messagesList}>
+        {!trainingStarted && 
+        <button className={styles.button} type="button" onClick={() => {setTrainingStarted((prev) => !prev)}}/>}
         {messages.map((message, index) => (
           <ChatBubble key={index} side={message.side} message={message.message} />
         ))}
-        {loading && <ChatBubble side={'left'} message={transcript} />}
       </div>
     </div>
   );
