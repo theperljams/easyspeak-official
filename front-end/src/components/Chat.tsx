@@ -23,6 +23,7 @@ export function Chat({ loading, messages, transcript }: Props) {
         ))}
         {loading && <ChatBubble side={'left'} message={transcript} />}
       </div>
+      <div className='footer'/>
     </div>
   );
 }

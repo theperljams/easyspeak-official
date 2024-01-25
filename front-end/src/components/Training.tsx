@@ -7,6 +7,12 @@ export interface Message {
   side: 'left' | 'right';
 }
 
+export interface GPTMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
+
 interface Props {
   messages: Message[];
   session: boolean;
