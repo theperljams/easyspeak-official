@@ -13,7 +13,7 @@ import { Training } from "./components/Training.js";
 import styles from "./App.module.css";
 
 // functions for communicating with API
-import {generateGPTQuestion, generateUserAudio, generateUserResponses} from "./Api.js";
+import {generateGPTQuestion, generateUserAudio, generateUserResponses, sendQuestionAnswerPair} from "./Api.js";
 
 export function App () {
 	const [initialLoad, setInitialLoad] = useState(false);
@@ -39,7 +39,6 @@ export function App () {
 	
 	// for sending quesiton answer pairs to the database
 	const [question, setQuestion] = useState('');
-	const [answer, setAnswer] = useState('');
  	
 	const { transcript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
 	
@@ -73,6 +72,9 @@ export function App () {
 			setTrainingMessages(prev => [...prev, { message: textInput, side: 'right' }]);
 			setGptMessages(prev => [...prev, { role: 'user', content: textInput }]);
 			getSystemReply();
+			
+			// put Q&A pair into the db
+			sendQuestionAnswerPair(`Q: ${question} A: ${textInput}`);
 		} else {
 			setMessages(prev => [...prev, { message: textInput, side: 'right' }]);
 			setIsSpeaking(true);
@@ -80,12 +82,10 @@ export function App () {
 	}
 	
 	const getSystemReply = () => {
-		console.log('hey there', gptMessages);
 		generateGPTQuestion(gptMessages)
 		.then((data) => {
-			console.log(data);
-			const question = data['choices'][0]['message']['content'];
-			setTrainingMessages(prev => [...prev, { message: question, side: 'left'}]);
+			setQuestion(data);
+			setTrainingMessages(prev => [...prev, { message: data, side: 'left'}]);
 			setGptMessages(prev => [...prev, { role: 'assistant', content: question }]);
 		})
 		.catch((error) => {

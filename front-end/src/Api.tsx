@@ -1,41 +1,62 @@
 import type { GPTMessage } from "./components/Training";
+import { createClient } from '@supabase/supabase-js';
 
-const COMPLETIONS_URL = 'https://api.openai.com/v1/chat/completions';
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY;
+const OPENAI_COMPLETE_URL = 'https://api.openai.com/v1/chat/completions';
+const OPENAI_EMBEDDING_URL = 'https://api.openai.com/v1/embeddings';
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
-// export const generateGPTEmbeddings = async () => {
-//   try {
-//     const response = await fetch();
-//   }
-// }
+const SUPA_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPA_API_KEY = import.meta.env.VITE_SUPABASE_API_KEY;
+const supabase = createClient(SUPA_URL, SUPA_API_KEY);
+const SUPA_TABLE = 'documents';
 
-export const generateGPTQuestion = async (messages: GPTMessage[]) => {
+export const sendQuestionAnswerPair = async (content: string) => {
   try {
-    const response = await fetch(COMPLETIONS_URL, {
+    const response = await fetch(OPENAI_EMBEDDING_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        'model': 'gpt-3.5-turbo',
-        'messages': messages
+        input: '',
+        model: 'text-embedding-ada-002'
       })
     });
     
-    if (response.ok) {
-      const json = await response.json();
-      return json;
-    }
+    const json = await response.json()
+    const embedding = json.data[0].embedding;
     
+    await supabase.from(SUPA_TABLE).insert({
+      content, 
+      embedding
+    });
   } catch (error) {
-    console.error('Error making OpenAI request:', error);
+    console.error('Error making OpenAI embed request:', error);
   }
 }
 
-export const sendQuestionAnswerPair = async () => {
-  
+export const generateGPTQuestion = async (messages: GPTMessage[]) => {
+  try {
+    const response = await fetch(OPENAI_COMPLETE_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: messages
+      })
+    });
+    
+    const json = await response.json();
+    return json.choices[0].message.content;
+    
+  } catch (error) {
+    console.error('Error making OpenAI complete request:', error);
+  }
 }
 
 export const generateUserAudio = async (input: string) => {

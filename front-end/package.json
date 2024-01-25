@@ -19,6 +19,7 @@
 		"react-dom": "^18.2.0",
 		"react-speech-recognition": "^3.10.0",
 		"react-use-websocket": "^4.5.0",
+		"supabase": "^1.136.3",
 		"web-vitals": "^3.5.0"
 	},
 	"devDependencies": {
