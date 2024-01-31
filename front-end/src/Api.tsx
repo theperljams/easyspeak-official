@@ -11,6 +11,24 @@ const SUPA_API_KEY = import.meta.env.VITE_SUPABASE_API_KEY;
 const supabase = createClient(SUPA_URL, SUPA_API_KEY);
 const SUPA_TABLE = 'documents';
 
+interface SignUpProps {
+  body: {
+    email: string
+    password: string
+  }
+}
+
+export const signUpNewUser = async (req:SignUpProps) => {
+  const { email, password } = req.body;
+  const { data, error } = await supabase.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+      emailRedirectTo: 'https://example.com/welcome'
+    }
+  })
+}
+
 export const sendQuestionAnswerPair = async (content: string) => {
   try {
     const response = await fetch(OPENAI_EMBEDDING_URL, {
@@ -98,3 +116,9 @@ export const generateUserResponses = async (input: string) => {
   console.log('response: ', data);
   return data;
 }
+
+export const signOut = async () => {
+  const { error } = await supabase.auth.signOut()
+}
+
+// NOTE: you can use the LLM to make a decision based on the info that it gets back
