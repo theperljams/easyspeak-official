@@ -26,11 +26,16 @@ export function App() {
 		} = supabase.auth.onAuthStateChange((_event, session) => {
 			setSession(session)
 		})
+		
 		return () => subscription.unsubscribe()
 	}, []);
 	
 	useEffect(() => {
-		console.log(session);
+		const user = session?.user.email;
+		
+		if (user) {
+			localStorage.setItem('user_id', user);
+		}
 	}, [session]);
 
 	if (session === null) {

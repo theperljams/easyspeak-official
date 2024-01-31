@@ -13,6 +13,8 @@ interface Props {
   transcript: string;
 }
 
+// scroll to bottom on message submit
+
 export function Chat({ loading, messages, transcript }: Props) {
   return (
     <div className={styles.chat}>

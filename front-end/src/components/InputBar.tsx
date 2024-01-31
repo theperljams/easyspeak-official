@@ -12,6 +12,8 @@ interface Props {
 	setIsTraining: () => void;
 }
 
+// TODO: handle the input overflow, allow maybe 3-4 lines then make it scrollable
+
 export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, setIsTraining }: Props) {
 	const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();

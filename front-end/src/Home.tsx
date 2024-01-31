@@ -151,8 +151,7 @@ export function Home () {
 				<Responses responses={userGeneratedResponses} setInputText={setTextInput} isTraining={isTrainingMode}/>
 			</div>
 			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsTraining={onTrainingClicked}/>
-			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={signOut} audioURL={audioURL} setIsTraining={onTrainingClicked}/>
-      
+			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={signOut} audioURL={audioURL} setIsTraining={onTrainingClicked}/> 
 		</div>
 	);
 }

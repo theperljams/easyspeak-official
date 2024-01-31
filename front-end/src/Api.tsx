@@ -9,7 +9,7 @@ const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 const SUPA_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPA_API_KEY = import.meta.env.VITE_SUPABASE_API_KEY;
 const supabase = createClient(SUPA_URL, SUPA_API_KEY);
-const SUPA_TABLE = 'documents';
+const SUPA_TABLE = 'short';
 
 interface SignUpProps {
   body: {
@@ -30,6 +30,8 @@ export const signUpNewUser = async (req:SignUpProps) => {
 }
 
 export const sendQuestionAnswerPair = async (content: string) => {
+  const user_id = localStorage.getItem('user_id');
+  
   try {
     const response = await fetch(OPENAI_EMBEDDING_URL, {
       method: 'POST',
@@ -38,7 +40,7 @@ export const sendQuestionAnswerPair = async (content: string) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        input: '',
+        input: content,
         model: 'text-embedding-ada-002'
       })
     });
@@ -47,6 +49,7 @@ export const sendQuestionAnswerPair = async (content: string) => {
     const embedding = json.data[0].embedding;
     
     await supabase.from(SUPA_TABLE).insert({
+      user_id,
       content, 
       embedding
     });
