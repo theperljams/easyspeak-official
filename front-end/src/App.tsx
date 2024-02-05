@@ -5,8 +5,13 @@ import {
   ThemeSupa,
 } from '@supabase/auth-ui-shared'
 import { useEffect, useState } from "react";
-import { Home } from './Home';
+import { Chat } from './Chat';
+import { Training } from './Training';
+
+// signout function
 import { signOut } from './Api';
+import { BrowserRouter, Route, RouterProvider, Routes } from 'react-router-dom';
+import { Home } from './Home';
 
 const SUPA_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPA_API_KEY = import.meta.env.VITE_SUPABASE_API_KEY;
@@ -42,6 +47,14 @@ export function App() {
 		return (<Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />)
 	}
 	else {
-		return (<Home/>)
+		return (
+			<BrowserRouter>
+				<Routes>
+					<Route path="/" element={<Home/>}/>
+					<Route path="/chat" element={<Chat/>}/>
+					<Route path="/training" element={<Training/>}/>
+				</Routes>
+			</BrowserRouter>
+		)
 	}
 }

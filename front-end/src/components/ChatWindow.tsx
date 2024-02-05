@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChatBubble } from './ChatBubble';
-import styles from './Chat.module.css';
+import styles from './ChatWindow.module.css';
 
 export interface Message {
   message: string;
@@ -15,7 +15,7 @@ interface Props {
 
 // scroll to bottom on message submit
 
-export function Chat({ loading, messages, transcript }: Props) {
+export function ChatWindow({ loading, messages, transcript }: Props) {
   return (
     <div className={styles.chat}>
       <div className={styles.titleBar}>Chat</div>
