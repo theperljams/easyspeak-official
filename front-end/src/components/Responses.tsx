@@ -17,7 +17,8 @@ export function Responses({ responses, setInputText, isTraining }: Props) {
 			<div className={styles.titleBar}>
 				Responses
 			</div>
-			<div className={styles.responsesList}>
+			
+			{responses.length>0 && <div className={styles.responsesList}>
 				{responses.map((response, index) => (
 					<button
 						className={styles.response}
@@ -29,7 +30,7 @@ export function Responses({ responses, setInputText, isTraining }: Props) {
 						{response}
 					</button>
 				))}
-			</div>
+			</div>}
 			
 		</div>
 	);

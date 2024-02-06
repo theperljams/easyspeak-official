@@ -58,21 +58,6 @@ export const sendQuestionAnswerPair = async (content: string) => {
   }
 }
 
-export const testFunction = async () => {
-  const match_count = 4;
-  const query_embedding = await getEmbedding('what is your favorite color?');
-  const similarity_threshold = 0.7;
-  
-  let { data, error } = await supabase
-  .rpc('match_short', {
-    match_count, 
-    query_embedding, 
-    similarity_threshold
-  })
-  if (error) console.error(error)
-  else console.log(data)
-}
-
 export const generateGPTQuestion = async (messages: GPTMessage[]) => {
   try {
     const response = await fetch(OPENAI_COMPLETE_URL, {
@@ -121,41 +106,28 @@ export const generateUserAudio = async (input: string) => {
 }
 
 export const generateUserResponses = async (input: string) => {
-  const res = await fetch(`${SERVER_URL}/query`, {
-    method: 'POST',
-    body: JSON.stringify({ question: input }),
-    headers: {
-      'Content-Type': 'application/json',
-      'accept': 'application/json',
-    },
-  });
+  try {
+    const res = await fetch(`${SERVER_URL}/generate`, {
+      method: 'POST',
+      body: JSON.stringify({ content: input }),
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': 'application/json',
+      },
+    });
+    const data = await res.json() as string[];
+    console.log('response: ', data);
+    return data;
+  } catch (error) {
+    console.error('error doing this thing');
+  }
+  
 
-  const data = await res.json() as string[];
-  console.log('response: ', data);
-  return data;
+  
 }
 
 export const signOut = async () => {
   const { error } = await supabase.auth.signOut()
-}
-
-const getEmbedding = async (content: string) => {
-  const response = await fetch(OPENAI_EMBEDDING_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${OPENAI_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      input: content,
-      model: 'text-embedding-ada-002'
-    })
-  });
-  
-  const json = await response.json()
-  const embedding = json.data[0].embedding;
-  
-  return embedding;
 }
 
 // NOTE: you can use the LLM to make a decision based on the info that it gets back

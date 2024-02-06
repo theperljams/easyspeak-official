@@ -22,13 +22,15 @@ RUN pip install -U langchain-community
 COPY data /app/data
 
 # Copy python files
-COPY api.py dumb_server.py mp.py MyDataLoader.py Recorder.py Speecher.py Transcriber.py /app/
+COPY api.py dumb_server.py mp.py MyDataLoader.py Recorder.py Speecher.py Transcriber.py MyOpenai.py MySupa.py /app/
 
 # Expose port 8000 for frontend use
 EXPOSE 8080
 
 # Env variable for openaikey
 ENV OPENAI_API_KEY=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
+ENV SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6d2xwZWt4bmdldmxlc3lrdmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDYyMTgyNDksImV4cCI6MjAyMTc5NDI0OX0.ypVAYmCz4NCthZyntGAPMN5W6zSJOtiJRx8O7XyCENU
+ENV SUPABASE_URL=https://pzwlpekxngevlesykvfx.supabase.co
 
 # Run your Python script when the container starts
 CMD ["python","-u", "mp.py"]

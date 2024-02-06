@@ -13,7 +13,7 @@ import { Training } from "./components/Training.js";
 import styles from "./App.module.css";
 
 // functions for communicating with API
-import {generateGPTQuestion, generateUserAudio, generateUserResponses, sendQuestionAnswerPair, signOut, testFunction } from "./Api.js";
+import {generateGPTQuestion, generateUserAudio, generateUserResponses, sendQuestionAnswerPair, signOut } from "./Api.js";
 
 const START_PROMPT = import.meta.env.VITE_START_PROMPT;
 
@@ -151,7 +151,7 @@ export function Chat () {
 				<Responses responses={userGeneratedResponses} setInputText={setTextInput} isTraining={isTrainingMode}/>
 			</div>
 			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsTraining={onTrainingClicked}/>
-			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={testFunction} audioURL={audioURL} setIsTraining={onTrainingClicked}/> 
+			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={signOut} audioURL={audioURL} setIsTraining={onTrainingClicked}/> 
 		</div>
 	);
 }

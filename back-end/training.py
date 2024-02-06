@@ -15,7 +15,7 @@ SUPABASE_URL = "https://pzwlpekxngevlesykvfx.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6d2xwZWt4bmdldmxlc3lrdmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDYyMTgyNDksImV4cCI6MjAyMTc5NDI0OX0.ypVAYmCz4NCthZyntGAPMN5W6zSJOtiJRx8O7XyCENU"
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 async def get_embedding(text):
     response = client.embeddings.create(
@@ -23,35 +23,67 @@ async def get_embedding(text):
         input=text,
         encoding_format="float"
     )
-    return response.data[0].embedding 
+    return response.data[0].embedding
 
-async def get_context(question, length):
+async def post_request_to_supabase_short(question):
+    import requests
     similarity_threshold = 0.1
     match_count = 10
     embedding = await get_embedding(question)
-    function_name = ""
 
-    if length == "short":
-        function_name = "match_short"
-    elif length == "long":
-        function_name = "match_long"
+    # Define the URL and the payload
+    url = 'https://pzwlpekxngevlesykvfx.supabase.co/rest/v1/rpc/match_short'
+    payload = {
+        "match_count": match_count,
+        "query_embedding": embedding,
+        "similarity_threshold": similarity_threshold
+    }
+
+    # Define the headers
+    headers = {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}"
+    }
+
+    # Make the POST request
+    response = requests.post(url, json=payload, headers=headers)
+
+    # Return the response
+    if response.ok:
+        return response.json()
+    else:
+        return response.status_code, response.text
     
-    print(function_name)
-    print(supabase)
+async def post_request_to_supabase_long(question):
+    import requests
+    similarity_threshold = 0.1
+    match_count = 10
+    embedding = await get_embedding(question)
 
-    context = await supabase.rpc('match_short', {
-        'query_embedding': embedding,
-        'similarity_threshold': similarity_threshold,
-        'match_count': match_count
-    })
+    # Define the URL and the payload
+    url = 'https://pzwlpekxngevlesykvfx.supabase.co/rest/v1/rpc/match_long'
+    payload = {
+        "match_count": match_count,
+        "query_embedding": embedding,
+        "similarity_threshold": similarity_threshold
+    }
 
-    if context.error:
-      print(f"Error during RPC call: {context.error}")
-      raise Exception(context.error)
+    # Define the headers
+    headers = {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}"
+    }
 
-    print("context: ", context)
+    # Make the POST request
+    response = requests.post(url, json=payload, headers=headers)
 
-    return context
+    # Return the response
+    if response.ok:
+        return response.json()
+    else:
+        return response.status_code, response.text
 
 async def get_response(prompt):
     stream = client.chat.completions.create(
@@ -68,45 +100,35 @@ async def get_response(prompt):
     return result
 
 async def answer(question):
-    short_context = await get_context(question, "short")
-    long_context = await get_context(question, "long")
+    short_context = await post_request_to_supabase_short(question)
+    long_context = await post_request_to_supabase_long(question)
 
-    prompt1 = f"""You are {personality}, please look at the context below to learn how {personality} speaks. As you answer, mimic their voice and way of speaking, try to be as convincing as possible. You can also search this context below to answer questions. Answer the question as if you were {personality}. 
-                This dataset mainly contains basic information. Assume any question you are asked is a question you are answering for {personality}. You = {personality}. For example, if someone asks: "What are you studying?" think of the question as: "What does {personality} say he is studying?"
-                Stay in character while answering questions. DO NOT refer to yourself in the third person. DO NOT ask how you can help. 
+    prompt = f"""You are an assistant drafting texts for {personality}. Your goal is to sound as much like them as possible. Follow these steps to learn how to do this.
+
+                Step 1: Look at the context below to learn how {personality} speaks. As you answer, mimic their voice and way of speaking, try to be as convincing as possible. You can also search this context below to answer questions. Answer the question as if you were sending a text from {personality}'s phone. 
+                This dataset mainly contains basic information. You = {personality}. For example, if someone asks: "What are you studying?" think of the question as: "What does {personality} say they are studying?" 
                 If the answer is not contained in the context, just say that you don't know. Don't add additional answers that don't answer the question.
 
                 Context: {short_context}
 
                 Other: {question}
-                {personality}: """
-
-    output1 = await get_response(prompt1)
-    print("output1", output1)
-
-    prompt2 = f"""Using this context, edit your response: {output1} to sound more like {personality}. This dataset contains answers that are more like journal entries. Use them to learn how to better mimic {personality}. 
-                This dataset also contains information you can pull from to clarify your previous response if necessary. If it does not provide any relevant information, simply use it as a guide to get a feel for the {personality}'s writing style. 
+                {personality}:  
+                
+                Step 2: Now, look at this context to learn {personality}'s writing style. This dataset contains answers that are more like journal entries. Use them to learn how to better mimic {personality}. 
+                This dataset also contains information you can pull from to clarify your previous response if necessary. If it does not provide any relevant information, only use it for style. Edit your previous response to sound more like {personality}.
 
                 {long_context}
 
                 Other: {question}
-                {personality}: """
-
-    output2 = await get_response(prompt2)
-    print("output2", output2)
-
-    prompt3 = f"""Now, take your previous response: {output2}, and come up with 3 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3. \n 4. Treat them as 4 separate sentences in different contexts. You can use either of the previous datasets for help with this.
-
-                {question}
-                1. 
-                2.
-                3. 
-                4.  """
-
-    output3 = await get_response(prompt3)
-    print("output3", output3)
-
-    return output3
+                {personality}:
+                
+                Step 3: Now, take your previous response and come up with 3 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3. \n 4. Treat them as 4 separate sentences in different contexts. You can use either of the previous datasets for help with this."""
+    
+    print("PROMPT: ", prompt, "\n\n")
+    
+    response = await get_response(prompt)
+    print("RESPONSE: ", response, "\n\n")
+    return response
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
@@ -114,6 +136,6 @@ if __name__ == "__main__":
         question = input("Question: ")
         if question.lower() == "exit":
             break
-        answer = loop.run_until_complete(answer(question))
+        result = loop.run_until_complete(answer(question))
         print("Answer:")
-        print(answer)
+        print(result)
