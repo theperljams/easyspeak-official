@@ -8,6 +8,13 @@
 4. Activate your virtual environment by running `source venv/bin/activate`
 5. Start the server by running the api script with `python3 mp.py`
 
+## Docker setup for back-end
+
+Run both these commands while in the back-end
+
+1. `docker build -t easy-speak-docker .`
+2. `docker run -it -p 8080:8000 easy-speak-docker`     
+
 ### Notes
 
 If you run into issues running `pyaudio`, try installing this `sudo apt-get install portaudio19-dev`
