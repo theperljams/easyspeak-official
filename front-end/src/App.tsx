@@ -9,7 +9,6 @@ import { Chat } from './Chat';
 import { Training } from './Training';
 
 // signout function
-import { signOut } from './Api';
 import { BrowserRouter, Route, RouterProvider, Routes } from 'react-router-dom';
 import { Home } from './Home';
 

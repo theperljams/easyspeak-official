@@ -13,7 +13,7 @@ import { Training } from "./components/Training.js";
 import styles from "./App.module.css";
 
 // functions for communicating with API
-import {generateGPTQuestion, generateUserAudio, generateUserResponses, sendQuestionAnswerPair, signOut } from "./Api.js";
+import {generateGPTQuestion, generateUserAudio, generateUserResponses, sendQuestionAnswerPairToShort, signOut } from "./Api.js";
 
 const START_PROMPT = import.meta.env.VITE_START_PROMPT;
 
@@ -81,7 +81,7 @@ export function Chat () {
         getSystemReply();
         
         // put Q&A pair into the db TODO: change name
-        sendQuestionAnswerPair(`Other: ${question} User: ${textInput}`);
+        sendQuestionAnswerPairToShort(`Other: ${question} User: ${textInput}`);
       } else {
         setMessages(prev => [...prev, { message: textInput, side: 'right' }]);
         setIsSpeaking(true);

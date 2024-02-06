@@ -29,7 +29,7 @@ export const signUpNewUser = async (req:SignUpProps) => {
   })
 }
 
-export const sendQuestionAnswerPair = async (content: string) => {
+export const sendQuestionAnswerPairToShort = async (content: string) => {
   const user_id = localStorage.getItem('user_id');
   
   try {
@@ -120,10 +120,8 @@ export const generateUserResponses = async (input: string) => {
     return data;
   } catch (error) {
     console.error('error doing this thing');
+    return [];
   }
-  
-
-  
 }
 
 export const signOut = async () => {
