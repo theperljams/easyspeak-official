@@ -1,4 +1,4 @@
-import type { GPTMessage } from "./components/Training";
+import type { GPTMessage } from "./Training";
 import { createClient } from '@supabase/supabase-js';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -107,7 +107,7 @@ export const generateUserAudio = async (input: string) => {
 
 export const generateUserResponses = async (input: string) => {
   try {
-    console.log(JSON.stringify({ content: input }));
+    console.log(JSON.stringify({ content: input }))
     const res = await fetch(`${SERVER_URL}/generate`, {
       method: 'POST',
       body: JSON.stringify({ content: input }),

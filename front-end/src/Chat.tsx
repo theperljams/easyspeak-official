@@ -98,7 +98,7 @@ export function Chat () {
 				<ChatWindow messages={messages} loading={isListening} transcript={transcript} title='Chat'/>
 				<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>
 			</div>
-			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL}/>
+			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => console.log('test')}/>
 		</div>
 	);
 }

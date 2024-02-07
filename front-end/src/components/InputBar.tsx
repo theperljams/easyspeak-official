@@ -9,11 +9,12 @@ interface Props {
 	setInput: (newText: string) => void;
 	handleSubmitInput: () => void;
 	audioURL: string | null;
+	setButton: () => void;
 }
 
 // TODO: handle the input overflow, allow maybe 3-4 lines then make it scrollable
 
-export function InputBar({ inputText, setInput, handleSubmitInput, audioURL }: Props) {
+export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, setButton }: Props) {
 	const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		handleSubmitInput();
@@ -22,7 +23,7 @@ export function InputBar({ inputText, setInput, handleSubmitInput, audioURL }: P
 
 	return (
 		<form className={styles.inputBar} onSubmit={onFormSubmit}>
-			<button className={styles.button} type="button" onClick={() => console.log('edit')}>
+			<button className={styles.button} type="button" onClick={setButton}>
 				<img src={pencil} alt="icon" className={styles.buttonIcon} />
 			</button>
 			<input

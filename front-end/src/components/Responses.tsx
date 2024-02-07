@@ -27,7 +27,6 @@ export function Responses({ responses, setInputText }: Props) {
 					</button>
 				))}
 			</div>}
-			
 		</div>
 	);
 }
