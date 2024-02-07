@@ -22,7 +22,6 @@ export function Chat () {
 	const [audioURL, setAudioURL] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [userGeneratedResponses, setUserGeneratedResponses] = useState(["", "", "", ""]);
-  
 	
 	// for use later: sending quesiton answer pairs to the database 
 	const [question, setQuestion] = useState('');

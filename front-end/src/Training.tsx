@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
 import { ChatWindow } from "./components/ChatWindow.js";
-import { Responses } from "./components/Responses.js";
 import { InputBar } from "./components/InputBar.js";
 
 import styles from "./App.module.css";
@@ -39,7 +38,7 @@ export function Training () {
 		generateGPTQuestion(messages)
 		.then((data) => {
 			setQuestion(data);
-			setMessages(prev => [...prev, { role: 'assistant', content: question }]);
+			setMessages(prev => [...prev, { role: 'assistant', content: data }]);
 			console.log(messages);
 		})
 		.catch((error) => {
@@ -55,7 +54,6 @@ export function Training () {
 		<div className={styles.app}>
 			<div className={styles.mainView}>
 				<ChatWindow messages={messages} loading={false} transcript={''} title='Training Mode'/>
-				<Responses responses={[]} setInputText={setTextInput}/>
 			</div>
 			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
 		</div>
