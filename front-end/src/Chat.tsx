@@ -4,7 +4,6 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 
 import { Listen } from "./components/Listen.js";
 import { ChatWindow } from "./components/ChatWindow.js";
-import type { Message } from "./components/ChatWindow.js";
 import { Responses } from "./components/Responses.js";
 import { InputBar } from "./components/InputBar.js";
 
@@ -12,6 +11,7 @@ import styles from "./App.module.css";
 
 // functions for communicating with API
 import { generateUserAudio, generateUserResponses } from "./Api.js";
+import type { Message } from "./components/Interfaces.js";
 
 export function Chat () {
 	const [initialLoad, setInitialLoad] = useState(false);
@@ -42,7 +42,7 @@ export function Chat () {
 		SpeechRecognition.stopListening();
 		
 		if (transcript) {
-			setMessages((prev) => [...prev, { message: transcript, side: 'left'}]);
+			setMessages((prev) => [...prev, { content: transcript, role: 'assistant'}]);
 			setUserGeneratedResponses(['', '', '', '']);
 			generateUserResponses(transcript)
 				.then((r) => {
@@ -56,7 +56,7 @@ export function Chat () {
 
 	const handleUserInputSubmit = () => {
     if (textInput != '') {
-      setMessages(prev => [...prev, { message: textInput, side: 'right' }]);
+      setMessages(prev => [...prev, { content: textInput, role: 'user' }]);
 			setIsSpeaking(true);
     }
 	}
@@ -93,11 +93,11 @@ export function Chat () {
 
 	return (
 		<div className={styles.app}>
-			<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}} />
 			<div className={styles.mainView}>
 				<ChatWindow messages={messages} loading={isListening} transcript={transcript} title='Chat'/>
 				<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>
 			</div>
+			<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}} />
 			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => console.log('test')}/>
 		</div>
 	);

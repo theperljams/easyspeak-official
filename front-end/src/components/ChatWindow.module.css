@@ -10,11 +10,8 @@
 .titleBar {
 	background-color: black;
 	font-size: 24px;
-	color: white;
-	
 	position: fixed;
-	margin-left: 200px;
-	width: 45%;
+	width: 60%;
 	height: 80px;
 	/* The title bar should not shrink when the screen is small */
 	min-height: 80px;

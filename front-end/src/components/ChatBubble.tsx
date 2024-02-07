@@ -1,20 +1,22 @@
 import styles from './ChatBubble.module.css';
 
 interface Props {
-	side: 'left' | 'right';
-	message: string;
+	content: string;
+	role: string;
 }
 
-export function ChatBubble({ side, message }: Props) {
+export function ChatBubble({ content, role }: Props) {
 	return (
-		<div
-			className={styles.messageBar + ' ' + (side === 'left' ? styles.messageBar_left : styles.messageBar_right)}
-		>
-			<div
-				className={styles.chatBubble + ' ' + (side === 'left' ? styles.chatBubble_left : styles.chatBubble_right)}
+		<>
+			{role != 'system' && <div
+				className={styles.messageBar + ' ' + ( role === 'assistant' ? styles.messageBar_left : styles.messageBar_right)}
 			>
-				{message}
-			</div>
-		</div>
+				<div
+					className={styles.chatBubble + ' ' + ( role === 'assistant' ? styles.chatBubble_left : styles.chatBubble_right)}
+				>
+					{content}
+				</div>
+			</div>}
+		</>
 	);
 }

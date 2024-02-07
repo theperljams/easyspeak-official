@@ -1,17 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChatBubble } from './ChatBubble';
 import styles from './ChatWindow.module.css';
-
-export interface Message {
-  message: string;
-  side: 'left' | 'right';
-}
+import type { Message } from './Interfaces';
 
 interface Props {
   messages: Message[];
   loading: Boolean;
   transcript: string;
-  title: string;
+  title : string;
 }
 
 // scroll to bottom on message submit
@@ -22,9 +18,9 @@ export function ChatWindow({ loading, messages, transcript, title }: Props) {
       <div className={styles.titleBar}>{title}</div>
       <div className={styles.messagesList}>
         {messages.map((message, index) => (
-          <ChatBubble key={index} side={message.side} message={message.message} />
+            <ChatBubble key={index} role={message.role} content={message.content} />
         ))}
-        {loading && <ChatBubble side={'left'} message={transcript} />}
+        {loading && <ChatBubble role={'assistant'} content={transcript} />}
       </div>
       <div className='footer'/>
     </div>

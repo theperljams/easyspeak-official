@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
 import { ChatWindow } from "./components/ChatWindow.js";
-import type { Message } from "./components/ChatWindow.js";
 import { Responses } from "./components/Responses.js";
 import { InputBar } from "./components/InputBar.js";
 
@@ -10,23 +9,13 @@ import styles from "./App.module.css";
 
 // functions for communicating with API
 import {generateGPTQuestion, sendQuestionAnswerPairToShort } from "./Api.js";
-
-export interface GPTMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-}
+import type { Message } from "./components/Interfaces.js";
 
 const START_PROMPT = import.meta.env.VITE_START_PROMPT;
 
 export function Training () {
 	const [textInput, setTextInput] = useState("");
-	const [messages, setMessages] = useState<Message[]>([]);
-  
-  // NOTES: 
-  // two different sections of questions, let them talk about what they want to talk about.
-  // prompts from config file
-
-	const [gptMessages, setGptMessages] = useState<GPTMessage[]>([
+	const [messages, setMessages] = useState<Message[]>([
     { // initial prompt
       role: 'system',
       content: `${START_PROMPT}`
@@ -38,21 +27,20 @@ export function Training () {
 
 	const handleUserInputSubmit = () => {
     if (textInput != '') {
-      setMessages(prev => [...prev, { message: textInput, side: 'right' }]);
-        setGptMessages(prev => [...prev, { role: 'user', content: textInput }]);
-        getSystemReply();
-        
-        // TODO: change other to user name
-        sendQuestionAnswerPairToShort(`Other: ${question} User: ${textInput}`);
+			setMessages(prev => [...prev, { role: 'user', content: textInput }]);
+			getSystemReply();
+			
+			// TODO: change other to user name
+			sendQuestionAnswerPairToShort(`Other: ${question} User: ${textInput}`);
     }
 	}
 	
 	const getSystemReply = () => {
-		generateGPTQuestion(gptMessages)
+		generateGPTQuestion(messages)
 		.then((data) => {
 			setQuestion(data);
-			setMessages(prev => [...prev, { message: data, side: 'left'}]);
-			setGptMessages(prev => [...prev, { role: 'assistant', content: question }]);
+			setMessages(prev => [...prev, { role: 'assistant', content: question }]);
+			console.log(messages);
 		})
 		.catch((error) => {
 			console.log(error);
