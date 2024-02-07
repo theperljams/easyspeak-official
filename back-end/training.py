@@ -1,4 +1,3 @@
-import openai
 from supabase_py import create_client, Client
 import os
 import dotenv

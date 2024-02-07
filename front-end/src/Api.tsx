@@ -107,6 +107,7 @@ export const generateUserAudio = async (input: string) => {
 
 export const generateUserResponses = async (input: string) => {
   try {
+    console.log(JSON.stringify({ content: input }));
     const res = await fetch(`${SERVER_URL}/generate`, {
       method: 'POST',
       body: JSON.stringify({ content: input }),

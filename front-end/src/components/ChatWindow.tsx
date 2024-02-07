@@ -11,14 +11,15 @@ interface Props {
   messages: Message[];
   loading: Boolean;
   transcript: string;
+  title: string;
 }
 
 // scroll to bottom on message submit
 
-export function ChatWindow({ loading, messages, transcript }: Props) {
+export function ChatWindow({ loading, messages, transcript, title }: Props) {
   return (
     <div className={styles.chat}>
-      <div className={styles.titleBar}>Chat</div>
+      <div className={styles.titleBar}>{title}</div>
       <div className={styles.messagesList}>
         {messages.map((message, index) => (
           <ChatBubble key={index} side={message.side} message={message.message} />

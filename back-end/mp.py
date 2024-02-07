@@ -12,7 +12,6 @@ from Speecher import Speecher
 import uvicorn
 import api as api
 
-
 class SignalCatcher:
     """
     Class to handle graceful exit of the process by catching SIGINT and SIGTERM signals,

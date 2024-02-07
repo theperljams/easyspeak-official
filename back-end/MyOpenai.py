@@ -48,7 +48,7 @@ async def generate_responses(content, context_short, context_long):
 async def get_chat_completions(prompt):
     stream = client.chat.completions.create(
         model="gpt-4-0125-preview",
-        messages=[{"role": "user", "content": prompt}],
+        messages=[{"role": "system", "content": prompt}],
         stream=True,
     )
     responseList = []

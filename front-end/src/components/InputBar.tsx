@@ -9,12 +9,11 @@ interface Props {
 	setInput: (newText: string) => void;
 	handleSubmitInput: () => void;
 	audioURL: string | null;
-	setIsTraining: () => void;
 }
 
 // TODO: handle the input overflow, allow maybe 3-4 lines then make it scrollable
 
-export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, setIsTraining }: Props) {
+export function InputBar({ inputText, setInput, handleSubmitInput, audioURL }: Props) {
 	const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		handleSubmitInput();
@@ -23,7 +22,7 @@ export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, set
 
 	return (
 		<form className={styles.inputBar} onSubmit={onFormSubmit}>
-			<button className={styles.button} type="button" onClick={setIsTraining}>
+			<button className={styles.button} type="button" onClick={() => console.log('edit')}>
 				<img src={pencil} alt="icon" className={styles.buttonIcon} />
 			</button>
 			<input
@@ -37,7 +36,7 @@ export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, set
 			/>
 			{
 				// Conditionally render audio player
-				audioURL && (
+				audioURL != null && (
 					<audio autoPlay key={audioURL}>
 						<source src={audioURL} type="audio/mpeg" />
 					</audio>
