@@ -15,12 +15,12 @@ interface Props {
 export function ChatWindow({ loading, messages, transcript, title }: Props) {
   return (
     <div className={styles.chat}>
-      <div className={styles.titleBar}>{title}</div>
+      {/* <div className={styles.titleBar}>{title}</div> */}
       <div className={styles.messagesList}>
         {messages.map((message, index) => (
             <ChatBubble key={index} role={message.role} content={message.content} />
         ))}
-        {loading && <ChatBubble role={'assistant'} content={transcript} />}
+        {loading && <ChatBubble role={'assistant'} content={transcript != '' ? transcript : '...' } />}
       </div>
       <div className='footer'/>
     </div>

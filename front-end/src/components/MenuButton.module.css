@@ -1,0 +1,15 @@
+.mainView {
+  display: flex;
+  justify-content: space-between;
+}
+
+.link {
+  font-size: 20px;
+  text-decoration: none;
+  color: black;
+  display: flex;
+}
+
+.title {
+  margin-left: 10px;
+}

@@ -10,10 +10,6 @@ interface Props {
 export function Responses({ responses, setInputText }: Props) {
 	return (
 		<div className={styles.responses}>
-			<div className={styles.titleBar}>
-				Responses
-			</div>
-			
 			{responses.length>0 && <div className={styles.responsesList}>
 				{responses.map((response, index) => (
 					<button

@@ -1,5 +1,5 @@
-import type { GPTMessage } from "./Training";
 import { createClient } from '@supabase/supabase-js';
+import type { Message } from './components/Interfaces';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 const OPENAI_COMPLETE_URL = 'https://api.openai.com/v1/chat/completions';
@@ -58,7 +58,7 @@ export const sendQuestionAnswerPairToShort = async (content: string) => {
   }
 }
 
-export const generateGPTQuestion = async (messages: GPTMessage[]) => {
+export const generateGPTQuestion = async (messages: Message[]) => {
   try {
     const response = await fetch(OPENAI_COMPLETE_URL, {
       method: 'POST',
@@ -105,12 +105,12 @@ export const generateUserAudio = async (input: string) => {
   }
 }
 
-export const generateUserResponses = async (input: string) => {
+export const generateUserResponses = async (question: string, messages: Message[]) => {
   try {
-    console.log(JSON.stringify({ content: input }))
+    console.log(JSON.stringify({ content: question }))
     const res = await fetch(`${SERVER_URL}/generate`, {
       method: 'POST',
-      body: JSON.stringify({ content: input }),
+      body: JSON.stringify({ content: question, messages: messages }),
       headers: {
         'Content-Type': 'application/json',
         'accept': 'application/json',

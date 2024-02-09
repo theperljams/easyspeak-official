@@ -27,6 +27,8 @@ cool_app.add_middleware(
 
 class Question(BaseModel):
     content: str
+    messages: list = []
+    
 
 @cool_app.post("/generate")
 async def query_chain(question: Question):

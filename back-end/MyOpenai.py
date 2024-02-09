@@ -40,15 +40,15 @@ async def generate_responses(content, context_short, context_long):
                 
                 Step 3: Now, take your previous response and come up with 3 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3. \n 4. Treat them as 4 separate sentences in different contexts. You can use either of the previous datasets for help with this."""
 
-    responses = await get_chat_completions(prompt)
+    responses = await get_chat_completions(prompt, content.messages)
     
     print("RESPONSES: ", responses, "\n\n")
     return responses
 
-async def get_chat_completions(prompt):
+async def get_chat_completions(prompt, messages):
     stream = client.chat.completions.create(
         model="gpt-4-0125-preview",
-        messages=[{"role": "system", "content": prompt}],
+        messages=[{"role": "system", "content": prompt}] + messages,
         stream=True,
     )
     responseList = []
