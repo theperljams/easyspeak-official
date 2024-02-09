@@ -21,10 +21,10 @@
 	box-sizing: border-box;
 }
 .chatBubble_left {
-	background-color: black;
-	color: white;
+	background-color: #DCE7F9;
+	color: #515151;
 }
 .chatBubble_right {
-	background-color: #DCE7F9;
-	color: #007AFF;
+	background-color: #75A6EF;
+	color: white;
 }

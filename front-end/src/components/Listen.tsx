@@ -14,7 +14,6 @@ export function Listen({ listen, toggleListen }: Props) {
 			onClick={toggleListen}
 		>
 			<img className={styles.volumeIcon} src={listen ? VolumeHigh : VolumeMute} />
-			{`Listen: ${listen ? 'On' : 'Off'}`}
 		</div>
 	);
 }

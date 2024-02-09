@@ -1,21 +1,18 @@
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
 import { Listen } from "./components/Listen.js";
 import { ChatWindow } from "./components/ChatWindow.js";
-import type { Message } from "./components/ChatWindow.js";
-import type { GPTMessage } from "./components/Training.js";
 import { Responses } from "./components/Responses.js";
 import { InputBar } from "./components/InputBar.js";
-import { Training } from "./components/Training.js";
 
-import styles from "./App.module.css";
+import styles from "./Chat.module.css";
 
 // functions for communicating with API
-import {generateGPTQuestion, generateUserAudio, generateUserResponses, sendQuestionAnswerPairToShort, signOut } from "./Api.js";
-
-const START_PROMPT = import.meta.env.VITE_START_PROMPT;
+import { generateUserAudio, generateUserResponses } from "./Api.js";
+import type { Message } from "./components/Interfaces.js";
+import { Header } from "./components/Header.js";
 
 export function Chat () {
 	const [initialLoad, setInitialLoad] = useState(false);
@@ -26,24 +23,8 @@ export function Chat () {
 	const [audioURL, setAudioURL] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [userGeneratedResponses, setUserGeneratedResponses] = useState(["", "", "", ""]);
-  
-  // NOTES: 
-  // two different sections of questions, let them talk about what they want to talk about.
-  // prompts from config file
 	
-	// TRAINING MODE
-	const [hasOpenTraining, setHasOpenTraining] = useState(false);
-	const [isTrainingMode, setIsTrainingMode] = useState(false);
-	const [trainingPrompt, setTrainingPrompt] = useState(""); // TBD for slow display of message
-	const [trainingMessages, setTrainingMessages] = useState<Message[]>([]);
-	const [gptMessages, setGptMessages] = useState<GPTMessage[]>([
-    { // initial prompt
-      role: 'system',
-      content: `${START_PROMPT}`
-    }
-  ]);
-	
-	// for sending quesiton answer pairs to the database
+	// for use later: sending quesiton answer pairs to the database 
 	const [question, setQuestion] = useState('');
  	
 	const { transcript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
@@ -61,9 +42,9 @@ export function Chat () {
 		SpeechRecognition.stopListening();
 		
 		if (transcript) {
-			setMessages((prev) => [...prev, { message: transcript, side: 'left'}]);
+			setMessages((prev) => [...prev, { content: transcript, role: 'assistant'}]);
 			setUserGeneratedResponses(['', '', '', '']);
-			generateUserResponses(transcript)
+			generateUserResponses(transcript, messages)
 				.then((r) => {
 					setUserGeneratedResponses(r);
 				})
@@ -75,35 +56,9 @@ export function Chat () {
 
 	const handleUserInputSubmit = () => {
     if (textInput != '') {
-      if (isTrainingMode) {
-        setTrainingMessages(prev => [...prev, { message: textInput, side: 'right' }]);
-        setGptMessages(prev => [...prev, { role: 'user', content: textInput }]);
-        getSystemReply();
-        
-        // put Q&A pair into the db TODO: change name
-        sendQuestionAnswerPairToShort(`Other: ${question} User: ${textInput}`);
-      } else {
-        setMessages(prev => [...prev, { message: textInput, side: 'right' }]);
-        setIsSpeaking(true);
-      }
+      setMessages(prev => [...prev, { content: textInput, role: 'user' }]);
+			setIsSpeaking(true);
     }
-	}
-	
-	const getSystemReply = () => {
-		generateGPTQuestion(gptMessages)
-		.then((data) => {
-			setQuestion(data);
-			setTrainingMessages(prev => [...prev, { message: data, side: 'left'}]);
-			setGptMessages(prev => [...prev, { role: 'assistant', content: question }]);
-		})
-		.catch((error) => {
-			console.log(error);
-		})
-	}
-	
-	// will eventually be swapped back to be to edit mode
-	const onTrainingClicked = () => {
-		setIsTrainingMode(prev => !prev);
 	}
 
 	useEffect(() => {
@@ -135,23 +90,16 @@ export function Chat () {
 			setInitialLoad(true);
 		}
 	}, [isListening]);
-	
-	useEffect(() => {
-		if (hasOpenTraining) {
-			getSystemReply();
-		}
-	}, [hasOpenTraining]);
 
 	return (
 		<div className={styles.app}>
-			<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}} />
+			<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}}></Listen>
+			<Header title={'Chat'}/>
 			<div className={styles.mainView}>
-				{!isTrainingMode && <ChatWindow messages={messages} loading={isListening} transcript={transcript}/>}
-				{isTrainingMode && <Training messages={trainingMessages} transcript={trainingPrompt} session={hasOpenTraining} setSessionStarted={() => setHasOpenTraining(true)}/>}
-				<Responses responses={userGeneratedResponses} setInputText={setTextInput} isTraining={isTrainingMode}/>
+				<ChatWindow messages={messages} loading={isListening} transcript={transcript} title='Chat'/>
+				<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>
 			</div>
-			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsTraining={onTrainingClicked}/>
-			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={signOut} audioURL={audioURL} setIsTraining={onTrainingClicked}/> 
+			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => console.log('test')}/>
 		</div>
 	);
 }
