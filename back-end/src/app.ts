@@ -10,13 +10,13 @@ const cors = require('cors');
 app.use(cors());
 
 app.post('/generate', async (req, res) => {
-  const { content } = req.body;
+  const { content, messages, user_id } = req.body;
   if (!content) {
     return res.status(400).send('Question is required');
   }
 
   try {
-    const openAiResponse = await generateResponses(content);
+    const openAiResponse = await generateResponses(content, messages, user_id);
     res.json(openAiResponse);
   } catch (error) {
     res.status(500).send('Error calling OpenAI API');

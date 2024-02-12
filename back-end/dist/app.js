@@ -21,12 +21,12 @@ const cors = require('cors');
 // Use CORS middleware
 app.use(cors());
 app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { content } = req.body;
+    const { content, messages, user_id } = req.body;
     if (!content) {
         return res.status(400).send('Question is required');
     }
     try {
-        const openAiResponse = yield (0, llm_1.generateResponses)(content);
+        const openAiResponse = yield (0, llm_1.generateResponses)(content, messages, user_id);
         res.json(openAiResponse);
     }
     catch (error) {

@@ -36,12 +36,13 @@ export async function insertQAPair(user_id: string, content: string, embedding: 
   }
 }
 
-export async function getContextLong(embedding: number[]): Promise<any> {
+export async function getContextLong(embedding: number[], user_id: string): Promise<any> {
   let { data, error } = await supabase
     .rpc('match_long', {
       match_count: MATCH_COUNT,
       query_embedding: embedding,
       similarity_threshold: SIMILARITY_THRESHOLD,
+      user_id: user_id
     });
 
   if (error) {
@@ -49,17 +50,24 @@ export async function getContextLong(embedding: number[]): Promise<any> {
     throw error;
   } else {
     // console.log('Data from getContextLong:', data);
-    return data;
+    
+    let result: Array<string> = [];
+    
+    for (const i in data) {
+      result.push(data[i].content);
+    }
+    
+    return result;
   }
 }
 
-export async function getContextShort(embedding: number[]): Promise<any> {
+export async function getContextShort(embedding: number[], user_id: string): Promise<any> {
   let { data, error } = await supabase
     .rpc('match_short', {
       match_count: MATCH_COUNT,
       query_embedding: embedding,
       similarity_threshold: SIMILARITY_THRESHOLD,
-      user_id: 'pearl.k.hulbert@gmail.com'
+      user_id: user_id
     });
 
   if (error) {

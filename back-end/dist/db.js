@@ -44,13 +44,14 @@ function insertQAPair(user_id, content, embedding, table_name) {
     });
 }
 exports.insertQAPair = insertQAPair;
-function getContextLong(embedding) {
+function getContextLong(embedding, user_id) {
     return __awaiter(this, void 0, void 0, function* () {
         let { data, error } = yield supabase
             .rpc('match_long', {
             match_count: MATCH_COUNT,
             query_embedding: embedding,
             similarity_threshold: SIMILARITY_THRESHOLD,
+            user_id: user_id
         });
         if (error) {
             console.error('Error in getContextLong:', error);
@@ -58,19 +59,23 @@ function getContextLong(embedding) {
         }
         else {
             // console.log('Data from getContextLong:', data);
-            return data;
+            let result = [];
+            for (const i in data) {
+                result.push(data[i].content);
+            }
+            return result;
         }
     });
 }
 exports.getContextLong = getContextLong;
-function getContextShort(embedding) {
+function getContextShort(embedding, user_id) {
     return __awaiter(this, void 0, void 0, function* () {
         let { data, error } = yield supabase
             .rpc('match_short', {
             match_count: MATCH_COUNT,
             query_embedding: embedding,
             similarity_threshold: SIMILARITY_THRESHOLD,
-            user_id: 'pearl.k.hulbert@gmail.com'
+            user_id: user_id
         });
         if (error) {
             console.error('Error in getContextShort:', error);

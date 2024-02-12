@@ -111,7 +111,7 @@ export const generateUserResponses = async (question: string, messages: Message[
     console.log(JSON.stringify({ content: question }))
     const res = await fetch(`${SERVER_URL}/generate`, {
       method: 'POST',
-      body: JSON.stringify({ content: question }),
+      body: JSON.stringify({ content: question, messages: messages, user_id: localStorage.getItem('user_id') }),
       headers: {
         'Content-Type': 'application/json',
         'accept': 'application/json',
