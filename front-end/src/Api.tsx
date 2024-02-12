@@ -80,9 +80,10 @@ export const generateGPTQuestion = async (messages: Message[]) => {
   }
 }
 
+// this does not work
 export const generateUserAudio = async (input: string) => {
   try {
-    const res = await fetch(`${SERVER_URL}/speak`, {
+    const res = await fetch(`${SERVER_URL}/tts`, {
       method: 'POST',
       body: JSON.stringify({ question: input }),
       headers: {
@@ -110,7 +111,7 @@ export const generateUserResponses = async (question: string, messages: Message[
     console.log(JSON.stringify({ content: question }))
     const res = await fetch(`${SERVER_URL}/generate`, {
       method: 'POST',
-      body: JSON.stringify({ content: question, messages: messages }),
+      body: JSON.stringify({ content: question, messages: messages, user_id: localStorage.getItem('user_id') }),
       headers: {
         'Content-Type': 'application/json',
         'accept': 'application/json',
