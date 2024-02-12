@@ -4,15 +4,19 @@ import { insertQAPair } from './db';
 
 const app = express();
 app.use(express.json());
+const cors = require('cors');
+
+// Use CORS middleware
+app.use(cors());
 
 app.post('/generate', async (req, res) => {
-  const { question } = req.body;
-  if (!question) {
+  const { content } = req.body;
+  if (!content) {
     return res.status(400).send('Question is required');
   }
 
   try {
-    const openAiResponse = await generateResponses(question);
+    const openAiResponse = await generateResponses(content);
     res.json(openAiResponse);
   } catch (error) {
     res.status(500).send('Error calling OpenAI API');
