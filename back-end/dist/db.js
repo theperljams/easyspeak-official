@@ -51,7 +51,7 @@ function getContextLong(embedding, user_id) {
             match_count: MATCH_COUNT,
             query_embedding: embedding,
             similarity_threshold: SIMILARITY_THRESHOLD,
-            user_id: user_id
+            userid: user_id
         });
         if (error) {
             console.error('Error in getContextLong:', error);
@@ -75,7 +75,7 @@ function getContextShort(embedding, user_id) {
             match_count: MATCH_COUNT,
             query_embedding: embedding,
             similarity_threshold: SIMILARITY_THRESHOLD,
-            user_id: user_id
+            userid: user_id
         });
         if (error) {
             console.error('Error in getContextShort:', error);

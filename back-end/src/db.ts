@@ -42,7 +42,7 @@ export async function getContextLong(embedding: number[], user_id: string): Prom
       match_count: MATCH_COUNT,
       query_embedding: embedding,
       similarity_threshold: SIMILARITY_THRESHOLD,
-      user_id: user_id
+      userid: user_id
     });
 
   if (error) {
@@ -67,7 +67,7 @@ export async function getContextShort(embedding: number[], user_id: string): Pro
       match_count: MATCH_COUNT,
       query_embedding: embedding,
       similarity_threshold: SIMILARITY_THRESHOLD,
-      user_id: user_id
+      userid: user_id
     });
 
   if (error) {
