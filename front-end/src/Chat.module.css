@@ -1,7 +1,7 @@
 .app {
 	width: 100vw;
 	/* Makes the app take up the entire screen height, so the InputBar is on the bottom */
-	height: 80vh;
+	height: 100vh;
 
 	display: flex;
 	flex-direction: column;
@@ -23,5 +23,5 @@
 	color: transparent;
 	position: absolute;
 	left: 10px;
-	bottom: 260px;
+	bottom: 130px;
 }
