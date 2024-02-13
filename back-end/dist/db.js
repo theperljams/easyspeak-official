@@ -18,7 +18,6 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_API_KEY = process.env.SUPABASE_API_KEY;
-console.log(SUPABASE_URL);
 if (!SUPABASE_URL || !SUPABASE_API_KEY) {
     throw new Error('Supabase URL and API Key must be set in environment variables.');
 }

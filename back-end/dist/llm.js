@@ -50,9 +50,6 @@ function generateResponses(content, messages, user_id) {
     return __awaiter(this, void 0, void 0, function* () {
         let contextShort = (yield (0, db_1.getContextShort)(yield getEmbedding(content), user_id));
         let contextLong = (yield (0, db_1.getContextLong)(yield getEmbedding(content), user_id));
-        // console.log(user_id);
-        // console.log("SHORT: ", contextShort);
-        console.log("LONG: ", contextLong);
         const prompt = `You are an assistant drafting texts for ${user_id}. Your goal is to sound as much like them as possible. Follow these steps to learn how to do this.
 
     Step 1: Look at the context below to learn how ${user_id} speaks. As you answer, mimic their voice and way of speaking, try to be as convincing as possible. You can also search the given contextShort below to answer questions. Answer the question as if you were sending a text from ${user_id}'s phone. 
