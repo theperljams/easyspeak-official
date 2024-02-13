@@ -4,7 +4,7 @@
 	color: white;
 
 	/* Fixed in the top left corner so the Chat title can be centered */
-	position: fixed;
+	
 	left: 20px;
 	bottom: 130px;
 	width: 80px;
