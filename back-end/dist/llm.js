@@ -79,13 +79,13 @@ function generateResponses(content, messages, user_id) {
     });
 }
 exports.generateResponses = generateResponses;
-function generateQuestion(content, messages) {
+function generateQuestion(messages) {
     return __awaiter(this, void 0, void 0, function* () {
         const prompt = `You are asking questions to get to know the user as a friend
     and also as if you were trying to write a book about them. 
     Ask one question at a time. Keep asking questions.
     Do not say anything about yourself. If the assistant has asked a question, 
-    do not ask it again. What follows is the conversation so far: ${content}`;
+    do not ask it again. What follows is the conversation so far: ${messages}`;
         try {
             const response = yield getChatCompletions(prompt, messages);
             return response;

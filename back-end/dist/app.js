@@ -33,7 +33,7 @@ app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(500).send('Error calling OpenAI API');
     }
 }));
-app.post('/dbinsert', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post('/insert', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { user_id, table_name, content } = req.body;
     try {
         const embeiddingResponse = yield (0, llm_1.getEmbedding)(content);
@@ -45,9 +45,16 @@ app.post('/dbinsert', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 }));
 app.post('/training', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { messages, } = req.body;
+    const { messages } = req.body;
     if (!messages) {
-        return res.status(400).send('Text is required');
+        return res.status(400).send('Messages are required');
+    }
+    try {
+        const response = yield (0, llm_1.generateQuestion)(messages);
+        res.json(response);
+    }
+    catch (error) {
+        res.status(500).send('Error in training');
     }
 }));
 app.post('/tts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
