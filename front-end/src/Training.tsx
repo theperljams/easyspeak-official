@@ -29,7 +29,7 @@ export function Training () {
 
 	const handleUserInputSubmit = () => {
     if (textInput != '') {
-			setMessages(prev => [...prev, { role: 'user', content: textInput }]);
+			setMessages(prev => [...prev, { role: 'assistant', content: textInput }]);
 			getSystemReply();
 			
 			// TODO: change other to user name
@@ -45,7 +45,7 @@ export function Training () {
 			setLoading(false);
 			setTranscript('');
 			setQuestion(data);
-			setMessages(prev => [...prev, { role: 'assistant', content: data }]);
+			setMessages(prev => [...prev, { role: 'user', content: data }]);
 		})
 		.catch((error) => {
 			console.log(error);

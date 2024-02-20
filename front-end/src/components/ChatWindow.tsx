@@ -20,7 +20,7 @@ export function ChatWindow({ loading, messages, transcript, title,  }: Props) {
         {messages.map((message, index) => (
             <ChatBubble key={index} role={message.role} content={message.content} />
         ))}
-        {loading && <ChatBubble role={'assistant'} content={transcript != '' ? transcript : '...' } />}
+        {loading && <ChatBubble role={'user'} content={transcript != '' ? transcript : '...' } />}
       </div>
       <div className='footer'/>
     </div>
