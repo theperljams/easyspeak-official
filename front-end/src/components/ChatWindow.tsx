@@ -1,6 +1,7 @@
 import { ChatBubble } from './ChatBubble';
 import styles from './ChatWindow.module.css';
 import type { Message } from './Interfaces';
+import {useEffect, useRef} from "react";
 
 interface Props {
   messages: Message[];
@@ -13,6 +14,21 @@ interface Props {
 // scroll to bottom on message submit
 
 export function ChatWindow({ loading, messages, transcript, title,  }: Props) {
+    // const scrollRef = useRef<null | HTMLDivElement>(null)
+
+    const messagesEndRef = useRef(null)
+
+
+
+    const scrollToBottom = () => {
+        // @ts-ignore
+        messagesEndRef.current!.scrollIntoView({ behavior: "smooth" })
+    }
+
+    useEffect(() => {
+        scrollToBottom()
+    }, [messages]);
+
   return (
     <div className={styles.chat}>
       {/* <div className={styles.titleBar}>{title}</div> */}
@@ -22,7 +38,7 @@ export function ChatWindow({ loading, messages, transcript, title,  }: Props) {
         ))}
         {loading && <ChatBubble role={'user'} content={transcript != '' ? transcript : '...' } />}
       </div>
-      <div className='footer'/>
+      <div className='footer' ref={messagesEndRef}/>
     </div>
   );
 }
