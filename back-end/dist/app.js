@@ -63,8 +63,8 @@ app.post('/tts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(400).send('Text is required');
     }
     try {
-        const ttsResponse = yield (0, llm_1.generateAudio)(text);
-        res.json(ttsResponse);
+        const response = yield (0, llm_1.generateAudio)(text);
+        res.json(response);
     }
     catch (error) {
         res.status(500).send('Error calling TTS API');

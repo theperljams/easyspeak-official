@@ -24,70 +24,52 @@ if (!SUPABASE_URL || !SUPABASE_API_KEY) {
 const supabase = (0, supabase_js_1.createClient)(SUPABASE_URL, SUPABASE_API_KEY);
 const SIMILARITY_THRESHOLD = 0.1;
 const MATCH_COUNT = 10;
-function insertQAPair(user_id, content, embedding, table_name) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const { error } = yield supabase.from(table_name).insert({
-                user_id,
-                content,
-                embedding
-            });
-            if (error) {
-                throw error;
-            }
-            console.log('Question-answer pair inserted successfully');
-        }
-        catch (error) {
-            console.error('Error inserting QA pair into Supabase:', error);
-        }
-    });
-}
+const insertQAPair = (user_id, content, embedding, table_name) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield supabase.from(table_name).insert({
+            user_id,
+            content,
+            embedding
+        });
+    }
+    catch (error) {
+        console.error('Error inserting QA pair into Supabase:', error);
+    }
+});
 exports.insertQAPair = insertQAPair;
-function getContextLong(embedding, user_id) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let { data, error } = yield supabase
-            .rpc('match_long', {
+const getContextLong = (embedding, user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { data, error } = yield supabase.rpc('match_long', {
             match_count: MATCH_COUNT,
             query_embedding: embedding,
             similarity_threshold: SIMILARITY_THRESHOLD,
             userid: user_id
         });
-        if (error) {
-            console.error('Error in getContextLong:', error);
-            throw error;
-        }
-        else {
-            // console.log('Data from getContextLong:', data);
-            let result = [];
-            for (const i in data) {
-                result.push(data[i].content);
-            }
-            return result;
-        }
-    });
-}
+        let result = [];
+        for (const i in data)
+            result.push(data[i].content);
+        return result;
+    }
+    catch (error) {
+        throw error;
+    }
+});
 exports.getContextLong = getContextLong;
-function getContextShort(embedding, user_id) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let { data, error } = yield supabase
-            .rpc('match_short', {
+const getContextShort = (embedding, user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { data, error } = yield supabase.rpc('match_short', {
             match_count: MATCH_COUNT,
             query_embedding: embedding,
             similarity_threshold: SIMILARITY_THRESHOLD,
             userid: user_id
         });
-        if (error) {
-            console.error('Error in getContextShort:', error);
-            throw error;
-        }
-        else {
-            // console.log('Data from getContextShort:', data);
-            let result = [];
-            for (const i in data) {
-                result.push(data[i].content);
-            }
-            return result;
-        }
-    });
-}
+        let result = [];
+        for (const i in data)
+            result.push(data[i].content);
+        return result;
+    }
+    catch (error) {
+        throw error;
+    }
+});
 exports.getContextShort = getContextShort;
