@@ -44,9 +44,9 @@ export function Chat () {
 		SpeechRecognition.stopListening();
 		
 		if (transcript) {
-			setMessages((prev) => [...prev, { content: transcript, role: 'assistant'}]);
+			setMessages((prev) => [...prev, { content: transcript, role: 'user'}]);
 			setUserGeneratedResponses(['', '', '', '']);
-			generateUserResponses(transcript, messages)
+			generateUserResponses(transcript, [...messages, {content: transcript, role: 'user'}])
 				.then((r) => {
 					setUserGeneratedResponses(r);
 				})
@@ -58,7 +58,7 @@ export function Chat () {
 
 	const handleUserInputSubmit = () => {
     if (textInput != '') {
-      setMessages(prev => [...prev, { content: textInput, role: 'user' }]);
+      setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
 			setIsSpeaking(true);
     }
 	}
