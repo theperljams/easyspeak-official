@@ -16,69 +16,51 @@ const SIMILARITY_THRESHOLD = 0.1;
 const MATCH_COUNT = 10;
 
 
-export async function insertQAPair(user_id: string, content: string, embedding: number[], table_name: string): Promise<void> {
+export const insertQAPair = async (user_id: string, content: string, embedding: number[], table_name: string) => {
   try {
-    const { error } = await supabase.from(table_name).insert({
+    await supabase.from(table_name).insert({
       user_id,
       content,
       embedding
     });
-
-    if (error) {
-      throw error;
-    }
-
-    console.log('Question-answer pair inserted successfully');
+    
   } catch (error) {
     console.error('Error inserting QA pair into Supabase:', error);
   }
 }
 
-export async function getContextLong(embedding: number[], user_id: string): Promise<any> {
-  let { data, error } = await supabase
-    .rpc('match_long', {
+export const getContextLong = async (embedding: number[], user_id: string) => {
+  try {
+    const { data, error } = await supabase.rpc('match_long', {
       match_count: MATCH_COUNT,
       query_embedding: embedding,
       similarity_threshold: SIMILARITY_THRESHOLD,
       userid: user_id
     });
-
-  if (error) {
-    console.error('Error in getContextLong:', error);
-    throw error;
-  } else {
-    // console.log('Data from getContextLong:', data);
     
     let result: Array<string> = [];
-    
-    for (const i in data) {
-      result.push(data[i].content);
-    }
-    
+    for (const i in data) result.push(data[i].content);
     return result;
+    
+  } catch (error) {
+    throw error;
   }
 }
 
-export async function getContextShort(embedding: number[], user_id: string): Promise<any> {
-  let { data, error } = await supabase
-    .rpc('match_short', {
+export const getContextShort = async (embedding: number[], user_id: string) => {
+  try {
+    const { data, error } = await supabase.rpc('match_short', {
       match_count: MATCH_COUNT,
       query_embedding: embedding,
       similarity_threshold: SIMILARITY_THRESHOLD,
       userid: user_id
     });
-
-  if (error) {
-    console.error('Error in getContextShort:', error);
-    throw error;
-  } else {
-    // console.log('Data from getContextShort:', data);
+    
     let result: Array<string> = [];
-    
-    for (const i in data) {
-      result.push(data[i].content);
-    }
-    
+    for (const i in data) result.push(data[i].content);
     return result;
+    
+  } catch (error) {
+    throw error;
   }
 }
