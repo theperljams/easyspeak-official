@@ -18,8 +18,6 @@ export function ChatWindow({ loading, messages, transcript, title,  }: Props) {
 
     const messagesEndRef = useRef(null)
 
-
-
     const scrollToBottom = () => {
         // @ts-ignore
         messagesEndRef.current!.scrollIntoView({ behavior: "smooth" })
@@ -27,7 +25,7 @@ export function ChatWindow({ loading, messages, transcript, title,  }: Props) {
 
     useEffect(() => {
         scrollToBottom()
-    }, [messages]);
+    }, [messages, loading]);
 
   return (
     <div className={styles.chat}>

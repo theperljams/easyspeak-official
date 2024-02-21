@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6fc72154-ee3b-4d98-b8d0-00603d1c0eb6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-end/src/Chat.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/src/Chat.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-end/src/components/ChatWindow.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../front-end/src/components/ChatWindow.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,9 +17,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2cQ0Zh3tT2C7Ubv5SQfE3DqpsSJ" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -29,6 +31,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "dart.analysis.tool.window.visible": "false",
+    "last_opened_file_path": "/Users/taylor/Documents/GitHub/easyspeak-official/back-end",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -55,6 +58,7 @@
       <option name="presentableId" value="Default" />
       <updated>1708028551830</updated>
       <workItem from="1708028552933" duration="10162000" />
+      <workItem from="1708539181475" duration="1208000" />
     </task>
     <servers />
   </component>
