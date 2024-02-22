@@ -30,7 +30,7 @@ export function Chat () {
 	const [question, setQuestion] = useState('');
 
 
-	
+
 
 	const { transcript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
 	
