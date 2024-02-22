@@ -9,6 +9,10 @@ const cors = require('cors');
 // Use CORS middleware
 app.use(cors());
 
+app.get('/ping', (req, res) => {
+  return res.send('pong 🏓')
+})
+
 app.post('/generate', async (req, res) => {
   const { content, messages, user_id } = req.body;
   if (!content) {
@@ -61,7 +65,7 @@ app.post('/tts', async (req, res) => {
     }
 });
 
-const PORT = 8080;
+const PORT = 8000;
 app.listen(PORT, () => {
   console.log(`Server is running on port  ${PORT}`);
 });
