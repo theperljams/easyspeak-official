@@ -8,9 +8,13 @@ import { useEffect, useState } from "react";
 import { Chat } from './Chat';
 import { Training } from './Training';
 
+
 // signout function
 import { BrowserRouter, Route, RouterProvider, Routes } from 'react-router-dom';
 import { Home } from './Home';
+import { Login }  from './Login';
+import { signInWithEmail } from './Api';
+import { Signup } from './Signup';
 
 const SUPA_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPA_API_KEY = import.meta.env.VITE_SUPABASE_API_KEY;
@@ -19,6 +23,39 @@ const supabase = createClient(SUPA_URL, SUPA_API_KEY);
 
 export function App() {
 	const [session, setSession] = useState<Session|null>(null);
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [passConfirm, setPassConfirm] = useState('');
+	const [error, setError] = useState(false);
+	
+	const login = async () => {
+		const response = await signInWithEmail({ body: { email: email, password: password }});
+		
+		if  (response != null) {
+			supabase.auth.getSession().then(({ data: { session } }) => {
+				setSession(session)
+			})
+		} else {
+			setError(true);
+		}
+	}
+	
+	const signup = async () => {
+		if (password != passConfirm) {
+			setError(true);
+			return;
+		}
+		
+		const response = await signInWithEmail({ body: { email: email, password: password }});
+		
+		if  (response != null) {
+			supabase.auth.getSession().then(({ data: { session } }) => {
+				setSession(session)
+			})
+		} else {
+			setError(true);
+		}
+	}
 
 	useEffect(() => {
 		supabase.auth.getSession().then(({ data: { session } }) => {
@@ -43,7 +80,29 @@ export function App() {
 	}, [session]);
 
 	if (session === null) {
-		return (<Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />)
+		return (
+			<BrowserRouter>
+				<Routes>
+					<Route path="/" element={<Login 
+																			email={email} error={error} 
+																			handleSignIn={login} 
+																			password={password} 
+																			setEmail={(e) => setEmail(e)} 
+																			setError={(e) => setError(e)}
+																			setPassword={(e) => setPassword(e)}/>}/>
+					<Route path="/signup" element={<Signup 
+																						email={email} 
+																						error={error} 
+																						handleSignUp={signup} 
+																						password={password} 
+																						passConfirm={passConfirm} 
+																						setEmail={(e) => setEmail(e)} 
+																						setError={(e) => setError(e)}
+																						setPassword={(e) => setPassword(e)} 
+																						setPassConfirm={(e) => setPassConfirm(e)}/>}/>
+				</Routes>
+			</BrowserRouter>
+		)
 	}
 	else {
 		return (

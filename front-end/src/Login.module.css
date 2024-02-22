@@ -1,0 +1,76 @@
+.button {
+  width: 50vw;
+  height: 10vh;
+  background-color: white;
+  border-style: solid;
+  border-width: 1.5px;
+  font-size: 30px;
+}
+
+.container {
+  width: 100vw;
+  height: 90vh;
+  padding: 5vh ;
+  
+  flex: 1;
+  font-size: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.error {
+  color: red
+}
+
+.form {
+  flex: 1;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  width: 90%
+}
+
+.input {
+  width: 50vw;
+  height: 10vh;
+  border: none;
+  border-bottom: 2px solid grey;
+  font-size: 30px;
+  margin-bottom: 5vh;
+}
+
+.message {
+  font-size: 20px;
+  margin-bottom: 5vh;
+}
+
+.signup {
+  color: grey
+}
+
+.signupbutton {
+  border: none;
+  background-color: white;
+  font-size: 25px;
+}
+
+.showPassword {
+  background: none;
+  border: none;
+  margin-left: -50px;
+}
+
+.subtitle {
+  font-size: 60px;
+  font-weight: normal;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 30px;
+  margin-bottom: 7vh;
+}

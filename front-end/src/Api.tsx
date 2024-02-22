@@ -14,7 +14,14 @@ interface SignUpProps {
   }
 }
 
-export const signUpNewUser = async (req:SignUpProps) => {
+interface SignInProps {
+  body: {
+    email: string
+    password: string
+  }
+}
+
+export const signUpNewUser = async (req : SignUpProps) => {
   const { email, password } = req.body;
   const { data, error } = await supabase.auth.signUp({
     email: email,
@@ -23,6 +30,16 @@ export const signUpNewUser = async (req:SignUpProps) => {
       emailRedirectTo: 'https://example.com/welcome'
     }
   })
+}
+
+export const signInWithEmail = async (req : SignInProps) => {
+  const { email, password } = req.body;
+  console.log("AH: ", req);
+  const response = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  })
+  console.log(response);
 }
 
 export const sendQuestionAnswerPairToShort = async (content: string) => {
