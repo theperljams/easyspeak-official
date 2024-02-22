@@ -28,7 +28,10 @@ export function Chat () {
 	
 	// for use later: sending quesiton answer pairs to the database 
 	const [question, setQuestion] = useState('');
- 	
+
+
+
+
 	const { transcript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
 	
 	if (!browserSupportsSpeechRecognition) {
@@ -60,24 +63,25 @@ export function Chat () {
     if (textInput != '') {
       setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
 			setIsSpeaking(true);
+		generateUserAudio(textInput)
+			.then((audioData) => {
+				if (audioData instanceof Blob) {
+					const audioURL = URL.createObjectURL(audioData);
+					console.log('audio URL:', audioURL);
+					setAudioURL(audioURL);
+					setIsSpeaking(false);
+					setTextInput("");
+				}
+			})
+			.catch((error) => {
+				console.error('Error speaking:', error);
+			});
     }
 	}
 
 	useEffect(() => {
     if (isSpeaking) {
-      generateUserAudio(textInput)
-				.then((audioData) => {
-					if (audioData instanceof Blob) {
-						const audioURL = URL.createObjectURL(audioData);
-						console.log('audio URL:', audioURL);
-						setAudioURL(audioURL);
-						setIsSpeaking(false);
-						setTextInput("");
-					}
-				})
-				.catch((error) => {
-					console.error('Error speaking:', error);
-				});
+
     }
 	}, [isSpeaking]);
 	
