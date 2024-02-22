@@ -20,6 +20,9 @@ app.use(express_1.default.json());
 const cors = require('cors');
 // Use CORS middleware
 app.use(cors());
+app.get('/ping', (req, res) => {
+    return res.send('pong 🏓');
+});
 app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { content, messages, user_id } = req.body;
     if (!content) {
@@ -70,7 +73,8 @@ app.post('/tts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(500).send('Error calling TTS API');
     }
 }));
-const PORT = process.env.PORT || 3000;
+const PORT = 8000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port  ${PORT}`);
 });
+//# sourceMappingURL=app.js.map

@@ -28,3 +28,4 @@ models/
 __pycache__/
 venv/
 ```
+vercel-backend/node_modules
