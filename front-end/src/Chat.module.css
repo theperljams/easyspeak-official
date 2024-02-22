@@ -11,10 +11,17 @@
 
 .mainView {
 	/* Makes the view grow to fit the space not used by the InputBar */
-	flex-grow: 1;
 	/* Makes the view shrink instead of hiding the InputBar when the screen height is small */
+	flex-grow: 1;
 	min-height: 0px;
 	display: flex;
 	flex-direction: row;
 	gap: 2px;
+}
+
+.dragView {
+	color: transparent;
+	position: absolute;
+	left: 10px;
+	bottom: 130px;
 }

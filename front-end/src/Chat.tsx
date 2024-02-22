@@ -7,6 +7,8 @@ import { ChatWindow } from "./components/ChatWindow.js";
 import { Responses } from "./components/Responses.js";
 import { InputBar } from "./components/InputBar.js";
 
+import Draggable from "react-draggable";
+
 import styles from "./Chat.module.css";
 
 // functions for communicating with API
@@ -42,9 +44,9 @@ export function Chat () {
 		SpeechRecognition.stopListening();
 		
 		if (transcript) {
-			setMessages((prev) => [...prev, { content: transcript, role: 'assistant'}]);
+			setMessages((prev) => [...prev, { content: transcript, role: 'user'}]);
 			setUserGeneratedResponses(['', '', '', '']);
-			generateUserResponses(transcript, messages)
+			generateUserResponses(transcript, [...messages, {content: transcript, role: 'user'}])
 				.then((r) => {
 					setUserGeneratedResponses(r);
 				})
@@ -56,7 +58,7 @@ export function Chat () {
 
 	const handleUserInputSubmit = () => {
     if (textInput != '') {
-      setMessages(prev => [...prev, { content: textInput, role: 'user' }]);
+      setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
 			setIsSpeaking(true);
     }
 	}
@@ -93,12 +95,18 @@ export function Chat () {
 
 	return (
 		<div className={styles.app}>
-			<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}}></Listen>
 			<Header title={'Chat'}/>
 			<div className={styles.mainView}>
 				<ChatWindow messages={messages} loading={isListening} transcript={transcript} title='Chat'/>
 				<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>
 			</div>
+			<Draggable
+				defaultPosition={{x: 30, y: -30}}>
+				<div className={styles.dragView}>
+					BLOCK
+				<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}}></Listen>
+				</div>
+			</Draggable>
 			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => console.log('test')}/>
 		</div>
 	);
