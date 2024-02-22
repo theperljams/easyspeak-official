@@ -19,7 +19,7 @@ const axiosInstance: AxiosInstance = axios.create({
 
 const openai: OpenAI = new OpenAI();
 
-export async function getEmbedding(content: string): Promise<number[]> {
+export const getEmbedding = async (content: string) => {
     try {
         const response = await axiosInstance.post(OPENAI_EMBEDDING_URL, {
             model: "text-embedding-ada-002",
@@ -33,7 +33,7 @@ export async function getEmbedding(content: string): Promise<number[]> {
     }
 }
 
-export async function generateResponses(content: string, messages: string[], user_id: string): Promise<string[]> {
+export const generateResponses = async (content: string, messages: string[], user_id: string) => {
     let contextShort: string[] = (await getContextShort(await getEmbedding(content), user_id));
     let contextLong: string[] = (await getContextLong(await getEmbedding(content), user_id));
 
@@ -66,12 +66,12 @@ export async function generateResponses(content: string, messages: string[], use
     return parseNumberedList(response);
 }
 
-export async function generateQuestion(content: string, messages: string[]): Promise<string> {
+export const generateQuestion = async (messages: string[]) => {
     const prompt: string = `You are asking questions to get to know the user as a friend
     and also as if you were trying to write a book about them. 
     Ask one question at a time. Keep asking questions.
     Do not say anything about yourself. If the assistant has asked a question, 
-    do not ask it again. What follows is the conversation so far: ${content}`;
+    do not ask it again. What follows is the conversation so far: ${messages}`;
 
     try {
         const response: string = await getChatCompletions(prompt, messages);
@@ -82,21 +82,7 @@ export async function generateQuestion(content: string, messages: string[]): Pro
     }
 }
 
-async function getChatCompletions(prompt: string, messages: string[]): Promise<string> {
-    try {
-        const response = await axiosInstance.post(OPENAI_CHAT_COMPLETION_URL, {
-            model: "gpt-4-0125-preview",
-            messages: [{ "role": "system", "content": prompt }, ...messages],
-        });
-        
-        return response.data.choices[0].message.content;
-    } catch (error: any) {
-        console.error('Error in getChatCompletions:', error);
-        throw error;
-    }
-}
-
-export async function generateAudio(content: string): Promise<string> {
+export const generateAudio = async (content: string) => {
     try {
         const mp3 = await openai.audio.speech.create({
             model: "tts-1",
@@ -116,7 +102,21 @@ export async function generateAudio(content: string): Promise<string> {
     }
 }
 
-function parseNumberedList(inputString: string): string[] {
+const getChatCompletions = async (prompt: string, messages: string[]) => {
+    try {
+        const response = await axiosInstance.post(OPENAI_CHAT_COMPLETION_URL, {
+            model: "gpt-4-0125-preview",
+            messages: [{ "role": "system", "content": prompt }, ...messages],
+        });
+        
+        return response.data.choices[0].message.content;
+    } catch (error: any) {
+        console.error('Error in getChatCompletions:', error);
+        throw error;
+    }
+}
+
+const parseNumberedList = (inputString: string) => {
     if (!hasNumericalCharacter(inputString)) {
         return [inputString];
     }
@@ -135,6 +135,6 @@ function parseNumberedList(inputString: string): string[] {
     return items;
 }
 
-function hasNumericalCharacter(inputString: string): boolean {
+const hasNumericalCharacter = (inputString: string) => {
     return /\d/.test(inputString);
 }

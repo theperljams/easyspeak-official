@@ -29,31 +29,25 @@ const axiosInstance = axios_1.default.create({
     },
 });
 const openai = new openai_1.OpenAI();
-function getEmbedding(content) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield axiosInstance.post(OPENAI_EMBEDDING_URL, {
-                model: "text-embedding-ada-002",
-                input: content,
-                encoding_format: "float",
-            });
-            return response.data.data[0].embedding;
-        }
-        catch (error) {
-            console.error('Error in getEmbedding:', error);
-            throw error;
-        }
-    });
-}
+const getEmbedding = (content) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield axiosInstance.post(OPENAI_EMBEDDING_URL, {
+            model: "text-embedding-ada-002",
+            input: content,
+            encoding_format: "float",
+        });
+        return response.data.data[0].embedding;
+    }
+    catch (error) {
+        console.error('Error in getEmbedding:', error);
+        throw error;
+    }
+});
 exports.getEmbedding = getEmbedding;
-function generateResponses(content, messages, user_id) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let contextShort = (yield (0, db_1.getContextShort)(yield getEmbedding(content), user_id));
-        let contextLong = (yield (0, db_1.getContextLong)(yield getEmbedding(content), user_id));
-        // console.log(user_id);
-        // console.log("SHORT: ", contextShort);
-        console.log("LONG: ", contextLong);
-        const prompt = `You are an assistant drafting texts for ${user_id}. Your goal is to sound as much like them as possible. Follow these steps to learn how to do this.
+const generateResponses = (content, messages, user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    let contextShort = (yield (0, db_1.getContextShort)(yield (0, exports.getEmbedding)(content), user_id));
+    let contextLong = (yield (0, db_1.getContextLong)(yield (0, exports.getEmbedding)(content), user_id));
+    const prompt = `You are an assistant drafting texts for ${user_id}. Your goal is to sound as much like them as possible. Follow these steps to learn how to do this.
 
     Step 1: Look at the context below to learn how ${user_id} speaks. As you answer, mimic their voice and way of speaking, try to be as convincing as possible. You can also search the given contextShort below to answer questions. Answer the question as if you were sending a text from ${user_id}'s phone. 
     This dataset mainly contains basic information. You speak as ${user_id}. For example, if the content contains: "What are you studying?" the assistant will read: "What does ${user_id} say they are studying?" 
@@ -77,66 +71,59 @@ function generateResponses(content, messages, user_id) {
     ALWAYS DO THIS STEP:
     
     Step 3: Now, take your previous response and come up with 3 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3. \n 4. Treat them as 4 separate sentences in different contexts. You can use either of the previous datasets for help with this.`;
-        const response = yield getChatCompletions(prompt, messages);
-        return parseNumberedList(response);
-    });
-}
+    const response = yield getChatCompletions(prompt, messages);
+    return parseNumberedList(response);
+});
 exports.generateResponses = generateResponses;
-function generateQuestion(content, messages) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const prompt = `You are asking questions to get to know the user as a friend
+const generateQuestion = (messages) => __awaiter(void 0, void 0, void 0, function* () {
+    const prompt = `You are asking questions to get to know the user as a friend
     and also as if you were trying to write a book about them. 
     Ask one question at a time. Keep asking questions.
     Do not say anything about yourself. If the assistant has asked a question, 
-    do not ask it again. What follows is the conversation so far: ${content}`;
-        try {
-            const response = yield getChatCompletions(prompt, messages);
-            return response;
-        }
-        catch (error) {
-            console.error('Error in generateQuestion:', error);
-            throw error;
-        }
-    });
-}
+    do not ask it again. What follows is the conversation so far: ${messages}`;
+    try {
+        const response = yield getChatCompletions(prompt, messages);
+        return response;
+    }
+    catch (error) {
+        console.error('Error in generateQuestion:', error);
+        throw error;
+    }
+});
 exports.generateQuestion = generateQuestion;
-function getChatCompletions(prompt, messages) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield axiosInstance.post(OPENAI_CHAT_COMPLETION_URL, {
-                model: "gpt-4-0125-preview",
-                messages: [{ "role": "system", "content": prompt }, ...messages],
-            });
-            return response.data.choices[0].message.content;
-        }
-        catch (error) {
-            console.error('Error in getChatCompletions:', error);
-            throw error;
-        }
-    });
-}
-function generateAudio(content) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const mp3 = yield openai.audio.speech.create({
-                model: "tts-1",
-                voice: "alloy",
-                input: content,
-            });
-            const buffer = Buffer.from(yield mp3.arrayBuffer());
-            const speechFile = path_1.default.resolve(`./${Date.now()}_speech.mp3`);
-            yield fs_1.default.promises.writeFile(speechFile, buffer);
-            console.log('Audio file created:', speechFile);
-            return speechFile;
-        }
-        catch (error) {
-            console.error('Error generating audio:', error);
-            throw error;
-        }
-    });
-}
+const generateAudio = (content) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const mp3 = yield openai.audio.speech.create({
+            model: "tts-1",
+            voice: "alloy",
+            input: content,
+        });
+        const buffer = Buffer.from(yield mp3.arrayBuffer());
+        const speechFile = path_1.default.resolve(`./${Date.now()}_speech.mp3`);
+        yield fs_1.default.promises.writeFile(speechFile, buffer);
+        console.log('Audio file created:', speechFile);
+        return speechFile;
+    }
+    catch (error) {
+        console.error('Error generating audio:', error);
+        throw error;
+    }
+});
 exports.generateAudio = generateAudio;
-function parseNumberedList(inputString) {
+const getChatCompletions = (prompt, messages) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield axiosInstance.post(OPENAI_CHAT_COMPLETION_URL, {
+            model: "gpt-4-0125-preview",
+            messages: [{ "role": "system", "content": prompt }, ...messages],
+        });
+        return response.data.choices[0].message.content;
+    }
+    catch (error) {
+        console.error('Error in getChatCompletions:', error);
+        throw error;
+    }
+});
+const parseNumberedList = (inputString) => {
     if (!hasNumericalCharacter(inputString)) {
         return [inputString];
     }
@@ -150,7 +137,7 @@ function parseNumberedList(inputString) {
         }
     }
     return items;
-}
-function hasNumericalCharacter(inputString) {
+};
+const hasNumericalCharacter = (inputString) => {
     return /\d/.test(inputString);
-}
+};

@@ -4,9 +4,9 @@
 	color: white;
 
 	/* Fixed in the top left corner so the Chat title can be centered */
-	position: fixed;
+	
 	left: 20px;
-	bottom: 130px;
+	bottom: 100px;
 	width: 80px;
 	height: 80px;
 	border-radius: 30px;

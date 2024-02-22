@@ -18,3 +18,10 @@
 	flex-direction: row;
 	gap: 2px;
 }
+
+.dragView {
+	color: transparent;
+	position: absolute;
+	left: 10px;
+	bottom: 130px;
+}
