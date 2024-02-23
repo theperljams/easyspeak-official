@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 
-import styles from './InputBar.module.css';
+import styles from '../styles/InputBar.module.css';
 import pencil from '../assets/pencil.svg';
 import paperAirplane from '../assets/paper-airplane.svg';
 import upArrowIcon from '../assets/arrow-up-square.svg';

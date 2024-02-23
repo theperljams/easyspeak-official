@@ -1,0 +1,30 @@
+.container {
+  width: 40vw;
+  border: solid;
+  border-color: lightgrey;
+  border-width: 1px;
+  
+  display: flex;
+  flex-direction: column;
+}
+
+.link {
+  text-decoration: none;
+  color: black;
+  font-size: 25px;
+  border: none;
+  background-color: white;
+}
+
+.navButton {
+  height: 100px;
+  display: flex;
+  padding-left: 70px;
+  align-items: center;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 30px;
+  margin: 7vh;
+}

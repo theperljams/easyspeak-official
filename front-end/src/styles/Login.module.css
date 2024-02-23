@@ -43,6 +43,10 @@
   margin-bottom: 5vh;
 }
 
+.input:focus {
+  outline: none
+}
+
 .message {
   font-size: 20px;
   margin-bottom: 5vh;

@@ -1,4 +1,4 @@
-import styles from './ChatBubble.module.css';
+import styles from '../styles/ChatBubble.module.css';
 
 interface Props {
 	content: string;

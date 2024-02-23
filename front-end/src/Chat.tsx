@@ -1,15 +1,12 @@
-
 import { useState, useEffect } from "react";
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
-
 import { Listen } from "./components/Listen.js";
 import { ChatWindow } from "./components/ChatWindow.js";
 import { Responses } from "./components/Responses.js";
 import { InputBar } from "./components/InputBar.js";
-
 import Draggable from "react-draggable";
 
-import styles from "./Chat.module.css";
+import styles from "./styles/Chat.module.css";
 
 // functions for communicating with API
 import { generateUserAudio, generateUserResponses } from "./Api.js";

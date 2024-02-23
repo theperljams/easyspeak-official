@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { ChatWindow } from "./components/ChatWindow.js";
 import { InputBar } from "./components/InputBar.js";
 
-import styles from "./Training.module.css";
+import styles from "./styles/Training.module.css";
 
 // functions for communicating with API
 import {generateGPTQuestion, sendQuestionAnswerPairToShort } from "./Api.js";

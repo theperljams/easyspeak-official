@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { IoEye, IoEyeOutline } from "react-icons/io5";
-
-import styles from "./Login.module.css";
 import { Link } from 'react-router-dom';
+
+import styles from "./styles/Login.module.css";
 
 interface Props {
 	email: string

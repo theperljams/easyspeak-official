@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Header.module.css';
+import styles from '../styles/Header.module.css';
 import { MenuButton } from './MenuButton';
 
 import HomeIcon from '../assets/home-2.svg';

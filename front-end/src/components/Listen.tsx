@@ -1,6 +1,6 @@
 import VolumeHigh from '../assets/volume-high-solid.svg';
 import VolumeMute from '../assets/volume-xmark-solid.svg';
-import styles from './Listen.module.css';
+import styles from '../styles/Listen.module.css';
 
 interface Props {
 	listen: boolean;

@@ -1,19 +1,11 @@
 import { createClient, type Session } from '@supabase/supabase-js'
-import { Auth } from '@supabase/auth-ui-react'
-import {
-  // Import predefined theme
-  ThemeSupa,
-} from '@supabase/auth-ui-shared'
 import { useEffect, useState } from "react";
 import { Chat } from './Chat';
 import { Training } from './Training';
-
-
-// signout function
 import { BrowserRouter, Route, RouterProvider, Routes } from 'react-router-dom';
 import { Home } from './Home';
 import { Login }  from './Login';
-import { signInWithEmail } from './Api';
+import { signInWithEmail, signUpNewUser } from './Api';
 import { Signup } from './Signup';
 
 const SUPA_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -46,7 +38,9 @@ export function App() {
 			return;
 		}
 		
-		const response = await signInWithEmail({ body: { email: email, password: password }});
+		const response = await signUpNewUser({ body: { email: email, password: password }});
+		
+		console.log(response);
 		
 		if  (response != null) {
 			supabase.auth.getSession().then(({ data: { session } }) => {

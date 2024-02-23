@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import 'regenerator-runtime/runtime'
 
-import './index.css';
+import './styles/index.css';
 import { createClient, type Session } from '@supabase/supabase-js'
 import { App } from './App';
 

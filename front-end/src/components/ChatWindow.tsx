@@ -1,5 +1,5 @@
 import { ChatBubble } from './ChatBubble';
-import styles from './ChatWindow.module.css';
+import styles from '../styles/ChatWindow.module.css';
 import type { Message } from './Interfaces';
 
 interface Props {
