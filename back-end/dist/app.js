@@ -58,6 +58,7 @@ app.post('/training', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 }));
 app.post('/tts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("req.body: ", req.body);
     const { text } = req.body;
     if (!text) {
         return res.status(400).send('Text is required');
@@ -65,6 +66,7 @@ app.post('/tts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield (0, llm_1.generateAudio)(text);
         res.json(response);
+        console.log("response: ", response);
     }
     catch (error) {
         res.status(500).send('Error calling TTS API');

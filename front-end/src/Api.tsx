@@ -65,8 +65,8 @@ export const generateGPTQuestion = async (messages: Message[]) => {
   }
 }
 
-// this does not work
 export const generateUserAudio = async (input: string) => {
+  console.log("input: ", input);
   try {
     const response = await fetch(`${SERVER_URL}/tts`, {
       method: 'POST',

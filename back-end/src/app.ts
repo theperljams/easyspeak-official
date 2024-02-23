@@ -49,6 +49,7 @@ app.post('/training', async (req, res) => {
 });
 
 app.post('/tts', async (req, res) => { 
+    console.log("req.body: ", req.body);
     const { text } = req.body;
     if (!text) {
       return res.status(400).send('Text is required');
@@ -56,6 +57,7 @@ app.post('/tts', async (req, res) => {
     try {
       const response = await generateAudio(text);
       res.json(response);
+      console.log("response: ", response);
     } catch (error) {
       res.status(500).send('Error calling TTS API');
     }

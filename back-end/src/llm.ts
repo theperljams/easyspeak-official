@@ -84,14 +84,14 @@ export const generateQuestion = async (messages: string[]) => {
 
 export const generateAudio = async (content: string) => {
     try {
-        const mp3 = await openai.audio.speech.create({
+        const audioFile = await openai.audio.speech.create({
             model: "tts-1",
             voice: "alloy",
             input: content,
         });
 
-        const buffer: Buffer = Buffer.from(await mp3.arrayBuffer());
-        const speechFile: string = path.resolve(`./${Date.now()}_speech.mp3`);
+        const buffer: Buffer = Buffer.from(await audioFile.arrayBuffer());
+        const speechFile: string = path.resolve(`./${Date.now()}_speech.wav`);
         await fs.promises.writeFile(speechFile, buffer);
 
         console.log('Audio file created:', speechFile);
