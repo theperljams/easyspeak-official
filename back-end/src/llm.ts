@@ -91,11 +91,14 @@ export const generateAudio = async (content: string) => {
         });
 
         const buffer: Buffer = Buffer.from(await audioFile.arrayBuffer());
-        const speechFile: string = path.resolve(`./${Date.now()}_speech.wav`);
+        const fileName: string = `${Date.now()}_speech.wav`;
+        const speechFile: string = path.resolve(`./public/${fileName}`);
         await fs.promises.writeFile(speechFile, buffer);
 
         console.log('Audio file created:', speechFile);
-        return speechFile;
+        const speechUrl: string = `http://localhost:3000/${fileName}`;
+        console.log("speechUrl:", speechUrl);
+        return speechUrl;
     } catch (error: any) {
         console.error('Error generating audio:', error);
         throw error;

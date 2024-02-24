@@ -4,6 +4,7 @@ import { insertQAPair } from './db';
 
 const app = express();
 app.use(express.json());
+app.use(express.static('public'));
 const cors = require('cors');
 
 // Use CORS middleware
@@ -67,3 +68,17 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+// import express from "express";
+
+// const app = express();
+// const port = 3000;
+
+// app.use(express.static("public"));
+
+// app.get("/", (req, res) => {
+//   res.send("Hello world");
+// });
+
+// app.listen(port, () => {
+//   console.log("Listening now");
+// });

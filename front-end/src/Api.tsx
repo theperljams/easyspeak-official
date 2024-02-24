@@ -78,7 +78,8 @@ export const generateUserAudio = async (input: string) => {
         text: input 
       })
     });
-    const audioData = await response.blob();
+    const audioData = await response.json()
+    console.log("audioData: ", audioData);
     return audioData;
     
   } catch (error) {

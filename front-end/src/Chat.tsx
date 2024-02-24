@@ -64,25 +64,21 @@ export function Chat () {
 	}
 
 	useEffect(() => {
-		if (textInput) {
+		if (textInput && !isSpeaking) {
 			console.log("in here");
-			// generateUserAudio(textInput)
-			// 	.then((audioData) => {
-			// 		if (audioData instanceof Blob) {
-			// 			const audioURL = URL.createObjectURL(audioData);
-			// 			console.log('audio URL:', audioURL);
-			// 			setAudioURL(audioURL);
-			// 			setIsSpeaking(false);
-			// 			setTextInput("");
-			// 		}
-			// 	})
-			// 	.catch((error) => {
-			// 		console.error('Error speaking:', error);
-			// 	})
-			setAudioURL("https://actions.google.com/sounds/v1/ambiences/barnyard_with_animals.ogg");
-			console.log("audioURL: ", audioURL);
+			generateUserAudio(textInput)
+				.then((audioURL) => {
+					console.log('audio URL:', audioURL);
+					setAudioURL(audioURL); // Directly use the URL returned from generateUserAudio
+					setIsSpeaking(false);
+					setTextInput("");
+				})
+				.catch((error) => {
+					console.error('Error speaking:', error);
+				});
 		} 
-	}, [textInput]);
+	}, [textInput, isSpeaking]);
+	
 	
 	useEffect(() => {
 		if (initialLoad) {

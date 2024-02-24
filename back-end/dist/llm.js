@@ -99,10 +99,13 @@ const generateAudio = (content) => __awaiter(void 0, void 0, void 0, function* (
             input: content,
         });
         const buffer = Buffer.from(yield audioFile.arrayBuffer());
-        const speechFile = path_1.default.resolve(`./${Date.now()}_speech.wav`);
+        const fileName = `${Date.now()}_speech.wav`;
+        const speechFile = path_1.default.resolve(`./public/${fileName}`);
         yield fs_1.default.promises.writeFile(speechFile, buffer);
         console.log('Audio file created:', speechFile);
-        return speechFile;
+        const speechUrl = `http://localhost:3000/${fileName}`;
+        console.log("speechUrl:", speechUrl);
+        return speechUrl;
     }
     catch (error) {
         console.error('Error generating audio:', error);
