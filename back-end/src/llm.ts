@@ -98,6 +98,17 @@ export const generateAudio = async (content: string) => {
         console.log('Audio file created:', speechFile);
         const speechUrl: string = `http://localhost:3000/${fileName}`;
         console.log("speechUrl:", speechUrl);
+
+        setTimeout(() => {
+            fs.unlink(speechFile, (err) => {
+                if (err) {
+                    console.error('Error deleting file:', err);
+                } else {
+                    console.log('File deleted:', speechFile);
+                }
+            });
+        }, 7000); 
+
         return speechUrl;
     } catch (error: any) {
         console.error('Error generating audio:', error);

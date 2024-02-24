@@ -105,6 +105,16 @@ const generateAudio = (content) => __awaiter(void 0, void 0, void 0, function* (
         console.log('Audio file created:', speechFile);
         const speechUrl = `http://localhost:3000/${fileName}`;
         console.log("speechUrl:", speechUrl);
+        setTimeout(() => {
+            fs_1.default.unlink(speechFile, (err) => {
+                if (err) {
+                    console.error('Error deleting file:', err);
+                }
+                else {
+                    console.log('File deleted:', speechFile);
+                }
+            });
+        }, 7000);
         return speechUrl;
     }
     catch (error) {
