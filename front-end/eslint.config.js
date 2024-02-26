@@ -27,8 +27,8 @@ export default [
 		},
 		rules: {
 			// Recommended
-			...js.configs.recommended.rules,
-			...stylistic.configs['recommended-flat'].rules,
+			// ...js.configs.recommended.rules,
+			// ...stylistic.configs['recommended-flat'].rules,
 
 			// Overrides
 			'@stylistic/indent': ['error', 'tab'],
@@ -57,7 +57,7 @@ export default [
 			},
 		},
 		rules: {
-			...typescriptPlugin.configs['strict-type-checked'].rules,
+			// ...typescriptPlugin.configs['strict-type-checked'].rules,
 			...typescriptPlugin.configs['stylistic-type-checked'].rules,
 		},
 	},

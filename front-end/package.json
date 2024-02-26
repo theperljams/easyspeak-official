@@ -5,6 +5,7 @@
 	"type": "module",
 	"author": "Paul Hathaway, Justin McBride",
 	"scripts": {
+		"lint-fix": "eslint . --fix",
 		"lint": "eslint .",
 		"test": "vitest",
 		"start": "vite",

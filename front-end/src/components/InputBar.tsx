@@ -18,31 +18,32 @@ export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, set
 		e.preventDefault();
 		handleSubmitInput();
 		setInput('');
-	}
-	
+	};
+
 	const onTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmitInput();
-      setInput('');
-    }
-  };
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			handleSubmitInput();
+			setInput('');
+		}
+	};
 
 	return (
 		<form className={styles.inputBar} onSubmit={onFormSubmit}>
 			<div className={styles.textContainer}>
-				<textarea 
-					className={styles.textBox} 
-					name="input" 
-					id="" 
+				<textarea
+					className={styles.textBox}
+					name="input"
+					id=""
 					value={inputText}
 					onKeyDown={onTextareaKeyDown}
-					onChange={e => setInput(e.target.value)}/>
+					onChange={(e) => { setInput(e.target.value); }}
+				/>
 				{
 					// Conditionally render audio player
 					audioURL != null && (
 						<audio autoPlay key={audioURL}>
-							<source src={audioURL} type="audio/mpeg"/>
+							<source src={audioURL} type="audio/mpeg" />
 						</audio>
 					)
 				}
