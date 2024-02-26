@@ -92,7 +92,7 @@ export const generateAudio = async (content: string) => {
 
         const buffer: Buffer = Buffer.from(await audioFile.arrayBuffer());
         const fileName: string = `${Date.now()}_speech.wav`;
-        const speechFile: string = path.resolve(`./public/${fileName}`);
+        const speechFile: string = path.resolve(`./tmp/${fileName}`);
         await fs.promises.writeFile(speechFile, buffer);
 
         console.log('Audio file created:', speechFile);
