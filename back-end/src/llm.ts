@@ -84,18 +84,32 @@ export const generateQuestion = async (messages: string[]) => {
 
 export const generateAudio = async (content: string) => {
     try {
-        const mp3 = await openai.audio.speech.create({
+        const audioFile = await openai.audio.speech.create({
             model: "tts-1",
             voice: "alloy",
             input: content,
         });
 
-        const buffer: Buffer = Buffer.from(await mp3.arrayBuffer());
-        const speechFile: string = path.resolve(`./${Date.now()}_speech.mp3`);
+        const buffer: Buffer = Buffer.from(await audioFile.arrayBuffer());
+        const fileName: string = `${Date.now()}_speech.wav`;
+        const speechFile: string = path.resolve(`./public/${fileName}`);
         await fs.promises.writeFile(speechFile, buffer);
 
         console.log('Audio file created:', speechFile);
-        return speechFile;
+        const speechUrl: string = `http://localhost:3000/${fileName}`;
+        console.log("speechUrl:", speechUrl);
+
+        setTimeout(() => {
+            fs.unlink(speechFile, (err) => {
+                if (err) {
+                    console.error('Error deleting file:', err);
+                } else {
+                    console.log('File deleted:', speechFile);
+                }
+            });
+        }, 7000); 
+
+        return speechUrl;
     } catch (error: any) {
         console.error('Error generating audio:', error);
         throw error;

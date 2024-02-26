@@ -93,16 +93,29 @@ const generateQuestion = (messages) => __awaiter(void 0, void 0, void 0, functio
 exports.generateQuestion = generateQuestion;
 const generateAudio = (content) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const mp3 = yield openai.audio.speech.create({
+        const audioFile = yield openai.audio.speech.create({
             model: "tts-1",
             voice: "alloy",
             input: content,
         });
-        const buffer = Buffer.from(yield mp3.arrayBuffer());
-        const speechFile = path_1.default.resolve(`./${Date.now()}_speech.mp3`);
+        const buffer = Buffer.from(yield audioFile.arrayBuffer());
+        const fileName = `${Date.now()}_speech.wav`;
+        const speechFile = path_1.default.resolve(`./public/${fileName}`);
         yield fs_1.default.promises.writeFile(speechFile, buffer);
         console.log('Audio file created:', speechFile);
-        return speechFile;
+        const speechUrl = `http://localhost:3000/${fileName}`;
+        console.log("speechUrl:", speechUrl);
+        setTimeout(() => {
+            fs_1.default.unlink(speechFile, (err) => {
+                if (err) {
+                    console.error('Error deleting file:', err);
+                }
+                else {
+                    console.log('File deleted:', speechFile);
+                }
+            });
+        }, 7000);
+        return speechUrl;
     }
     catch (error) {
         console.error('Error generating audio:', error);
