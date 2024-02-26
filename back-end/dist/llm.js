@@ -14,8 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateAudio = exports.generateQuestion = exports.generateResponses = exports.getEmbedding = void 0;
 const axios_1 = __importDefault(require("axios"));
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
 const openai_1 = require("openai");
 const blob_1 = require("@vercel/blob");
 // Assuming these functions exist in './db'
@@ -99,15 +97,16 @@ const generateAudio = (content) => __awaiter(void 0, void 0, void 0, function* (
             voice: "alloy",
             input: content,
         });
-        const fileName = `speech.wav`;
+        // const fileName: string = `speech.wav`;
         const buffer = Buffer.from(yield audioFile.arrayBuffer());
-        const speechFile = path_1.default.resolve(`${fileName}`);
+        // const speechFile: string = path.resolve(`/tmp/${fileName}`);
         // let writeStream = fs.createWriteStream(`/tmp/${fileName}`);
-        yield fs_1.default.promises.writeFile(speechFile, buffer);
+        // let thing = await fs.promises.writeFile(speechFile, buffer);
+        // console.log(thing)
         // const buffer: Buffer = Buffer.from(await audioFile.arrayBuffer());
         // const speechFile: string = path.resolve(`./tmp/${fileName}`);
-        const { url } = yield (0, blob_1.put)(speechFile, 'Hello World!', { access: 'public' });
-        console.log('Audio file created:', speechFile);
+        const { url } = yield (0, blob_1.put)('speech.wav', buffer, { access: 'public' });
+        // console.log('Audio file created:', speechFile);
         const speechUrl = url; //`http://localhost:3000/${fileName}`;
         console.log("speechUrl:", speechUrl);
         // setTimeout(() => {
