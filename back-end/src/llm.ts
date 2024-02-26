@@ -95,6 +95,7 @@ export const generateAudio = async (content: string) => {
 
         // const fileName: string = `speech.wav`;
         const buffer: Buffer = Buffer.from(await audioFile.arrayBuffer());
+
         // const speechFile: string = path.resolve(`/tmp/${fileName}`);
         // let writeStream = fs.createWriteStream(`/tmp/${fileName}`);
 
