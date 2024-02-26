@@ -15,6 +15,7 @@ import styles from "./Chat.module.css";
 import { generateUserAudio, generateUserResponses } from "./Api.js";
 import type { Message } from "./components/Interfaces.js";
 import { Header } from "./components/Header.js";
+import { text } from "stream/consumers";
 
 export function Chat () {
 	const [initialLoad, setInitialLoad] = useState(false);
@@ -60,30 +61,24 @@ export function Chat () {
 	}
 
 	const handleUserInputSubmit = () => {
-    if (textInput != '') {
-      setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
-			setIsSpeaking(true);
-		generateUserAudio(textInput)
-			.then((audioData) => {
-				if (audioData instanceof Blob) {
-					const audioURL = URL.createObjectURL(audioData);
+		console.log("handle User input submit");
+		if (textInput !== '') {
+			console.log("text input: ", textInput);
+			setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
+	
+			// Call generateUserAudio directly here
+			generateUserAudio(textInput)
+				.then((audioURL) => {
 					console.log('audio URL:', audioURL);
 					setAudioURL(audioURL);
-					setIsSpeaking(false);
 					setTextInput("");
-				}
-			})
-			.catch((error) => {
-				console.error('Error speaking:', error);
-			});
-    }
-	}
-
-	useEffect(() => {
-    if (isSpeaking) {
-
-    }
-	}, [isSpeaking]);
+				})
+				.catch((error) => {
+					console.error('Error speaking:', error);
+				});
+		}
+	};
+	
 	
 	useEffect(() => {
 		if (initialLoad) {
