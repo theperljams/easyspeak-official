@@ -29,7 +29,10 @@ export function Chat () {
 	
 	// for use later: sending quesiton answer pairs to the database 
 	const [question, setQuestion] = useState('');
- 	
+
+
+
+
 	const { transcript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
 	
 	if (!browserSupportsSpeechRecognition) {
