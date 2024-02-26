@@ -100,7 +100,7 @@ const generateAudio = (content) => __awaiter(void 0, void 0, void 0, function* (
         });
         const buffer = Buffer.from(yield audioFile.arrayBuffer());
         const fileName = `${Date.now()}_speech.wav`;
-        const speechFile = path_1.default.resolve(`./public/${fileName}`);
+        const speechFile = path_1.default.resolve(`./tmp/${fileName}`);
         yield fs_1.default.promises.writeFile(speechFile, buffer);
         console.log('Audio file created:', speechFile);
         const speechUrl = `http://localhost:3000/${fileName}`;
