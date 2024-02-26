@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { OpenAI } from 'openai';
 
+import { put } from "@vercel/blob";
+
 // Assuming these functions exist in './db'
 import { getContextLong, getContextShort } from './db';
 
@@ -90,24 +92,33 @@ export const generateAudio = async (content: string) => {
             input: content,
         });
 
-        const buffer: Buffer = Buffer.from(await audioFile.arrayBuffer());
-        const fileName: string = `${Date.now()}_speech.wav`;
-        const speechFile: string = path.resolve(`/tmp/${fileName}`);
-        await fs.promises.writeFile(speechFile, buffer);
 
-        console.log('Audio file created:', speechFile);
-        const speechUrl: string = `http://localhost:3000/${fileName}`;
+        // const fileName: string = `speech.wav`;
+        const buffer: Buffer = Buffer.from(await audioFile.arrayBuffer());
+        // const speechFile: string = path.resolve(`/tmp/${fileName}`);
+        // let writeStream = fs.createWriteStream(`/tmp/${fileName}`);
+
+        // let thing = await fs.promises.writeFile(speechFile, buffer);
+        // console.log(thing)
+        // const buffer: Buffer = Buffer.from(await audioFile.arrayBuffer());
+        // const speechFile: string = path.resolve(`./tmp/${fileName}`);
+
+
+
+        const { url } = await put('speech.wav', buffer, { access: 'public' });
+        // console.log('Audio file created:', speechFile);
+        const speechUrl: string = url;//`http://localhost:3000/${fileName}`;
         console.log("speechUrl:", speechUrl);
 
-        setTimeout(() => {
-            fs.unlink(speechFile, (err) => {
-                if (err) {
-                    console.error('Error deleting file:', err);
-                } else {
-                    console.log('File deleted:', speechFile);
-                }
-            });
-        }, 7000); 
+        // setTimeout(() => {
+        //     fs.unlink(speechFile, (err) => {
+        //         if (err) {
+        //             console.error('Error deleting file:', err);
+        //         } else {
+        //             console.log('File deleted:', speechFile);
+        //         }
+        //     });
+        // }, 7000);
 
         return speechUrl;
     } catch (error: any) {
