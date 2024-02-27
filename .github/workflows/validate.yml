@@ -47,10 +47,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
 
 
       # Add more steps here later
@@ -59,12 +55,24 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./front-end
+        working-directory: front-end
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_FRONTEND }}
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+
       #  Vercel Deployment
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
@@ -83,6 +91,8 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_BACKEND }}
     steps:
+      - name: Install dependencies
+        run: npm install
       #  Vercel Deployment
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
