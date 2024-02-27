@@ -42,6 +42,7 @@ export const signInWithEmail = async (req : SignInProps) => {
   console.log(response);
 }
 
+
 export const sendQuestionAnswerPairToShort = async (content: string) => {
 	const user_id = localStorage.getItem('user_id');
 

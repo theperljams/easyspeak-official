@@ -1,3 +1,4 @@
+
 import {createClient, type Session} from '@supabase/supabase-js'
 import {useEffect, useState} from "react";
 import {Chat} from './Chat';
@@ -7,6 +8,7 @@ import {Home} from './Home';
 import {Login} from './Login';
 import {signInWithEmail, signUpNewUser} from './Api';
 import {Signup} from './Signup';
+
 
 const SUPA_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPA_API_KEY = import.meta.env.VITE_SUPABASE_API_KEY;
