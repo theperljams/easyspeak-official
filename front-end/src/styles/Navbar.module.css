@@ -1,0 +1,42 @@
+.container {
+  width: 40vw;
+  border: solid;
+  border-color: lightgrey;
+  border-width: 1px;
+  
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  overflow: wrap;
+}
+
+.link {
+  text-decoration: none;
+  color: black;
+  font-size: 25px;
+  border: none;
+  background-color: transparent;
+}
+
+.navButton {
+  height: 100px;
+  display: flex;
+  padding-left: 70px;
+  align-items: center;
+  text-decoration: none;
+}
+
+.navButton:hover {
+  background-color: rgb(237, 237, 237);
+  color: red;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 30px;
+  margin: 7vh;
+}

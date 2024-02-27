@@ -28,6 +28,5 @@ models/
 __pycache__/
 venv/
 ```
-
+back-end/node_modules
 back-end/.idea/workspace.xml
-vercel-backend/node_modules

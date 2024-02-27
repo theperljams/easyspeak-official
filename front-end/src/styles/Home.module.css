@@ -1,0 +1,19 @@
+.mainView {
+  display: flex;
+  background-color: white;
+  height: 1000px;
+}
+
+.open {
+  margin-top: 5vh;
+  height: 10vh;
+  position: absolute;
+  left: 23vw;
+}
+
+.close {
+  margin-top: 5vh;
+  position: absolute;
+  height: 10vh;
+  left: 30px
+}

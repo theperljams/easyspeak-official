@@ -3,10 +3,27 @@
 	/* Makes the app take up the entire screen height, so the InputBar is on the bottom */
 	height: 100vh;
 
+	background-image: linear-gradient(to right, #E7F1FD, #F8F4FD);
+}
+
+.container {
 	display: flex;
 	flex-direction: column;
-	/* Pushes the InputBar to the bottom */
 	justify-content: space-between;
+	height: 95vh;
+	margin: 20px 20px 20px 100px;
+	background-color: white;
+	border-radius: 20px;
+}
+
+.footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 'auto';
+	height: 100px;
+	margin: 20px;
+	margin-top: 0px;
 }
 
 .mainView {

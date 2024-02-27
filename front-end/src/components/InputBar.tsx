@@ -1,9 +1,7 @@
-import { useState, type FormEvent } from 'react';
+import {type FormEvent} from 'react';
 
-import styles from './InputBar.module.css';
-import pencil from '../assets/pencil.svg';
-import paperAirplane from '../assets/paper-airplane.svg';
-import upArrowIcon from '../assets/arrow-up-square.svg';
+import styles from '../styles/InputBar.module.css';
+import send from '../assets/send.svg';
 
 interface Props {
 	inputText: string;
@@ -29,28 +27,29 @@ export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, set
 	};
 
 	return (
-		<form className={styles.inputBar} onSubmit={onFormSubmit}>
-			<div className={styles.textContainer}>
-				<textarea
-					className={styles.textBox}
-					name="input"
-					id=""
-					value={inputText}
-					onKeyDown={onTextareaKeyDown}
-					onChange={(e) => { setInput(e.target.value); }}
-				/>
-				{
-					// Conditionally render audio player
-					audioURL != null && (
-						<audio autoPlay key={audioURL}>
-							<source src={audioURL} type="audio/mpeg" />
-						</audio>
-					)
-				}
-				<button className={styles.button} type="submit">
-					<img src={upArrowIcon} alt="icon" className={styles.buttonIcon} />
-				</button>
-			</div>
-		</form>
+		<div className={styles.container}>
+			<form className={styles.inputBar} onSubmit={onFormSubmit}>
+				<div className={styles.textContainer}>
+					<textarea 
+						className={styles.textBox} 
+						name="input" 
+						id="" 
+						value={inputText}
+						onKeyDown={onTextareaKeyDown}
+						onChange={e => setInput(e.target.value)}/>
+					{
+						// Conditionally render audio player
+						audioURL != null && (
+							<audio autoPlay key={audioURL}>
+								<source src={audioURL} type="audio/mpeg"/>
+							</audio>
+						)
+					}
+					<button className={styles.button} type="submit">
+						<img src={send} alt="icon" className={styles.buttonIcon} />
+					</button>
+				</div>
+			</form>
+		</div>
 	);
 }
