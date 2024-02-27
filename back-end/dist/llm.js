@@ -14,9 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateAudio = exports.generateQuestion = exports.generateResponses = exports.getEmbedding = void 0;
 const axios_1 = __importDefault(require("axios"));
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
 const openai_1 = require("openai");
+const blob_1 = require("@vercel/blob");
 // Assuming these functions exist in './db'
 const db_1 = require("./db");
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -93,16 +92,33 @@ const generateQuestion = (messages) => __awaiter(void 0, void 0, void 0, functio
 exports.generateQuestion = generateQuestion;
 const generateAudio = (content) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const mp3 = yield openai.audio.speech.create({
+        const audioFile = yield openai.audio.speech.create({
             model: "tts-1",
             voice: "alloy",
             input: content,
         });
-        const buffer = Buffer.from(yield mp3.arrayBuffer());
-        const speechFile = path_1.default.resolve(`./${Date.now()}_speech.mp3`);
-        yield fs_1.default.promises.writeFile(speechFile, buffer);
-        console.log('Audio file created:', speechFile);
-        return speechFile;
+        // const fileName: string = `speech.wav`;
+        const buffer = Buffer.from(yield audioFile.arrayBuffer());
+        // const speechFile: string = path.resolve(`/tmp/${fileName}`);
+        // let writeStream = fs.createWriteStream(`/tmp/${fileName}`);
+        // let thing = await fs.promises.writeFile(speechFile, buffer);
+        // console.log(thing)
+        // const buffer: Buffer = Buffer.from(await audioFile.arrayBuffer());
+        // const speechFile: string = path.resolve(`./tmp/${fileName}`);
+        const { url } = yield (0, blob_1.put)('speech.wav', buffer, { access: 'public' });
+        // console.log('Audio file created:', speechFile);
+        const speechUrl = url; //`http://localhost:3000/${fileName}`;
+        console.log("speechUrl:", speechUrl);
+        // setTimeout(() => {
+        //     fs.unlink(speechFile, (err) => {
+        //         if (err) {
+        //             console.error('Error deleting file:', err);
+        //         } else {
+        //             console.log('File deleted:', speechFile);
+        //         }
+        //     });
+        // }, 7000);
+        return speechUrl;
     }
     catch (error) {
         console.error('Error generating audio:', error);

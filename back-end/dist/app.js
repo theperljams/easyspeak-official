@@ -17,6 +17,7 @@ const llm_1 = require("./llm");
 const db_1 = require("./db");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+app.use(express_1.default.static('tmp'));
 const cors = require('cors');
 // Use CORS middleware
 app.use(cors());
@@ -61,6 +62,7 @@ app.post('/training', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 }));
 app.post('/tts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("req.body: ", req.body);
     const { text } = req.body;
     if (!text) {
         return res.status(400).send('Text is required');
@@ -68,13 +70,24 @@ app.post('/tts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield (0, llm_1.generateAudio)(text);
         res.json(response);
+        console.log("response: ", response);
     }
     catch (error) {
         res.status(500).send('Error calling TTS API');
     }
 }));
-const PORT = 8000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port  ${PORT}`);
 });
+// import express from "express";
+// const app = express();
+// const port = 3000;
+// app.use(express.static("public"));
+// app.get("/", (req, res) => {
+//   res.send("Hello world");
+// });
+// app.listen(port, () => {
+//   console.log("Listening now");
+// });
 //# sourceMappingURL=app.js.map

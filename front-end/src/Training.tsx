@@ -1,68 +1,67 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { ChatWindow } from './components/ChatWindow.js';
+import { InputBar } from './components/InputBar.js';
 
-import { ChatWindow } from "./components/ChatWindow.js";
-import { InputBar } from "./components/InputBar.js";
-
-import styles from "./Training.module.css";
+import styles from './Training.module.css';
 
 // functions for communicating with API
-import {generateGPTQuestion, sendQuestionAnswerPairToShort } from "./Api.js";
-import type { Message } from "./components/Interfaces.js";
-import Header from "./components/Header.js";
+import { generateGPTQuestion, sendQuestionAnswerPairToShort } from './Api.js';
+import type { Message } from './components/Interfaces.js';
+import Header from './components/Header.js';
 
 const START_PROMPT = import.meta.env.VITE_START_PROMPT;
 
-export function Training () {
+export function Training() {
 	const [transcript, setTranscript] = useState('');
-	const [textInput, setTextInput] = useState("");
+	const [textInput, setTextInput] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [messages, setMessages] = useState<Message[]>([
-    { // initial prompt
-      role: 'system',
-      content: `${START_PROMPT}`
-    }
-  ]);
-	
+		{ // initial prompt
+			role: 'system',
+			content: `${START_PROMPT}`,
+		},
+	]);
+
 	// for sending quesiton answer pairs to the database
 	const [question, setQuestion] = useState('');
 
 	const handleUserInputSubmit = () => {
-    if (textInput != '') {
+		if (textInput != '') {
 			setMessages(prev => [...prev, { role: 'assistant', content: textInput }]);
 			getSystemReply();
-			
+
 			// TODO: change other to user name
 			sendQuestionAnswerPairToShort(`Other: ${question} User: ${textInput}`);
-    }
-	}
-	
+		}
+	};
+
 	const getSystemReply = () => {
 		setTranscript('...');
-		setLoading(true)
+		setLoading(true);
 		generateGPTQuestion(messages)
-		.then((data) => {
-			setLoading(false);
-			setTranscript('');
-			setQuestion(data);
-			setMessages(prev => [...prev, { role: 'user', content: data }]);
-		})
-		.catch((error) => {
-			console.log(error);
-		})
-	}
-  
-  useEffect(() => {
-    getSystemReply();
-  }, [])
+			.then((data) => {
+				setLoading(false);
+				setTranscript('');
+				setQuestion(data);
+				setMessages(prev => [...prev, { role: 'user', content: data }]);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	};
+
+	useEffect(() => {
+		getSystemReply();
+	}, []);
 
 	return (
 		<div className={styles.app}>
-			<Header title={'Birdy'}/>
+			<Header title="Birdy" />
 			<div className={styles.mainView}>
-				<ChatWindow messages={messages} loading={loading} transcript={transcript} title='Training Mode'/>
+				<ChatWindow messages={messages} loading={loading} transcript={transcript} title="Training Mode" />
 			</div>
-			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
+			<InputBar inputText={textInput} setInput={(s) => { setTextInput(s); }} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => { console.log('test'); }} />
 		</div>
 	);
 }
