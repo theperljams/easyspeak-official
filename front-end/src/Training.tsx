@@ -63,7 +63,7 @@ export function Training() {
 					<ChatWindow messages={messages} loading={loading} transcript={transcript} title='Training Mode'/>
 				</div>
 				<div className={styles.footer}>
-					<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
+					<InputBar inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
 				</div>
 			</div>
 		</div>

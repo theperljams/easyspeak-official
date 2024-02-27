@@ -30,6 +30,7 @@ export default [
 			// ...js.configs.recommended.rules,
 			// ...stylistic.configs['recommended-flat'].rules,
 
+
 			// Overrides
 			'@stylistic/indent': ['error', 'tab'],
 			'@stylistic/indent-binary-ops': ['error', 'tab'],
@@ -85,6 +86,7 @@ export default [
 			...reactPlugin.configs['jsx-runtime'].rules,
 
 			// Overrides
+			"react/no-unescaped-entities": 0,
 			'@stylistic/jsx-indent': ['error', 'tab'],
 			'@stylistic/jsx-indent-props': ['error', 'tab'],
 		},

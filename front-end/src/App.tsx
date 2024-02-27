@@ -1,5 +1,5 @@
 
-import {createClient, type Session} from '@supabase/supabase-js'
+import {createClient, type Session} from '@supabase/supabase-js';
 import {useEffect, useState} from "react";
 import {Chat} from './Chat';
 import {Training} from './Training';
@@ -27,13 +27,13 @@ export function App() {
 		const response = await signInWithEmail({ body: { email: email, password: password }});
 		
 		if  (response != null) {
-			supabase.auth.getSession().then(({ data: { session } }) => {
-				setSession(session)
-			})
+			supabase.auth.getSession().then(({ data: { session: inSession } }) => {
+				setSession(inSession);
+			});
 		} else {
 			setError(true);
 		}
-	}
+	};
 	
 	const signup = async () => {
 		if (password != passConfirm) {
@@ -46,13 +46,13 @@ export function App() {
 		console.log(response);
 		
 		if  (response != null) {
-			supabase.auth.getSession().then(({ data: { session } }) => {
-				setSession(session)
-			})
+			supabase.auth.getSession().then(({ data: { session: inSession } }) => {
+				setSession(inSession);
+			});
 		} else {
 			setError(true);
 		}
-	}
+	};
 
 	useEffect(() => {
 		supabase.auth.getSession().then(({ data: { session: tempSession } }) => {
@@ -81,25 +81,25 @@ export function App() {
 			<BrowserRouter>
 				<Routes>
 					<Route path="/" element={<Login 
-																			email={email} error={error} 
-																			handleSignIn={login} 
-																			password={password} 
-																			setEmail={(e) => setEmail(e)} 
-																			setError={(e) => setError(e)}
-																			setPassword={(e) => setPassword(e)}/>}/>
+						email={email} error={error} 
+						handleSignIn={login} 
+						password={password} 
+						setEmail={(e) => setEmail(e)} 
+						setError={(e) => setError(e)}
+						setPassword={(e) => setPassword(e)}/>}/>
 					<Route path="/signup" element={<Signup 
-																						email={email} 
-																						error={error} 
-																						handleSignUp={signup} 
-																						password={password} 
-																						passConfirm={passConfirm} 
-																						setEmail={(e) => setEmail(e)} 
-																						setError={(e) => setError(e)}
-																						setPassword={(e) => setPassword(e)} 
-																						setPassConfirm={(e) => setPassConfirm(e)}/>}/>
+						email={email} 
+						error={error} 
+						handleSignUp={signup} 
+						password={password} 
+						passConfirm={passConfirm} 
+						setEmail={(e) => setEmail(e)} 
+						setError={(e) => setError(e)}
+						setPassword={(e) => setPassword(e)} 
+						setPassConfirm={(e) => setPassConfirm(e)}/>}/>
 				</Routes>
 			</BrowserRouter>
-		)
+		);
 
 	}
 	else {

@@ -1,6 +1,6 @@
 
 import {useEffect, useState} from "react";
-import SpeechRecognition, {useSpeechRecognition} from 'react-speech-recognition'
+import SpeechRecognition, {useSpeechRecognition} from 'react-speech-recognition';
 import {Listen} from "./components/Listen.js";
 import {ChatWindow} from "./components/ChatWindow.js";
 import {Responses} from "./components/Responses.js";
@@ -97,8 +97,8 @@ export function Chat() {
 					{<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>}	
 				</div>}
 				<div className={styles.footer}>
-					<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}}></Listen>
-					<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => console.log('test')}/>
+					<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev);}}></Listen>
+					<InputBar inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => console.log('test')}/>
 				</div>
 			</div>
 		</div>
