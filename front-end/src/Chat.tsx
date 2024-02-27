@@ -36,6 +36,7 @@ export function Chat() {
 	}
 
 	const startListening = () => {
+		setAudioURL(null);
 		resetTranscript();
 		SpeechRecognition.startListening({ continuous: true, language: 'en-IN' });
 	};
