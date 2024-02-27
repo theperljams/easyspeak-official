@@ -18,15 +18,15 @@ export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, set
 		e.preventDefault();
 		handleSubmitInput();
 		setInput('');
-	}
-	
+	};
+
 	const onTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmitInput();
-      setInput('');
-    }
-  };
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			handleSubmitInput();
+			setInput('');
+		}
+	};
 
 	return (
 		<div className={styles.container}>

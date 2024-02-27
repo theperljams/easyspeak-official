@@ -14,6 +14,7 @@ const SUPA_API_KEY = import.meta.env.VITE_SUPABASE_API_KEY;
 const supabase = createClient(SUPA_URL, SUPA_API_KEY);
 
 export function App() {
+
 	const [session, setSession] = useState<Session|null>(null);
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -52,22 +53,22 @@ export function App() {
 	}
 
 	useEffect(() => {
-		supabase.auth.getSession().then(({ data: { session } }) => {
-			setSession(session)
-		})
+		supabase.auth.getSession().then(({ data: { session: tempSession } }) => {
+			setSession(tempSession);
+		});
 
 		const {
 			data: { subscription },
-		} = supabase.auth.onAuthStateChange((_event, session) => {
-			setSession(session)
-		})
-		
-		return () => subscription.unsubscribe()
+		} = supabase.auth.onAuthStateChange((_event, tempSession) => {
+			setSession(tempSession);
+		});
+
+		return () => { subscription.unsubscribe(); };
 	}, []);
-	
+
 	useEffect(() => {
 		const user = session?.user.email;
-		
+
 		if (user) {
 			localStorage.setItem('user_id', user);
 		}
@@ -97,16 +98,17 @@ export function App() {
 				</Routes>
 			</BrowserRouter>
 		)
+
 	}
 	else {
 		return (
 			<BrowserRouter>
 				<Routes>
-					<Route path="/" element={<Home/>}/>
-					<Route path="/chat" element={<Chat/>}/>
-					<Route path="/training" element={<Training/>}/>
+					<Route path="/" element={<Home />} />
+					<Route path="/chat" element={<Chat />} />
+					<Route path="/training" element={<Training />} />
 				</Routes>
 			</BrowserRouter>
-		)
+		);
 	}
 }

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 import { Listen } from "./components/Listen.js";
@@ -8,42 +9,45 @@ import Draggable from "react-draggable";
 
 import styles from "./styles/Chat.module.css";
 
-// functions for communicating with API
-import { generateUserAudio, generateUserResponses } from "./Api.js";
-import type { Message } from "./components/Interfaces.js";
-import { Header } from "./components/Header.js";
 
-export function Chat () {
+// functions for communicating with API
+import { generateUserAudio, generateUserResponses } from './Api.js';
+import type { Message } from './components/Interfaces.js';
+import { Header } from './components/Header.js';
+import { text } from 'stream/consumers';
+
+export function Chat() {
 	const [initialLoad, setInitialLoad] = useState(false);
 	const [isSpeaking, setIsSpeaking] = useState(false);
 	const [isListening, setIsListening] = useState(false);
-	
-	const [textInput, setTextInput] = useState("");
+
+	const [textInput, setTextInput] = useState('');
 	const [audioURL, setAudioURL] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
-	const [userGeneratedResponses, setUserGeneratedResponses] = useState(["With all these pressures, it's crucial to take care of your mental health. ", "some reasonable lenght of text witll go right here", "some reasonable lenght of text witll go right here"]);
-	
-	// for use later: sending quesiton answer pairs to the database 
+
+	const [userGeneratedResponses, setUserGeneratedResponses] = useState(['', '', '']);
+
 	const [question, setQuestion] = useState('');
- 	
+
 	const { transcript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
-	
+
 	if (!browserSupportsSpeechRecognition) {
-		return (<p>Browser does not support speech recognition...</p>)
+		return (<p>Browser does not support speech recognition...</p>);
 	}
-	
+
 	const startListening = () => {
+		setAudioURL(null);
 		resetTranscript();
-		SpeechRecognition.startListening({continuous:true, language:"en-IN"});
-	}
-	
+		SpeechRecognition.startListening({ continuous: true, language: 'en-IN' });
+	};
+
 	const stopListening = () => {
 		SpeechRecognition.stopListening();
-		
+
 		if (transcript) {
-			setMessages((prev) => [...prev, { content: transcript, role: 'assistant'}]);
+			setMessages(prev => [...prev, { content: transcript, role: 'user' }]);
 			setUserGeneratedResponses(['', '', '']);
-			generateUserResponses(transcript, messages)
+			generateUserResponses(transcript, [...messages, { content: transcript, role: 'user' }])
 				.then((r) => {
 					setUserGeneratedResponses(r);
 				})
@@ -51,41 +55,37 @@ export function Chat () {
 					console.error('Error generating responses:', error);
 				});
 		}
-	}
+	};
 
 	const handleUserInputSubmit = () => {
-    if (textInput != '') {
-      setMessages(prev => [...prev, { content: textInput, role: 'user' }]);
-			setIsSpeaking(true);
-    }
-	}
+		console.log('handle User input submit');
+		if (textInput !== '') {
+			console.log('text input: ', textInput);
+			setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
 
-	useEffect(() => {
-    if (isSpeaking) {
-      generateUserAudio(textInput)
-				.then((audioData) => {
-					if (audioData instanceof Blob) {
-						const audioURL = URL.createObjectURL(audioData);
-						console.log('audio URL:', audioURL);
-						setAudioURL(audioURL);
-						setIsSpeaking(false);
-						setTextInput("");
-					}
+			// Call generateUserAudio directly here
+			generateUserAudio(textInput)
+				.then((tempURL) => {
+					console.log('audio URL:', tempURL);
+					setAudioURL(tempURL);
+					setTextInput('');
 				})
 				.catch((error) => {
 					console.error('Error speaking:', error);
 				});
-    }
-	}, [isSpeaking]);
-	
+		}
+	};
+
 	useEffect(() => {
 		if (initialLoad) {
 			if (isListening) {
 				startListening();
-			} else {
+			}
+			else {
 				stopListening();
 			}
-		} else {
+		}
+		else {
 			setInitialLoad(true);
 		}
 	}, [isListening]);

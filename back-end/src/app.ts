@@ -4,10 +4,15 @@ import { insertQAPair } from './db';
 
 const app = express();
 app.use(express.json());
+app.use(express.static('tmp'));
 const cors = require('cors');
 
 // Use CORS middleware
 app.use(cors());
+
+app.get('/ping', (req, res) => {
+  return res.send('pong 🏓')
+})
 
 app.post('/generate', async (req, res) => {
   const { content, messages, user_id } = req.body;
@@ -49,6 +54,7 @@ app.post('/training', async (req, res) => {
 });
 
 app.post('/tts', async (req, res) => { 
+    console.log("req.body: ", req.body);
     const { text } = req.body;
     if (!text) {
       return res.status(400).send('Text is required');
@@ -56,6 +62,7 @@ app.post('/tts', async (req, res) => {
     try {
       const response = await generateAudio(text);
       res.json(response);
+      console.log("response: ", response);
     } catch (error) {
       res.status(500).send('Error calling TTS API');
     }
@@ -63,5 +70,19 @@ app.post('/tts', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port  ${PORT}`);
 });
+// import express from "express";
+
+// const app = express();
+// const port = 3000;
+
+// app.use(express.static("public"));
+
+// app.get("/", (req, res) => {
+//   res.send("Hello world");
+// });
+
+// app.listen(port, () => {
+//   console.log("Listening now");
+// });
