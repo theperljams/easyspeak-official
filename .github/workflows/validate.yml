@@ -50,8 +50,8 @@ jobs:
 
 
       # Add more steps here later
-
   vercel-front-end:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -83,6 +83,7 @@ jobs:
       - name: Trigger Vercel Deploy
         run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
   vercel-back-end:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     defaults:
       run:
