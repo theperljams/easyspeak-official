@@ -5,7 +5,8 @@ import styles from "./styles/Chat.module.css";
 export function Dash() {
   return (
     <div className={styles.app}>
-      DASH
+      <div className={styles.container}>
+      </div>
     </div>
   );
 }

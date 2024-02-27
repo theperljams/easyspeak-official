@@ -1,5 +1,4 @@
-import VolumeHigh from '../assets/volume-high-solid.svg';
-import VolumeMute from '../assets/volume-xmark-solid.svg';
+import Icon from '../assets/listen.svg';
 import styles from '../styles/Listen.module.css';
 
 interface Props {
@@ -9,11 +8,12 @@ interface Props {
 
 export function Listen({ listen, toggleListen }: Props) {
 	return (
-		<div
-			className={styles.listenButton}
-			onClick={toggleListen}
-		>
-			<img className={styles.volumeIcon} src={listen ? VolumeHigh : VolumeMute} />
+		<div className={styles.container}>
+			<div
+				className={listen ? styles.listen : styles.nolisten}
+				onClick={toggleListen}>
+				<img src={Icon} />
+			</div>
 		</div>
 	);
 }

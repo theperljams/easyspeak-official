@@ -8,12 +8,18 @@
   flex-direction: column;
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  overflow: wrap;
+}
+
 .link {
   text-decoration: none;
   color: black;
   font-size: 25px;
   border: none;
-  background-color: white;
+  background-color: transparent;
 }
 
 .navButton {
@@ -21,6 +27,12 @@
   display: flex;
   padding-left: 70px;
   align-items: center;
+  text-decoration: none;
+}
+
+.navButton:hover {
+  background-color: rgb(237, 237, 237);
+  color: red;
 }
 
 .title {

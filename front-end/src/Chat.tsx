@@ -21,7 +21,7 @@ export function Chat () {
 	const [textInput, setTextInput] = useState("");
 	const [audioURL, setAudioURL] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
-	const [userGeneratedResponses, setUserGeneratedResponses] = useState(["", "", "", ""]);
+	const [userGeneratedResponses, setUserGeneratedResponses] = useState(["With all these pressures, it's crucial to take care of your mental health. ", "some reasonable lenght of text witll go right here", "some reasonable lenght of text witll go right here"]);
 	
 	// for use later: sending quesiton answer pairs to the database 
 	const [question, setQuestion] = useState('');
@@ -42,7 +42,7 @@ export function Chat () {
 		
 		if (transcript) {
 			setMessages((prev) => [...prev, { content: transcript, role: 'assistant'}]);
-			setUserGeneratedResponses(['', '', '', '']);
+			setUserGeneratedResponses(['', '', '']);
 			generateUserResponses(transcript, messages)
 				.then((r) => {
 					setUserGeneratedResponses(r);
@@ -92,19 +92,18 @@ export function Chat () {
 
 	return (
 		<div className={styles.app}>
-			<Header title={'Chat'}/>
-			<div className={styles.mainView}>
-				<ChatWindow messages={messages} loading={isListening} transcript={transcript} title='Chat'/>
-				<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>
-			</div>
-			<Draggable
-				defaultPosition={{x: 30, y: -30}}>
-				<div className={styles.dragView}>
-					BLOCK
-				<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}}></Listen>
+			<div className={styles.container}>
+				<div className={styles.mainView}>
+					<ChatWindow messages={messages} loading={isListening} transcript={transcript} title='Chat'/>
 				</div>
-			</Draggable>
-			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => console.log('test')}/>
+				{userGeneratedResponses[0] != '' && <div className={styles.responseView}>
+					{<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>}	
+				</div>}
+				<div className={styles.footer}>
+					<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}}></Listen>
+					<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => console.log('test')}/>
+				</div>
+			</div>
 		</div>
 	);
 }
