@@ -1,8 +1,9 @@
+.container {
+	flex: 8;
+	margin-left: 10px;
+}
+
 .inputBar {
-	background-color: white;
-	width: 98%;
-	padding: 15px;
-	border-top: solid #D7D7D7;
 }
 
 .button {
@@ -15,30 +16,37 @@
 }
 
 .buttonIcon {
-	width: 80%;
-	height: 80%;
+	background-color: #EEEEEE;
+	border-radius: 10px;
+	padding: 10px;
+	padding-right: 30px;
+	padding-left: 30px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	margin-right: 20px;
+	margin-bottom: 15px;
+	
 }
 
 .textContainer {
-	padding: 10px 20px 10px 20px;
-	width: 96%;
+	height: auto;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	background-color: #E5E5EA;
-	border-radius: 40px;
+	
+	border: solid #D7D8DB 1px;
+	border-radius: 10px;
+	padding: 20px 0px 5px 30px;
 }
 
 .textBox {
-	resize: none;
 	width: 100%;
-	margin-left: 20px;
-	font-size: 30px;
-	height: 70px; 
+	height: 50px;
+	resize: none;
+	font-size: 40px;
 	overflow-y: scroll;
-	/* get rid of default styling */
-	background-color: transparent;
-	border-style: none;
 	outline: 0;
-	margin-bottom: -90px;
+	border: none;
 }

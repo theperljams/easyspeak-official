@@ -58,11 +58,14 @@ export function Training () {
 
 	return (
 		<div className={styles.app}>
-			<Header title={'Birdy'}/>
-			<div className={styles.mainView}>
-				<ChatWindow messages={messages} loading={loading} transcript={transcript} title='Training Mode'/>
+			<div className={styles.container}>
+				<div className={styles.mainView}>
+					<ChatWindow messages={messages} loading={loading} transcript={transcript} title='Training Mode'/>
+				</div>
+				<div className={styles.footer}>
+					<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
+				</div>
 			</div>
-			<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
 		</div>
 	);
 }

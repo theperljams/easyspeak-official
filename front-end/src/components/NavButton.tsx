@@ -6,15 +6,16 @@ import { Link } from 'react-router-dom';
 interface Props {
   label: string
   setScreen: (x: number) => void
+  setShowNav: () => void
   screenValue: number
 }
 
-export function NavButton({ label, setScreen, screenValue } : Props) {
+export function NavButton({ label, setScreen, setShowNav, screenValue } : Props) {
   return (
-    <div className={styles.navButton}>
-      <button className={styles.link} onClick={() => setScreen(screenValue)}>
+    <div className={styles.navButton} onClick={() => {setScreen(screenValue); setShowNav()}}>
+      <div className={styles.link}>
         {label}
-      </button>
+      </div>
     </div>
   );
 }
