@@ -1,20 +1,16 @@
-
-import { useState, useEffect } from "react";
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
-import { Listen } from "./components/Listen.js";
-import { ChatWindow } from "./components/ChatWindow.js";
-import { Responses } from "./components/Responses.js";
-import { InputBar } from "./components/InputBar.js";
-import Draggable from "react-draggable";
+import {useEffect, useState} from "react";
+import SpeechRecognition, {useSpeechRecognition} from 'react-speech-recognition'
+import {Listen} from "./components/Listen.js";
+import {ChatWindow} from "./components/ChatWindow.js";
+import {Responses} from "./components/Responses.js";
+import {InputBar} from "./components/InputBar.js";
 
 import styles from "./styles/Chat.module.css";
 
 
 // functions for communicating with API
-import { generateUserAudio, generateUserResponses } from './Api.js';
-import type { Message } from './components/Interfaces.js';
-import { Header } from './components/Header.js';
-import { text } from 'stream/consumers';
+import {generateUserAudio, generateUserResponses} from './Api.js';
+import type {Message} from './components/Interfaces.js';
 
 export function Chat() {
 	const [initialLoad, setInitialLoad] = useState(false);

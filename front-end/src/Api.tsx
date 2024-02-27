@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-import type { Message } from './components/Interfaces';
+import {createClient} from '@supabase/supabase-js';
+import type {Message} from './components/Interfaces';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 

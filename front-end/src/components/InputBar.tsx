@@ -1,8 +1,6 @@
-import { useState, type FormEvent } from 'react';
+import {type FormEvent} from 'react';
 
 import styles from '../styles/InputBar.module.css';
-import pencil from '../assets/pencil.svg';
-import paperAirplane from '../assets/paper-airplane.svg';
 import send from '../assets/send.svg';
 
 interface Props {

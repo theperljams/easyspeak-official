@@ -1,7 +1,7 @@
-import { basename } from 'node:path';
-import { describe, expect, test, vi } from 'vitest';
+import {basename} from 'node:path';
+import {describe, expect, test, vi} from 'vitest';
 
-import { reportWebVitals } from './reportWebVitals';
+import {reportWebVitals} from './reportWebVitals';
 
 const mockWebVitals = vi.hoisted(() => ({
 	onCLS: vi.fn(),
