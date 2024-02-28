@@ -105,7 +105,7 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 		<div className={styles.app}>
 			<div className={styles.container}>
 				<div className={styles.mainView}>
-					<ChatWindow messages={messages} loading={isListening} transcript={transcript}/>
+					<ChatWindow mode={'chat'} messages={messages} loading={isListening} transcript={transcript}/>
 				</div>
 				{userGeneratedResponses && <div className={styles.responseView}>
 					{<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>}	
