@@ -1,8 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { signOut } from '../Api';
-import { NavButton } from './NavButton';
-import { IoIosArrowBack } from "react-icons/io";
+import {signOut} from '../Api';
+import {NavButton} from './NavButton';
+import {IoIosArrowBack} from "react-icons/io";
 
 import styles from '../styles/Navbar.module.css';
 

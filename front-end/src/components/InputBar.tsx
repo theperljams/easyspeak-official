@@ -1,8 +1,6 @@
-import { useState, type FormEvent } from 'react';
+import {type FormEvent} from 'react';
 
 import styles from '../styles/InputBar.module.css';
-import pencil from '../assets/pencil.svg';
-import paperAirplane from '../assets/paper-airplane.svg';
 import send from '../assets/send.svg';
 
 interface Props {
@@ -19,15 +17,15 @@ export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, set
 		e.preventDefault();
 		handleSubmitInput();
 		setInput('');
-	}
-	
+	};
+
 	const onTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmitInput();
-      setInput('');
-    }
-  };
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			handleSubmitInput();
+			setInput('');
+		}
+	};
 
 	return (
 		<div className={styles.container}>

@@ -1,5 +1,5 @@
-import { onCLS, onFID, onFCP, onLCP, onTTFB } from 'web-vitals';
-import type { ReportCallback } from 'web-vitals';
+import type {ReportCallback} from 'web-vitals';
+import {onCLS, onFCP, onFID, onLCP, onTTFB} from 'web-vitals';
 
 export function reportWebVitals(onPerfEntry?: ReportCallback) {
 	if (onPerfEntry && onPerfEntry instanceof Function) {

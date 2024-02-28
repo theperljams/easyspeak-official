@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Navbar } from './components/Navbar';
-import { Chat } from './Chat';
+import {useState} from 'react';
+import {Navbar} from './components/Navbar';
+import {Chat} from './Chat';
 
 import styles from './styles/Home.module.css';
-import { Training } from './Training';
-import { Dash } from './Dash';
+import {Training} from './Training';
+import {Dash} from './Dash';
 
 import { IoIosArrowForward } from "react-icons/io";
 import type { Message } from './components/Interfaces';

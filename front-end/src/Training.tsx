@@ -1,8 +1,8 @@
+import {useEffect, useState} from 'react';
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import {ChatWindow} from './components/ChatWindow.js';
+import {InputBar} from './components/InputBar.js';
 
-import { ChatWindow } from "./components/ChatWindow.js";
-import { InputBar } from "./components/InputBar.js";
 
 import styles from "./styles/Training.module.css";
 
@@ -14,9 +14,9 @@ import { Responses } from "./components/Responses.js";
 const START_PROMPT_SHORT = import.meta.env.VITE_START_SHORT;
 const START_PROMPT_LONG = import.meta.env.VITE_START_LONG;
 
-export function Training () {
+export function Training() {
 	const [transcript, setTranscript] = useState('');
-	const [textInput, setTextInput] = useState("");
+	const [textInput, setTextInput] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [chatMode, setChatMode] = useState('');
 	const [messages, setMessages] = useState<Message[]>([]);
@@ -31,25 +31,26 @@ export function Training () {
 			content: 'please make a selection to begin training'
 		}
 	]);
-	
+
 	// for sending quesiton answer pairs to the database
 	const [question, setQuestion] = useState('');
 
 	const handleUserInputSubmit = () => {
-    if (textInput != '') {
-			setMessages(prev => [...prev, { role: 'user', content: textInput }]);
+		if (textInput != '') {
+			setMessages(prev => [...prev, { role: 'assistant', content: textInput }]);
 			getSystemReply();
-			
+
 			// TODO: change other to user name
 			sendQuestionAnswerPair(`Other: ${question} User: ${textInput}`, chatMode);
     }
 	}
-	
+  
 	const getSystemReply = () => {
 		console.log('yes');
 		setTranscript('...');
 		setLoading(true);
 		generateGPTQuestion(messages)
+
 		.then((data) => {
 			setLoading(false);
 			setTranscript('');

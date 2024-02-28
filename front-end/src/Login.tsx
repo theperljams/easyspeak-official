@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { IoEye, IoEyeOutline } from "react-icons/io5";
-import { Link } from 'react-router-dom';
+import React, {useState} from 'react';
+import {IoEye, IoEyeOutline} from "react-icons/io5";
+import {Link} from 'react-router-dom';
 
 import styles from "./styles/Login.module.css";
 
