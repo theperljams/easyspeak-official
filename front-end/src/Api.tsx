@@ -15,32 +15,33 @@ interface SignUpProps {
 }
 
 interface SignInProps {
-  body: {
-    email: string
-    password: string
-  }
+	body: {
+		email: string;
+		password: string;
+	};
 }
 
 export const signUpNewUser = async (req : SignUpProps) => {
-  const { email, password } = req.body;
-  const { data, error } = await supabase.auth.signUp({
-    email: email,
-    password: password,
-    options: {
-      emailRedirectTo: 'https://example.com/welcome'
-    }
-  })
-}
+	const { email, password } = req.body;
+	const { data, error } = await supabase.auth.signUp({
+		email: email,
+		password: password,
+		options: {
+			emailRedirectTo: 'https://example.com/welcome'
+		}
+	});
+};
 
 export const signInWithEmail = async (req : SignInProps) => {
-  const { email, password } = req.body;
-  console.log("AH: ", req);
-  const response = await supabase.auth.signInWithPassword({
-    email: email,
-    password: password,
-  })
-  console.log(response);
-}
+	const { email, password } = req.body;
+	console.log("AH: ", req);
+	const response = await supabase.auth.signInWithPassword({
+		email: email,
+		password: password,
+	});
+	console.log(response);
+};
+
 
 export const sendQuestionAnswerPair = async (content: string, table: string) => {
   const user_id = localStorage.getItem('user_id');

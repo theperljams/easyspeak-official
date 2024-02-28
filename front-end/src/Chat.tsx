@@ -111,8 +111,8 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 					{<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>}	
 				</div>}
 				<div className={styles.footer}>
-					<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev)}}></Listen>
-					<InputBar inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => console.log('test')}/>
+					<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev);}}></Listen>
+					<InputBar inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => console.log('test')}/>
 				</div>
 			</div>
 		</div>

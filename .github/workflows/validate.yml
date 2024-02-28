@@ -3,20 +3,22 @@ name: Validate
 
 on:
   pull_request:
+    types:
+      - closed
+      - opened
     branches: [main]
   push:
     branches: [main]
   workflow_dispatch:
 
 jobs:
+
+
   front-end:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./front-end
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID_FRONTEND: ${{ secrets.VERCEL_PROJECT_ID_FRONTEND }}
 
     steps:
       - name: Checkout repository
@@ -38,35 +40,41 @@ jobs:
 
       - name: Tests
         run: npm test
-
-      #  Vercel Deployment
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Trigger Vercel Deploy
-        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
-      
   back-end:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./back-end
 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+
+      # Add more steps here later
+  vercel-front-end:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front-end
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID_BACKEND: ${{ secrets.VERCEL_PROJECT_ID_BACKEND }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_FRONTEND }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup python
-        uses: actions/setup-python@v2
+      - name: Setup node
+        uses: actions/setup-node@v3
         with:
-          python-version: '3.9'
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
 
       #  Vercel Deployment
       - name: Install Vercel CLI
@@ -77,4 +85,24 @@ jobs:
 
       - name: Trigger Vercel Deploy
         run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
-      # Add more steps here later
+  vercel-back-end:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back-end
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_BACKEND }}
+    steps:
+      - name: Install dependencies
+        run: npm install
+      #  Vercel Deployment
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Trigger Vercel Deploy
+        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}

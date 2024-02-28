@@ -1,7 +1,9 @@
+
 import {ChatBubble} from './ChatBubble';
 import styles from '../styles/ChatWindow.module.css';
 import type { Message } from './Interfaces';
 import { useEffect } from 'react';
+
 
 interface Props {
   messages: Message[];

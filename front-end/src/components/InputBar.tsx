@@ -53,5 +53,6 @@ export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, set
 				</div>
 			</form>
 		</div>
+
 	);
 }

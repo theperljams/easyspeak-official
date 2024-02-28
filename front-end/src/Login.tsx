@@ -5,13 +5,13 @@ import {Link} from 'react-router-dom';
 import styles from "./styles/Login.module.css";
 
 interface Props {
-	email: string
-	error: boolean
-	password: string
-	handleSignIn: () => void
-	setEmail: (x : string) => void
-	setError: (x : boolean) => void
-	setPassword: (x : string) => void
+	email: string;
+	error: boolean;
+	password: string;
+	handleSignIn: () => void;
+	setEmail: (x : string) => void;
+	setError: (x : boolean) => void;
+	setPassword: (x : string) => void;
 }
 
 export function Login({ email, error, handleSignIn, password, setEmail, setError, setPassword } : Props) {
@@ -22,14 +22,14 @@ export function Login({ email, error, handleSignIn, password, setEmail, setError
 		setPassword('');
 		setShowPassword(false);
 		setError(false);
-	}
+	};
 	
 	return (
 		<div className={styles.container}>
 			<div className={styles.header}>
 				<div className={styles.title}>EasySpeak</div>
 				<div className={styles.signup}>
-					Don't have an account?
+					Don&'t have an account?
 					<Link to={'/signup'}><button onClick={swap}className={styles.signupbutton}>{'Sign Up'}</button></Link>
 				</div>
 			</div>

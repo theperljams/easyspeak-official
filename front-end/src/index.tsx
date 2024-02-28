@@ -1,8 +1,9 @@
+
 import {createRoot} from 'react-dom/client';
 import 'regenerator-runtime/runtime';
 
 import './styles/index.css';
-import {createClient} from '@supabase/supabase-js'
+import {createClient} from '@supabase/supabase-js';
 import {App} from './App';
 
 const SUPA_URL = import.meta.env.VITE_SUPABASE_URL;
