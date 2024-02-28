@@ -38,7 +38,7 @@ export function Training() {
 
 	const handleUserInputSubmit = () => {
 		if (textInput != '') {
-			setMessages(prev => [...prev, { role: 'assistant', content: textInput }]);
+			setMessages(prev => [...prev, { role: 'user', content: textInput }]);
 			getSystemReply();
 
 			// TODO: change other to user name
@@ -86,7 +86,7 @@ export function Training() {
 		<div className={styles.app}>
 			<div className={styles.container}>
 				<div className={styles.mainView}>
-					<ChatWindow messages={messages} loading={loading} transcript={transcript} introMessages={introMessages}/>
+					<ChatWindow mode={'training'} messages={messages} loading={loading} transcript={transcript} introMessages={introMessages}/>
 				</div>
 				{chatMode == '' && <div className={styles.responseView}>
 					{<Responses responses={['short', 'long', 'other']} setInputText={setChatMode}/>}	

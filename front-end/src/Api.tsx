@@ -64,7 +64,6 @@ export const sendQuestionAnswerPair = async (content: string, table: string) => 
 }
 
 export const generateGPTQuestion = async (messages: Message[]) => {
-  console.log(messages);
   try {
     const response = await fetch(`${SERVER_URL}/training`, {
       method: 'POST',
