@@ -42,7 +42,7 @@ export const signInWithEmail = async (req : SignInProps) => {
   console.log(response);
 }
 
-export const sendQuestionAnswerPairToShort = async (content: string) => {
+export const sendQuestionAnswerPair = async (content: string, table: string) => {
   const user_id = localStorage.getItem('user_id');
   
   try {
@@ -53,7 +53,7 @@ export const sendQuestionAnswerPairToShort = async (content: string) => {
       },
       body: JSON.stringify({
         content: content,
-        table_name: 'short',
+        table_name: table,
         user_id: user_id,
       })
     });
@@ -63,6 +63,7 @@ export const sendQuestionAnswerPairToShort = async (content: string) => {
 }
 
 export const generateGPTQuestion = async (messages: Message[]) => {
+  console.log(messages);
   try {
     const response = await fetch(`${SERVER_URL}/training`, {
       method: 'POST',

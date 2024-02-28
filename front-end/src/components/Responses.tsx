@@ -4,7 +4,7 @@ import styles from '../styles/Responses.module.css';
 
 interface Props {
 	responses: string[];
-	setInputText: Dispatch<SetStateAction<string>>;
+	setInputText: (x : string) => void;
 }
 
 export function Responses({ responses, setInputText }: Props) {

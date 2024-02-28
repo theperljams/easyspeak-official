@@ -4,16 +4,19 @@ import { Listen } from "./components/Listen.js";
 import { ChatWindow } from "./components/ChatWindow.js";
 import { Responses } from "./components/Responses.js";
 import { InputBar } from "./components/InputBar.js";
-import Draggable from "react-draggable";
 
 import styles from "./styles/Chat.module.css";
 
 // functions for communicating with API
 import { generateUserAudio, generateUserResponses } from "./Api.js";
 import type { Message } from "./components/Interfaces.js";
-import { Header } from "./components/Header.js";
 
-export function Chat () {
+interface Props {
+	messageHistory: Message[]
+	setMessageHistory: (x: Message[]) => void;
+}
+
+export function Chat ({messageHistory, setMessageHistory} : Props) {
 	const [initialLoad, setInitialLoad] = useState(false);
 	const [isSpeaking, setIsSpeaking] = useState(false);
 	const [isListening, setIsListening] = useState(false);
@@ -21,7 +24,7 @@ export function Chat () {
 	const [textInput, setTextInput] = useState("");
 	const [audioURL, setAudioURL] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
-	const [userGeneratedResponses, setUserGeneratedResponses] = useState(["With all these pressures, it's crucial to take care of your mental health. ", "some reasonable lenght of text witll go right here", "some reasonable lenght of text witll go right here"]);
+	const [userGeneratedResponses, setUserGeneratedResponses] = useState(['', '', '']);
 	
 	// for use later: sending quesiton answer pairs to the database 
 	const [question, setQuestion] = useState('');
@@ -79,6 +82,10 @@ export function Chat () {
 	}, [isSpeaking]);
 	
 	useEffect(() => {
+		setMessageHistory(messages);
+	}, [messages])
+	
+	useEffect(() => {
 		if (initialLoad) {
 			if (isListening) {
 				startListening();
@@ -89,14 +96,20 @@ export function Chat () {
 			setInitialLoad(true);
 		}
 	}, [isListening]);
+	
+	useEffect(() => {
+		if (messageHistory) {
+			setMessages(messageHistory);
+		}	
+	}, [])
 
 	return (
 		<div className={styles.app}>
 			<div className={styles.container}>
 				<div className={styles.mainView}>
-					<ChatWindow messages={messages} loading={isListening} transcript={transcript} title='Chat'/>
+					<ChatWindow messages={messages} loading={isListening} transcript={transcript}/>
 				</div>
-				{userGeneratedResponses[0] != '' && <div className={styles.responseView}>
+				{userGeneratedResponses && <div className={styles.responseView}>
 					{<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>}	
 				</div>}
 				<div className={styles.footer}>
