@@ -3,6 +3,9 @@ name: Validate
 
 on:
   pull_request:
+    types:
+      - closed
+      - opened
     branches: [main]
   push:
     branches: [main]
