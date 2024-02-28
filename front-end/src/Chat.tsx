@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { Listen } from "./components/Listen.js";
 import { ChatWindow } from "./components/ChatWindow.js";
 import { Responses } from "./components/Responses.js";
@@ -13,7 +13,7 @@ import { generateUserAudio, generateUserResponses } from "./Api.js";
 import type { Message } from "./components/Interfaces.js";
 
 interface Props {
-	messageHistory: Message[]
+	messageHistory: Message[];
 	setMessageHistory: (x: Message[]) => void;
 }
 
@@ -79,7 +79,7 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 
 	useEffect(() => {
 		setMessageHistory(messages);
-	}, [messages])
+	}, [messages]);
 	
 	useEffect(() => {
 		if (initialLoad) {
@@ -99,7 +99,7 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 		if (messageHistory) {
 			setMessages(messageHistory);
 		}	
-	}, [])
+	}, []);
 
 	return (
 		<div className={styles.app}>

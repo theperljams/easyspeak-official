@@ -43,8 +43,8 @@ export function Training() {
 
 			// TODO: change other to user name
 			sendQuestionAnswerPair(`Other: ${question} User: ${textInput}`, chatMode);
-    }
-	}
+		}
+	};
   
 	const getSystemReply = () => {
 		console.log('yes');
@@ -52,16 +52,16 @@ export function Training() {
 		setLoading(true);
 		generateGPTQuestion(messages)
 
-		.then((data) => {
-			setLoading(false);
-			setTranscript('');
-			setQuestion(data);
-			setMessages(prev => [...prev, { role: 'assistant', content: data }]);
-		})
-		.catch((error) => {
-			console.log(error);
-		})
-	}
+			.then((data) => {
+				setLoading(false);
+				setTranscript('');
+				setQuestion(data);
+				setMessages(prev => [...prev, { role: 'assistant', content: data }]);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	};
 	
 	useEffect(() => {
 		if (chatMode != '') {
@@ -74,13 +74,13 @@ export function Training() {
 			}
 			getSystemReply();
 		}
-	}, [chatMode])
+	}, [chatMode]);
   
-  useEffect(() => {
+	useEffect(() => {
 		if (chatMode != '') {
 			getSystemReply();
 		}
-  }, [])
+	}, []);
 
 	return (
 		<div className={styles.app}>
@@ -92,7 +92,7 @@ export function Training() {
 					{<Responses responses={['short', 'long', 'other']} setInputText={setChatMode}/>}	
 				</div>}
 				<div className={styles.footer}>
-					<InputBar loading={loading} inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
+					<InputBar loading={loading} inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
 				</div>
 			</div>
 		</div>

@@ -9,7 +9,7 @@ interface Props {
 	handleSubmitInput: () => void;
 	audioURL: string | null;
 	setButton: () => void;
-	loading?: boolean
+	loading?: boolean;
 }
 
 export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, setButton, loading }: Props) {
