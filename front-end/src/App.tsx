@@ -8,6 +8,7 @@ import {Home} from './Home';
 import {Login} from './Login';
 import {signInWithEmail, signUpNewUser} from './Api';
 import {Signup} from './Signup';
+import type { Message } from './components/Interfaces';
 
 
 const SUPA_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -107,8 +108,6 @@ export function App() {
 			<BrowserRouter>
 				<Routes>
 					<Route path="/" element={<Home />} />
-					<Route path="/chat" element={<Chat />} />
-					<Route path="/training" element={<Training />} />
 				</Routes>
 			</BrowserRouter>
 		);

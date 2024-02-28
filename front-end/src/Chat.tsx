@@ -1,19 +1,23 @@
-
-import {useEffect, useState} from "react";
-import SpeechRecognition, {useSpeechRecognition} from 'react-speech-recognition';
-import {Listen} from "./components/Listen.js";
-import {ChatWindow} from "./components/ChatWindow.js";
-import {Responses} from "./components/Responses.js";
-import {InputBar} from "./components/InputBar.js";
+import { useState, useEffect } from "react";
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import { Listen } from "./components/Listen.js";
+import { ChatWindow } from "./components/ChatWindow.js";
+import { Responses } from "./components/Responses.js";
+import { InputBar } from "./components/InputBar.js";
 
 import styles from "./styles/Chat.module.css";
 
 
 // functions for communicating with API
-import {generateUserAudio, generateUserResponses} from './Api.js';
-import type {Message} from './components/Interfaces.js';
+import { generateUserAudio, generateUserResponses } from "./Api.js";
+import type { Message } from "./components/Interfaces.js";
 
-export function Chat() {
+interface Props {
+	messageHistory: Message[];
+	setMessageHistory: (x: Message[]) => void;
+}
+
+export function Chat ({messageHistory, setMessageHistory} : Props) {
 	const [initialLoad, setInitialLoad] = useState(false);
 	const [isSpeaking, setIsSpeaking] = useState(false);
 	const [isListening, setIsListening] = useState(false);
@@ -21,9 +25,9 @@ export function Chat() {
 	const [textInput, setTextInput] = useState('');
 	const [audioURL, setAudioURL] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
-
 	const [userGeneratedResponses, setUserGeneratedResponses] = useState(['', '', '']);
-
+	
+	// for use later: sending quesiton answer pairs to the database 
 	const [question, setQuestion] = useState('');
 
 	const { transcript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
@@ -74,6 +78,10 @@ export function Chat() {
 	};
 
 	useEffect(() => {
+		setMessageHistory(messages);
+	}, [messages]);
+	
+	useEffect(() => {
 		if (initialLoad) {
 			if (isListening) {
 				startListening();
@@ -86,14 +94,20 @@ export function Chat() {
 			setInitialLoad(true);
 		}
 	}, [isListening]);
+	
+	useEffect(() => {
+		if (messageHistory) {
+			setMessages(messageHistory);
+		}	
+	}, []);
 
 	return (
 		<div className={styles.app}>
 			<div className={styles.container}>
 				<div className={styles.mainView}>
-					<ChatWindow messages={messages} loading={isListening} transcript={transcript} title='Chat'/>
+					<ChatWindow mode={'chat'} messages={messages} loading={isListening} transcript={transcript}/>
 				</div>
-				{userGeneratedResponses[0] != '' && <div className={styles.responseView}>
+				{userGeneratedResponses && <div className={styles.responseView}>
 					{<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>}	
 				</div>}
 				<div className={styles.footer}>

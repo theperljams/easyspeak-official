@@ -43,9 +43,9 @@ export const signInWithEmail = async (req : SignInProps) => {
 };
 
 
-export const sendQuestionAnswerPairToShort = async (content: string) => {
+export const sendQuestionAnswerPair = async (content: string, table: string) => {
 	const user_id = localStorage.getItem('user_id');
-
+  
 	try {
 		await fetch(`${SERVER_URL}/insert`, {
 			method: 'POST',
@@ -54,12 +54,11 @@ export const sendQuestionAnswerPairToShort = async (content: string) => {
 			},
 			body: JSON.stringify({
 				content: content,
-				table_name: 'short',
+				table_name: table,
 				user_id: user_id,
-			}),
+			})
 		});
-	}
-	catch (error) {
+	} catch (error) {
 		console.error('Error inserting into db:', error);
 	}
 };
@@ -72,14 +71,14 @@ export const generateGPTQuestion = async (messages: Message[]) => {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				messages: messages,
-			}),
+				messages: messages
+			})
 		});
-
+    
 		const json = await response.json();
 		return json;
-	}
-	catch (error) {
+    
+	} catch (error) {
 		console.error('Error making OpenAI complete request:', error);
 	}
 };
