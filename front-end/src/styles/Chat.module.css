@@ -1,0 +1,42 @@
+.app {
+	width: 100vw;
+	height: 100vh;
+	background-image: linear-gradient(to right, #E7F1FD, #F8F4FD);
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	height: 95vh;
+	margin: 20px 20px 20px 100px;
+	background-color: white;
+	border-radius: 20px;
+}
+
+.mainView {
+	flex: 1;
+	flex-direction: column;
+}
+
+.responseView {
+	flex: 1;
+}
+
+.dragView {
+	color: transparent;
+	position: absolute;
+	left: 10px;
+	bottom: 130px;
+}
+
+.footer {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 'auto';
+	height: 100px;
+	margin: 20px;
+	margin-top: 0px;
+}

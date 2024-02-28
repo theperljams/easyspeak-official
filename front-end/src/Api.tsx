@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-import type { Message } from './components/Interfaces';
+import {createClient} from '@supabase/supabase-js';
+import type {Message} from './components/Interfaces';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -14,16 +14,34 @@ interface SignUpProps {
 	};
 }
 
-export const signUpNewUser = async (req: SignUpProps) => {
+interface SignInProps {
+	body: {
+		email: string;
+		password: string;
+	};
+}
+
+export const signUpNewUser = async (req : SignUpProps) => {
 	const { email, password } = req.body;
 	const { data, error } = await supabase.auth.signUp({
 		email: email,
 		password: password,
 		options: {
-			emailRedirectTo: 'https://example.com/welcome',
-		},
+			emailRedirectTo: 'https://example.com/welcome'
+		}
 	});
 };
+
+export const signInWithEmail = async (req : SignInProps) => {
+	const { email, password } = req.body;
+	console.log("AH: ", req);
+	const response = await supabase.auth.signInWithPassword({
+		email: email,
+		password: password,
+	});
+	console.log(response);
+};
+
 
 export const sendQuestionAnswerPairToShort = async (content: string) => {
 	const user_id = localStorage.getItem('user_id');

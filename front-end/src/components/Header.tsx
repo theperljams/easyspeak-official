@@ -1,6 +1,6 @@
 import React from 'react';
-import styles from './Header.module.css';
-import { MenuButton } from './MenuButton';
+import styles from '../styles/Header.module.css';
+import {MenuButton} from './MenuButton';
 
 import HomeIcon from '../assets/home-2.svg';
 import SettingsIcon from '../assets/setting-2.svg';

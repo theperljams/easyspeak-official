@@ -1,20 +1,17 @@
-import { useState, useEffect } from 'react';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
-import { Listen } from './components/Listen.js';
-import { ChatWindow } from './components/ChatWindow.js';
-import { Responses } from './components/Responses.js';
-import { InputBar } from './components/InputBar.js';
+import {useEffect, useState} from "react";
+import SpeechRecognition, {useSpeechRecognition} from 'react-speech-recognition';
+import {Listen} from "./components/Listen.js";
+import {ChatWindow} from "./components/ChatWindow.js";
+import {Responses} from "./components/Responses.js";
+import {InputBar} from "./components/InputBar.js";
 
-import Draggable from 'react-draggable';
+import styles from "./styles/Chat.module.css";
 
-import styles from './Chat.module.css';
 
 // functions for communicating with API
-import { generateUserAudio, generateUserResponses } from './Api.js';
-import type { Message } from './components/Interfaces.js';
-import { Header } from './components/Header.js';
-import { text } from 'stream/consumers';
+import {generateUserAudio, generateUserResponses} from './Api.js';
+import type {Message} from './components/Interfaces.js';
 
 export function Chat() {
 	const [initialLoad, setInitialLoad] = useState(false);
@@ -24,9 +21,9 @@ export function Chat() {
 	const [textInput, setTextInput] = useState('');
 	const [audioURL, setAudioURL] = useState<string | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
-	const [userGeneratedResponses, setUserGeneratedResponses] = useState(['', '', '', '']);
 
-	// for use later: sending quesiton answer pairs to the database
+	const [userGeneratedResponses, setUserGeneratedResponses] = useState(['', '', '']);
+
 	const [question, setQuestion] = useState('');
 
 	const { transcript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
@@ -46,7 +43,7 @@ export function Chat() {
 
 		if (transcript) {
 			setMessages(prev => [...prev, { content: transcript, role: 'user' }]);
-			setUserGeneratedResponses(['', '', '', '']);
+			setUserGeneratedResponses(['', '', '']);
 			generateUserResponses(transcript, [...messages, { content: transcript, role: 'user' }])
 				.then((r) => {
 					setUserGeneratedResponses(r);
@@ -92,20 +89,18 @@ export function Chat() {
 
 	return (
 		<div className={styles.app}>
-			<Header title="Chat" />
-			<div className={styles.mainView}>
-				<ChatWindow messages={messages} loading={isListening} transcript={transcript} title="Chat" />
-				<Responses responses={userGeneratedResponses} setInputText={setTextInput} />
-			</div>
-			<Draggable
-				defaultPosition={{ x: 30, y: -30 }}
-			>
-				<div className={styles.dragView}>
-					BLOCK
-					<Listen listen={isListening} toggleListen={() => { setIsListening(prev => !prev); }}></Listen>
+			<div className={styles.container}>
+				<div className={styles.mainView}>
+					<ChatWindow messages={messages} loading={isListening} transcript={transcript} title='Chat'/>
 				</div>
-			</Draggable>
-			<InputBar inputText={textInput} setInput={(s) => { setTextInput(s); }} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => { console.log('test'); }} />
+				{userGeneratedResponses[0] != '' && <div className={styles.responseView}>
+					{<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>}	
+				</div>}
+				<div className={styles.footer}>
+					<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev);}}></Listen>
+					<InputBar inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => console.log('test')}/>
+				</div>
+			</div>
 		</div>
 	);
 }

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
-import styles from './MenuButton.module.css';
+import styles from '../styles/MenuButton.module.css';
 
 interface Props {
 	image: string;
