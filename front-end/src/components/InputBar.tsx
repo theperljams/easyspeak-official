@@ -9,9 +9,10 @@ interface Props {
 	handleSubmitInput: () => void;
 	audioURL: string | null;
 	setButton: () => void;
+	loading?: boolean
 }
 
-export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, setButton }: Props) {
+export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, setButton, loading }: Props) {
 	const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		handleSubmitInput();
@@ -31,7 +32,8 @@ export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, set
 			<form className={styles.inputBar} onSubmit={onFormSubmit}>
 				<div className={styles.textContainer}>
 					<textarea 
-						className={styles.textBox} 
+						className={styles.textBox}
+						disabled={loading} 
 						name="input" 
 						id="" 
 						value={inputText}
