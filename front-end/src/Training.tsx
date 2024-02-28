@@ -8,20 +8,29 @@ import {InputBar} from './components/InputBar.js';
 import styles from "./styles/Training.module.css";
 
 // functions for communicating with API
-import {generateGPTQuestion, sendQuestionAnswerPairToShort} from './Api.js';
-import type {Message} from './components/Interfaces.js';
+import {generateGPTQuestion, sendQuestionAnswerPair } from "./Api.js";
+import type { Message } from "./components/Interfaces.js";
+import { Responses } from "./components/Responses.js";
 
-const START_PROMPT = import.meta.env.VITE_START_PROMPT;
+const START_PROMPT_SHORT = import.meta.env.VITE_START_SHORT;
+const START_PROMPT_LONG = import.meta.env.VITE_START_LONG;
 
 export function Training() {
 	const [transcript, setTranscript] = useState('');
 	const [textInput, setTextInput] = useState('');
 	const [loading, setLoading] = useState(false);
-	const [messages, setMessages] = useState<Message[]>([
-		{ // initial prompt
-			role: 'system',
-			content: `${START_PROMPT}`,
+	const [chatMode, setChatMode] = useState('');
+	const [messages, setMessages] = useState<Message[]>([]);
+	
+	const [introMessages, setIntroMessages] = useState<Message[]>([
+		{
+			role: 'assistant',
+			content: 'Welcome to training mode!'
 		},
+		{
+			role: 'assistant',
+			content: 'please make a selection to begin training'
+		}
 	]);
 
 	// for sending quesiton answer pairs to the database
@@ -33,37 +42,57 @@ export function Training() {
 			getSystemReply();
 
 			// TODO: change other to user name
-			sendQuestionAnswerPairToShort(`Other: ${question} User: ${textInput}`);
-		}
-	};
-
+			sendQuestionAnswerPair(`Other: ${question} User: ${textInput}`, chatMode);
+    }
+	}
+  
 	const getSystemReply = () => {
+		console.log('yes');
 		setTranscript('...');
 		setLoading(true);
 		generateGPTQuestion(messages)
-			.then((data) => {
-				setLoading(false);
-				setTranscript('');
-				setQuestion(data);
-				setMessages(prev => [...prev, { role: 'user', content: data }]);
-			})
-			.catch((error) => {
-				console.log(error);
-			});
-	};
 
+		.then((data) => {
+			setLoading(false);
+			setTranscript('');
+			setQuestion(data);
+			setMessages(prev => [...prev, { role: 'assistant', content: data }]);
+		})
+		.catch((error) => {
+			console.log(error);
+		})
+	}
+	
 	useEffect(() => {
-		getSystemReply();
-	}, []);
+		if (chatMode != '') {
+			setIntroMessages(prev => [...prev, { role: 'assistant', content: `You selected: ${chatMode} mode` }]);
+		
+			if (chatMode == 'long') {
+				setMessages([{role: 'system', content: START_PROMPT_LONG}]);
+			} else {
+				setMessages([{role: 'system', content: START_PROMPT_SHORT}]);
+			}
+			getSystemReply();
+		}
+	}, [chatMode])
+  
+  useEffect(() => {
+		if (chatMode != '') {
+			getSystemReply();
+		}
+  }, [])
 
 	return (
 		<div className={styles.app}>
 			<div className={styles.container}>
 				<div className={styles.mainView}>
-					<ChatWindow messages={messages} loading={loading} transcript={transcript} title='Training Mode'/>
+					<ChatWindow messages={messages} loading={loading} transcript={transcript} introMessages={introMessages}/>
 				</div>
+				{chatMode == '' && <div className={styles.responseView}>
+					{<Responses responses={['short', 'long', 'other']} setInputText={setChatMode}/>}	
+				</div>}
 				<div className={styles.footer}>
-					<InputBar inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
+					<InputBar loading={loading} inputText={textInput} setInput={(s) => {setTextInput(s)}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
 				</div>
 			</div>
 		</div>

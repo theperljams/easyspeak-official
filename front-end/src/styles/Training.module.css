@@ -1,8 +1,6 @@
 .app {
 	width: 100vw;
-	/* Makes the app take up the entire screen height, so the InputBar is on the bottom */
 	height: 100vh;
-
 	background-image: linear-gradient(to right, #E7F1FD, #F8F4FD);
 }
 
@@ -16,6 +14,13 @@
 	border-radius: 20px;
 }
 
+.mainView {
+	flex: 6;
+	flex-direction: column;
+	display: flex;
+	overflow: auto;
+}
+
 .footer {
 	display: flex;
 	align-items: center;
@@ -24,14 +29,4 @@
 	height: 100px;
 	margin: 20px;
 	margin-top: 0px;
-}
-
-.mainView {
-	/* Makes the view grow to fit the space not used by the InputBar */
-	flex-grow: 1;
-	/* Makes the view shrink instead of hiding the InputBar when the screen height is small */
-	min-height: 0px;
-	display: flex;
-	flex-direction: row;
-	gap: 2px;
 }
