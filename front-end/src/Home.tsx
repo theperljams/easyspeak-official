@@ -18,7 +18,7 @@ export function Home() {
 		<div className={styles.mainView}>
 			{ showNav && <Navbar setScreen={setScreen} setShowNav={() => setShowNav(false)}/> } 
 			{ !showNav && <div className={styles.close} onClick={() => setShowNav(true)}><IoIosArrowForward size={45}/></div>}
-			{ screen == 0 && <Dash/>}
+			{/* { screen == 0 && <Dash/>} */}
 			{ screen == 1 && <Chat messageHistory={messages ? messages : []} setMessageHistory={setMesssages}/> }
 			{ screen == 2 && <Training/> }
 		</div>
