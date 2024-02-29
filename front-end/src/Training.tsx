@@ -99,7 +99,7 @@ export function Training() {
 					{<Responses responses={[SHORT, LONG]} setInputText={setChatMode}/>}	
 				</div>}
 				{chatMode != '' && <div className={styles.responseView}>
-					{<Responses responses={[' ', 'Reselect training mode', ' ']} setInputText={goBack}/>}
+					{<Responses responses={[' ', 'Select mode', ' ']} setInputText={goBack}/>}
 				</div>}
 
 				<div className={styles.footer}>
