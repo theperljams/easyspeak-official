@@ -20,7 +20,6 @@ interface Props {
 
 export function Chat ({messageHistory, setMessageHistory} : Props) {
 	const [initialLoad, setInitialLoad] = useState(false);
-	const [isSpeaking, setIsSpeaking] = useState(false);
 	const [isListening, setIsListening] = useState(false);
 
 	const [textInput, setTextInput] = useState('');
@@ -114,7 +113,7 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 				<div className={styles.mainView}>
 					<ChatWindow mode={'chat'} messages={messages} loading={isListening} transcript={transcript}/>
 				</div>
-				<RefreshButton handleRefresh={generate}/>
+					<RefreshButton handleRefresh={generate}/>
 				{userGeneratedResponses && <div className={styles.responseView}>
 					{<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>}	
 				</div>}

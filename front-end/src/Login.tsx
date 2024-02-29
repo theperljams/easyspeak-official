@@ -6,11 +6,11 @@ import styles from "./styles/Login.module.css";
 
 interface Props {
 	email: string;
-	error: boolean;
+	error: string;
 	password: string;
 	handleSignIn: () => void;
 	setEmail: (x : string) => void;
-	setError: (x : boolean) => void;
+	setError: (x : string) => void;
 	setPassword: (x : string) => void;
 }
 
@@ -21,7 +21,7 @@ export function Login({ email, error, handleSignIn, password, setEmail, setError
 		setEmail('');
 		setPassword('');
 		setShowPassword(false);
-		setError(false);
+		setError('');
 	};
 	
 	return (
@@ -49,7 +49,7 @@ export function Login({ email, error, handleSignIn, password, setEmail, setError
 			<div className={styles.options}>
 				<button className={styles.button} onClick={handleSignIn}>Sign In</button>
 			</div>
-			{ error && <div className={styles.error}>ERROR SIGNING IN</div>}
+			{ error != '' && <div className={styles.error}>{error}</div>}
 		</div>
 	);
 }

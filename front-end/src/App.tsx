@@ -19,7 +19,8 @@ export function App() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [passConfirm, setPassConfirm] = useState('');
-	const [error, setError] = useState(false);
+	const [error, setError] = useState('');
+	const [messages, setMessage] = useState('');
 	
 	const login = async () => {
 		const response = await signInWithEmail({ body: { email: email, password: password }});
@@ -29,26 +30,28 @@ export function App() {
 				setSession(inSession);
 			});
 		} else {
-			setError(true);
+			setError('Error Loggin in');
 		}
 	};
 	
 	const signup = async () => {
 		if (password != passConfirm) {
-			setError(true);
+			setError('Passwords must match');
 			return;
+		} else {
+			setMessage('Please check your email for verification');
 		}
 		
 		const response = await signUpNewUser({ body: { email: email, password: password }});
 		
 		console.log(response);
 		
-		if  (response != null) {
+		if (response != null) {
 			supabase.auth.getSession().then(({ data: { session: inSession } }) => {
 				setSession(inSession);
 			});
 		} else {
-			setError(true);
+			setError('Error Signing Up');
 		}
 	};
 

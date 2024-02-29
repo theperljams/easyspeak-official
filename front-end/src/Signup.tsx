@@ -6,25 +6,26 @@ import styles from "./styles/Login.module.css";
 
 interface Props {
 	email: string;
-	error: boolean;
+	error: string;
 	password: string;
 	passConfirm: string;
 	handleSignUp: () => void;
 	setEmail: (x : string) => void;
-	setError: (x : boolean) => void;
+	setError: (x : string) => void;
 	setPassword: (x : string) => void;
 	setPassConfirm: (x : string) => void;
 }
 
 export function Signup({ email, error, handleSignUp, password, passConfirm, setEmail, setError, setPassword, setPassConfirm } : Props) {
 	const [showPassword, setShowPassword] = useState(false);
+	const [agreed, setAgreed] = useState(false);
 	
 	const swap = () => {
 		setEmail('');
 		setPassword('');
 		setPassConfirm('');
 		setShowPassword(false);
-		setError(false);
+		setError('');
 	};
 	
 	return (
@@ -54,6 +55,9 @@ export function Signup({ email, error, handleSignUp, password, passConfirm, setE
 			<div className={styles.options}>
 				<button className={styles.button} onClick={handleSignUp}>Sign Up</button>
 			</div>
+			{/* <div className={styles.options}>
+				<button className={styles.button} onClick={handleSignUp}>Sign Up</button>
+			</div> */}
 			{ error && <div className={styles.error}>ERROR SIGNING UP</div>}
 		</div>
 	);

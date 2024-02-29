@@ -27,14 +27,13 @@ export const signUpNewUser = async (req : SignUpProps) => {
 		email: email,
 		password: password,
 		options: {
-			emailRedirectTo: 'https://example.com/welcome'
+			emailRedirectTo: 'https://easyspeak-aac.com/'
 		}
 	});
 };
 
 export const signInWithEmail = async (req : SignInProps) => {
 	const { email, password } = req.body;
-	console.log("AH: ", req);
 	const response = await supabase.auth.signInWithPassword({
 		email: email,
 		password: password,
