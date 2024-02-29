@@ -1,14 +1,11 @@
 
 import {createClient, type Session} from '@supabase/supabase-js';
 import {useEffect, useState} from "react";
-import {Chat} from './Chat';
-import {Training} from './Training';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {Home} from './Home';
 import {Login} from './Login';
 import {signInWithEmail, signUpNewUser} from './Api';
 import {Signup} from './Signup';
-import type { Message } from './components/Interfaces';
 
 
 const SUPA_URL = import.meta.env.VITE_SUPABASE_URL;

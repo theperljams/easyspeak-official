@@ -64,6 +64,8 @@ export const sendQuestionAnswerPair = async (content: string, table: string) => 
 };
 
 export const generateGPTQuestion = async (messages: Message[]) => {
+	const user_id = localStorage.getItem('user_id');
+	
 	try {
 		const response = await fetch(`${SERVER_URL}/training`, {
 			method: 'POST',
@@ -71,6 +73,7 @@ export const generateGPTQuestion = async (messages: Message[]) => {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
+				user_id: user_id,
 				messages: messages
 			})
 		});
