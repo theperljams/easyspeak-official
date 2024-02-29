@@ -40,12 +40,12 @@ app.post('/insert', async (req, res) => {
 });
 
 app.post('/training', async (req, res) => { 
-  const { user_id, messages } = req.body;
+  const { user_id, messages, chat } = req.body;
     if (!messages) {
       return res.status(400).send('Messages are required');
     }
     try {
-      const response = await generateQuestion(user_id, messages);
+      const response = await generateQuestion(user_id, messages, chat);
       res.json(response);
     } catch (error) {
       res.status(500).send('Error in training')
