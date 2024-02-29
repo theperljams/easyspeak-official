@@ -108,6 +108,7 @@ export function App() {
 			<BrowserRouter>
 				<Routes>
 					<Route path="/" element={<Home />} />
+					<Route path="/signup" element={<Home />} />
 				</Routes>
 			</BrowserRouter>
 		);
