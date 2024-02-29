@@ -68,19 +68,21 @@ export const generateResponses = async (content: string, messages: string[], use
     return parseNumberedList(response);
 }
 
-export const generateQuestion = async (user_id: string, messages: string[]) => {
+export const generateQuestion = async (user_id: string, messages: string[], chat: string) => {
     let context = await getContextAll(user_id);
     
-    const prompt: string = `You are asking questions to get to know the user as a friend
+    const shortPrompt: string = `You are asking questions to get to know the user as a friend
     and also as if you were trying to write a book about them. 
     Ask one question at a time. Keep asking questions.
     Do not say anything about yourself. This is all the information you know about the user
     so far: ${context}. Do not ask questions if the answer is already containted in
     the context. If the assistant has already asked a question, 
     do not ask it again. What follows is the conversation so far: ${messages}`;
+    
+    const longPrompt: string = `WHEN THIS PROMPT IS CALLED, SAY THE SENTENCE: Needs implementation, look in file: llm.ts`;
 
     try {
-        const response: string = await getChatCompletions(prompt, messages);
+        const response: string = await getChatCompletions(chat =='short' ? shortPrompt : longPrompt, messages);
         return response;
     } catch (error: any) {
         console.error('Error in generateQuestion:', error);
