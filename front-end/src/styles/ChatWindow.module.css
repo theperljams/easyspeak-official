@@ -47,16 +47,4 @@
 	gap: 15px;
 }
 
-.button {
-	background-color: #007AFF;
 
-	height: 10%;
-	aspect-ratio: 1/1;
-	border-radius: 37.5%;
-
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	cursor: pointer;
-}

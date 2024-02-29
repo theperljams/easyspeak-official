@@ -9,7 +9,7 @@ import styles from "./styles/Chat.module.css";
 
 
 // functions for communicating with API
-import { generateUserAudio, generateUserResponses } from "./Api.js";
+import { generateUserAudio, generateUserResponses, sendQuestionAnswerPair } from "./Api.js";
 import type { Message } from "./components/Interfaces.js";
 
 interface Props {
@@ -47,6 +47,7 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 
 		if (transcript) {
 			setMessages(prev => [...prev, { content: transcript, role: 'user' }]);
+			setQuestion(transcript);
 			setUserGeneratedResponses(['', '', '']);
 			generateUserResponses(transcript, [...messages, { content: transcript, role: 'user' }])
 				.then((r) => {
@@ -63,6 +64,7 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 		if (textInput !== '') {
 			console.log('text input: ', textInput);
 			setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
+			sendQuestionAnswerPair(`Other: ${question} User: ${textInput}`, 'short');
 
 			// Call generateUserAudio directly here
 			generateUserAudio(textInput)
