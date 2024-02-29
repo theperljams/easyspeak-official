@@ -19,7 +19,7 @@ export function Navbar({ setScreen, setShowNav } : Props) {
 					<IoIosArrowBack size={45}/>
 				</div>
 			</div>
-			<NavButton label='Dashboard' setShowNav={setShowNav} setScreen={setScreen} screenValue={0}></NavButton>
+			{/* <NavButton label='Dashboard' setShowNav={setShowNav} setScreen={setScreen} screenValue={0}></NavButton> */}
 			<NavButton label='Chat' setShowNav={setShowNav} setScreen={setScreen} screenValue={1}></NavButton>
 			<NavButton label='Training' setShowNav={setShowNav} setScreen={setScreen} screenValue={2}></NavButton>
 			<div className={styles.navButton} onClick={signOut}><div className={styles.link}>Log out</div></div>
