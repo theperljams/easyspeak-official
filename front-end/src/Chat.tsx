@@ -11,6 +11,7 @@ import styles from "./styles/Chat.module.css";
 // functions for communicating with API
 import { generateUserAudio, generateUserResponses, sendQuestionAnswerPair } from "./Api.js";
 import type { Message } from "./components/Interfaces.js";
+import { RefreshButton } from "./components/RefreshButton.js";
 
 interface Props {
 	messageHistory: Message[];
@@ -41,6 +42,17 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 		resetTranscript();
 		SpeechRecognition.startListening({ continuous: true, language: 'en-IN' });
 	};
+	
+	const generate = () => {
+		setUserGeneratedResponses(['', '', '']);
+		generateUserResponses(transcript, [...messages, { content: transcript, role: 'user' }])
+			.then((r) => {
+				setUserGeneratedResponses(r);
+			})
+			.catch((error) => {
+				console.error('Error generating responses:', error);
+			});
+	}
 
 	const stopListening = () => {
 		SpeechRecognition.stopListening();
@@ -48,14 +60,7 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 		if (transcript) {
 			setMessages(prev => [...prev, { content: transcript, role: 'user' }]);
 			setQuestion(transcript);
-			setUserGeneratedResponses(['', '', '']);
-			generateUserResponses(transcript, [...messages, { content: transcript, role: 'user' }])
-				.then((r) => {
-					setUserGeneratedResponses(r);
-				})
-				.catch((error) => {
-					console.error('Error generating responses:', error);
-				});
+			generate();
 		}
 	};
 
@@ -109,6 +114,7 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 				<div className={styles.mainView}>
 					<ChatWindow mode={'chat'} messages={messages} loading={isListening} transcript={transcript}/>
 				</div>
+				<RefreshButton handleRefresh={generate}/>
 				{userGeneratedResponses && <div className={styles.responseView}>
 					{<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>}	
 				</div>}
