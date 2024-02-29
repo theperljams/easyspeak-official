@@ -65,6 +65,10 @@ export function Training() {
 				console.log(error);
 			});
 	};
+	const goBack = () => {
+		setChatMode('');
+		window.location.reload();
+	}
 	
 	useEffect(() => {
 		if (chatMode != '') {
@@ -94,6 +98,10 @@ export function Training() {
 				{chatMode == '' && <div className={styles.responseView}>
 					{<Responses responses={[SHORT, LONG]} setInputText={setChatMode}/>}	
 				</div>}
+				{chatMode != '' && <div className={styles.responseView}>
+					{<Responses responses={[' ', 'Reselect training mode', ' ']} setInputText={goBack}/>}
+				</div>}
+
 				<div className={styles.footer}>
 					<InputBar loading={loading} inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
 				</div>
