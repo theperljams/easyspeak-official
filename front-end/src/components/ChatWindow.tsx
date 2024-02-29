@@ -24,7 +24,7 @@ export function ChatWindow({ loading, messages, transcript, introMessages, mode}
 	};
 
 	useEffect(() => {
-		// scrollToBottom();
+		scrollToBottom();
 	}, [messages, loading]);
   
 	return (
@@ -43,7 +43,8 @@ export function ChatWindow({ loading, messages, transcript, introMessages, mode}
 						:
 						<ChatBubble mode={mode} role={'user'} content={transcript != '' ? transcript : '...' } />}
 				</>}
-			</div >
+				<div ref={messagesEndRef} />
+			</div>
 			<div className="footer"/>
 		</div>
 	);

@@ -15,6 +15,9 @@ import { Responses } from "./components/Responses.js";
 const START_PROMPT_SHORT = import.meta.env.VITE_START_SHORT;
 const START_PROMPT_LONG = import.meta.env.VITE_START_LONG;
 
+const SHORT = 'short';
+const LONG = 'long';
+
 export function Training() {
 	const [transcript, setTranscript] = useState('');
 	const [textInput, setTextInput] = useState('');
@@ -67,7 +70,7 @@ export function Training() {
 		if (chatMode != '') {
 			setIntroMessages(prev => [...prev, { role: 'assistant', content: `You selected: ${chatMode} mode` }]);
 		
-			if (chatMode == 'long') {
+			if (chatMode == LONG) {
 				setMessages([{role: 'system', content: START_PROMPT_LONG}]);
 			} else {
 				setMessages([{role: 'system', content: START_PROMPT_SHORT}]);
@@ -89,7 +92,7 @@ export function Training() {
 					<ChatWindow mode={'training'} messages={messages} loading={loading} transcript={transcript} introMessages={introMessages}/>
 				</div>
 				{chatMode == '' && <div className={styles.responseView}>
-					{<Responses responses={['short', 'long', 'other']} setInputText={setChatMode}/>}	
+					{<Responses responses={[SHORT, LONG]} setInputText={setChatMode}/>}	
 				</div>}
 				<div className={styles.footer}>
 					<InputBar loading={loading} inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
