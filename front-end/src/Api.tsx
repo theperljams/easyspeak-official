@@ -63,7 +63,7 @@ export const sendQuestionAnswerPair = async (content: string, table: string) => 
 	}
 };
 
-export const generateGPTQuestion = async (messages: Message[]) => {
+export const generateGPTQuestion = async (messages: Message[], chat: string) => {
 	const user_id = localStorage.getItem('user_id');
 	
 	try {
@@ -74,7 +74,8 @@ export const generateGPTQuestion = async (messages: Message[]) => {
 			},
 			body: JSON.stringify({
 				user_id: user_id,
-				messages: messages
+				messages: messages,
+				chat: chat
 			})
 		});
     

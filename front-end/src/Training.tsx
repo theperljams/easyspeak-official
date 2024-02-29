@@ -53,7 +53,7 @@ export function Training() {
 		console.log('yes');
 		setTranscript('...');
 		setLoading(true);
-		generateGPTQuestion(messages)
+		generateGPTQuestion(messages, chatMode == SHORT ? 'short' : 'long')
 
 			.then((data) => {
 				setLoading(false);
