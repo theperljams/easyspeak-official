@@ -12,7 +12,7 @@ import type { Message } from './components/Interfaces';
 export function Home() {
 
 	const [showNav, setShowNav] = useState(false);
-	const [screen, setScreen] = useState(0);
+	const [screen, setScreen] = useState(1);
 	const [messages, setMesssages] = useState<Message[]>([]);
 
 	useEffect(() => {
