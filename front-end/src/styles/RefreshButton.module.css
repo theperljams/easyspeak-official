@@ -1,0 +1,17 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  height: 40px;
+  width: 40px;
+  padding: 20px;
+  background-color: #EEEEEE;;
+  border-radius: 10px;
+}
+
+.container:hover {
+	filter: brightness(0.8);
+}
+
+

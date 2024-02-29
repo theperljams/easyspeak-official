@@ -29,6 +29,32 @@ export const insertQAPair = async (user_id: string, content: string, embedding: 
   }
 }
 
+export const getContextAll = async (user_id: string) => {
+  try {
+    const { data: longData, error: longError } = await supabase
+      .from('long')
+      .select('*')
+      .eq('user_id', user_id);
+
+    const { data: shortData, error: shortError } = await supabase
+      .from('short')
+      .select('*')
+      .eq('user_id', user_id);
+
+    if (longError || shortError) {
+      throw new Error('Error fetching data from Supabase');
+    }
+    
+    let result: Array<string> = [];
+    for (const i in shortData) result.push(shortData[i].content);
+    for (const j in longData) result.push(longData[j].content);
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const getContextLong = async (embedding: number[], user_id: string) => {
   try {
     const { data, error } = await supabase.rpc('match_long', {

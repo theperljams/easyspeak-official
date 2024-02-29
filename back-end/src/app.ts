@@ -1,6 +1,6 @@
 import express from 'express';
 import { generateAudio, generateQuestion, generateResponses, getEmbedding } from './llm';
-import { insertQAPair } from './db';
+import { getContextAll, insertQAPair } from './db';
 
 const app = express();
 app.use(express.json());
@@ -40,12 +40,12 @@ app.post('/insert', async (req, res) => {
 });
 
 app.post('/training', async (req, res) => { 
-  const { messages } = req.body;
+  const { user_id, messages } = req.body;
     if (!messages) {
       return res.status(400).send('Messages are required');
     }
     try {
-      const response = await generateQuestion(messages);
+      const response = await generateQuestion(user_id, messages);
       res.json(response);
     } catch (error) {
       res.status(500).send('Error in training')
