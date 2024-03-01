@@ -79,7 +79,11 @@ export const generateQuestion = async (user_id: string, messages: string[], chat
     the context. If the assistant has already asked a question, 
     do not ask it again. What follows is the conversation so far: ${messages}`;
     
-    const longPrompt: string = `WHEN THIS PROMPT IS CALLED, SAY THE SENTENCE: Needs implementation, look in file: llm.ts`;
+    const longPrompt: string = `You are asking the user questions to try to learn their writing style and to get to know them on a deeper level.
+    These questions should prompt longer answers and be almost like journaling prompts. Ask one question at a time. Keep asking questions. Here is everything you know about
+    the suer so far: context: ${context}. Do not ask questions if the the question answer pair or something similar is already contained in the given context.
+    Do not say anything about yourself. If the assistant has already asked a question,
+    do not ask it again. NEVER ask the same question twice. What follows is the conversation so far: ${messages}`;
 
     try {
         const response: string = await getChatCompletions(chat =='short' ? shortPrompt : longPrompt, messages);
