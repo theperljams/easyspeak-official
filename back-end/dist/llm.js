@@ -76,6 +76,7 @@ const generateResponses = (content, messages, user_id) => __awaiter(void 0, void
 exports.generateResponses = generateResponses;
 const generateQuestion = (user_id, messages, chat) => __awaiter(void 0, void 0, void 0, function* () {
     let context = yield (0, db_1.getContextAll)(user_id);
+    let short = chat.includes('short');
     const shortPrompt = `You are asking questions to get to know the user as a friend
     and also as if you were trying to write a book about them. 
     Ask one question at a time. Keep asking questions.
@@ -83,9 +84,13 @@ const generateQuestion = (user_id, messages, chat) => __awaiter(void 0, void 0, 
     so far: ${context}. Do not ask questions if the answer is already containted in
     the context. If the assistant has already asked a question, 
     do not ask it again. What follows is the conversation so far: ${messages}`;
-    const longPrompt = `WHEN THIS PROMPT IS CALLED, SAY THE SENTENCE: Needs implementation, look in file: llm.ts`;
+    const longPrompt = `You are asking the user questions to try to learn their writing style and to get to know them on a deeper level.
+    These questions should prompt longer answers and be almost like journaling prompts. Ask one question at a time. Keep asking questions. Here is everything you know about
+    the suer so far: context: ${context}. Do not ask questions if the the question answer pair or something similar is already contained in the given context.
+    Do not say anything about yourself. If the assistant has already asked a question,
+    do not ask it again. NEVER ask the same question twice. What follows is the conversation so far: ${messages}`;
     try {
-        const response = yield getChatCompletions(chat == 'short' ? shortPrompt : longPrompt, messages);
+        const response = yield getChatCompletions(short ? shortPrompt : longPrompt, messages);
         return response;
     }
     catch (error) {
