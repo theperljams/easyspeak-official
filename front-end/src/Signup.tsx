@@ -31,7 +31,7 @@ export function Signup({ email, error, handleSignUp, password, passConfirm, setE
 	return (
 		<div className={styles.container}>
 			<div className={styles.header}>
-				<div className={styles.title}> EasySpeak</div>
+				<Link to={'https://easyspeak.framer.website/'} className={styles.title}>EasySpeak</Link>
 					<div className={styles.right}>
 						<div className={styles.signup}>
 							Already have an account? 
