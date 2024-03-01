@@ -29,7 +29,7 @@ export function Login({ email, error, handleSignIn, password, setEmail, setError
 			<div className={styles.header}>
 				<Link to={'https://easyspeak.framer.website/'} className={styles.title}>EasySpeak</Link>
 				<div className={styles.signup}>
-					Don&'t have an account?
+					Don't have an account?
 					<Link to={'/signup'}><button onClick={swap}className={styles.signupbutton}>{'Sign Up'}</button></Link>
 				</div>
 			</div>

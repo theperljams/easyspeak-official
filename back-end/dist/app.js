@@ -49,12 +49,12 @@ app.post('/insert', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 }));
 app.post('/training', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { messages } = req.body;
+    const { user_id, messages, chat } = req.body;
     if (!messages) {
         return res.status(400).send('Messages are required');
     }
     try {
-        const response = yield (0, llm_1.generateQuestion)(messages);
+        const response = yield (0, llm_1.generateQuestion)(user_id, messages, chat);
         res.json(response);
     }
     catch (error) {

@@ -73,8 +73,14 @@ export function Training() {
 	
 	useEffect(() => {
 		if (chatMode != '') {
-			setIntroMessages(prev => [...prev, { role: 'assistant', content: `You selected: ${chatMode} mode` }]);
-		
+			if (chatMode == SHORT) {
+				setIntroMessages(prev => [...prev, { role: 'assistant', content: `You selected: ${chatMode} mode. The following questions will allow EasySpeak to get to know some basic information about you. 
+				Treat this like having causal small talk with a friend. Be as authentic as possible.`}]);
+			}
+			else {
+				setIntroMessages(prev => [...prev, { role: 'assistant', content: `You selected: ${chatMode} mode. The following questions will allow EasySpeak to get to know you on a deeper level, as well as your writing style. 
+				Treat this like something between writing a blog post or a journal entry (because blog posts are public, but journal entries are deep). These questions are meant to prompt ~200 word answers. Really go deep.` }]);
+			}
 			if (chatMode == LONG) {
 				setMessages([{role: 'system', content: START_PROMPT_LONG}]);
 			} else {
@@ -100,9 +106,8 @@ export function Training() {
 				{chatMode == '' && <div className={styles.responseView}>
 					{<Responses responses={[SHORT, LONG]} setInputText={setChatMode}/>}	
 				</div>}
-				{chatMode != '' && <div className={styles.footContainer}>
-					<RefreshButton handleRefresh={getSystemReply}/>
-					<Responses responses={[' ', 'Reselect training mode', ' ']} setInputText={goBack}/>
+				{chatMode != '' && <div className={styles.responseView}>
+					{<Responses responses={[' ', 'Select mode', ' ']} setInputText={goBack}/>}
 				</div>}
 
 				<div className={styles.footer}>

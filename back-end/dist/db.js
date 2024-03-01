@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContextShort = exports.getContextLong = exports.insertQAPair = void 0;
+exports.getContextShort = exports.getContextLong = exports.getContextAll = exports.insertQAPair = void 0;
 const supabase_js_1 = require("@supabase/supabase-js");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
@@ -37,6 +37,31 @@ const insertQAPair = (user_id, content, embedding, table_name) => __awaiter(void
     }
 });
 exports.insertQAPair = insertQAPair;
+const getContextAll = (user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { data: longData, error: longError } = yield supabase
+            .from('long')
+            .select('*')
+            .eq('user_id', user_id);
+        const { data: shortData, error: shortError } = yield supabase
+            .from('short')
+            .select('*')
+            .eq('user_id', user_id);
+        if (longError || shortError) {
+            throw new Error('Error fetching data from Supabase');
+        }
+        let result = [];
+        for (const i in shortData)
+            result.push(shortData[i].content);
+        for (const j in longData)
+            result.push(longData[j].content);
+        return result;
+    }
+    catch (error) {
+        throw error;
+    }
+});
+exports.getContextAll = getContextAll;
 const getContextLong = (embedding, user_id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { data, error } = yield supabase.rpc('match_long', {

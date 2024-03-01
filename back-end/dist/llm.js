@@ -74,14 +74,18 @@ const generateResponses = (content, messages, user_id) => __awaiter(void 0, void
     return parseNumberedList(response);
 });
 exports.generateResponses = generateResponses;
-const generateQuestion = (messages) => __awaiter(void 0, void 0, void 0, function* () {
-    const prompt = `You are asking questions to get to know the user as a friend
+const generateQuestion = (user_id, messages, chat) => __awaiter(void 0, void 0, void 0, function* () {
+    let context = yield (0, db_1.getContextAll)(user_id);
+    const shortPrompt = `You are asking questions to get to know the user as a friend
     and also as if you were trying to write a book about them. 
     Ask one question at a time. Keep asking questions.
-    Do not say anything about yourself. If the assistant has asked a question, 
+    Do not say anything about yourself. This is all the information you know about the user
+    so far: ${context}. Do not ask questions if the answer is already containted in
+    the context. If the assistant has already asked a question, 
     do not ask it again. What follows is the conversation so far: ${messages}`;
+    const longPrompt = `WHEN THIS PROMPT IS CALLED, SAY THE SENTENCE: Needs implementation, look in file: llm.ts`;
     try {
-        const response = yield getChatCompletions(prompt, messages);
+        const response = yield getChatCompletions(chat == 'short' ? shortPrompt : longPrompt, messages);
         return response;
     }
     catch (error) {
