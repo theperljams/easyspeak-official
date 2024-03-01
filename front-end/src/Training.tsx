@@ -11,12 +11,13 @@ import styles from "./styles/Training.module.css";
 import {generateGPTQuestion, sendQuestionAnswerPair } from "./Api.js";
 import type { Message } from "./components/Interfaces.js";
 import { Responses } from "./components/Responses.js";
+import { RefreshButton } from './components/RefreshButton.js';
 
 const START_PROMPT_SHORT = import.meta.env.VITE_START_SHORT;
 const START_PROMPT_LONG = import.meta.env.VITE_START_LONG;
 
-const SHORT = 'short';
-const LONG = 'long';
+const SHORT = 'Short Answer (for casual conversations)';
+const LONG = 'Long Answer (for deeper conversations)';
 
 export function Training() {
 	const [transcript, setTranscript] = useState('');
@@ -95,11 +96,13 @@ export function Training() {
 				<div className={styles.mainView}>
 					<ChatWindow mode={'training'} messages={messages} loading={loading} transcript={transcript} introMessages={introMessages}/>
 				</div>
+				
 				{chatMode == '' && <div className={styles.responseView}>
 					{<Responses responses={[SHORT, LONG]} setInputText={setChatMode}/>}	
 				</div>}
-				{chatMode != '' && <div className={styles.responseView}>
-					{<Responses responses={[' ', 'Reselect training mode', ' ']} setInputText={goBack}/>}
+				{chatMode != '' && <div className={styles.footContainer}>
+					<RefreshButton handleRefresh={getSystemReply}/>
+					<Responses responses={[' ', 'Reselect training mode', ' ']} setInputText={goBack}/>
 				</div>}
 
 				<div className={styles.footer}>

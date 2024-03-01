@@ -25,7 +25,7 @@ export function Responses({ responses, setInputText }: Props) {
 								style={{
 									visibility: response == ' ' ? 'hidden' : 'visible',
 									pointerEvents: response == ' ' ? 'none' : 'auto',
-									width: response == 'Reselect training mode' ? '45%' : '100%',
+									width: response == 'Reselect training mode' ? '1000px' : '100%',
 									height: response == 'Reselect training mode' ? '45%' : '100%'
 									// position: response == 'Reselect training mode' ? 'relative' : 'absolute'// visibility:
 								}}>
