@@ -107,6 +107,7 @@ export function Training() {
 					{<Responses responses={[SHORT, LONG]} setInputText={setChatMode}/>}	
 				</div>}
 				{chatMode != '' && <div className={styles.responseView}>
+					<RefreshButton handleRefresh={getSystemReply}/>
 					{<Responses responses={[' ', 'Select mode', ' ']} setInputText={goBack}/>}
 				</div>}
 
