@@ -27,14 +27,13 @@ export const signUpNewUser = async (req : SignUpProps) => {
 		email: email,
 		password: password,
 		options: {
-			emailRedirectTo: 'https://example.com/welcome'
+			emailRedirectTo: 'https://easyspeak-aac.com/'
 		}
 	});
 };
 
 export const signInWithEmail = async (req : SignInProps) => {
 	const { email, password } = req.body;
-	console.log("AH: ", req);
 	const response = await supabase.auth.signInWithPassword({
 		email: email,
 		password: password,
@@ -63,7 +62,9 @@ export const sendQuestionAnswerPair = async (content: string, table: string) => 
 	}
 };
 
-export const generateGPTQuestion = async (messages: Message[]) => {
+export const generateGPTQuestion = async (messages: Message[], chat: string) => {
+	const user_id = localStorage.getItem('user_id');
+	
 	try {
 		const response = await fetch(`${SERVER_URL}/training`, {
 			method: 'POST',
@@ -71,7 +72,9 @@ export const generateGPTQuestion = async (messages: Message[]) => {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				messages: messages
+				user_id: user_id,
+				messages: messages,
+				chat: chat
 			})
 		});
     

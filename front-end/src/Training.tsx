@@ -11,9 +11,13 @@ import styles from "./styles/Training.module.css";
 import {generateGPTQuestion, sendQuestionAnswerPair } from "./Api.js";
 import type { Message } from "./components/Interfaces.js";
 import { Responses } from "./components/Responses.js";
+import { RefreshButton } from './components/RefreshButton.js';
 
 const START_PROMPT_SHORT = import.meta.env.VITE_START_SHORT;
 const START_PROMPT_LONG = import.meta.env.VITE_START_LONG;
+
+const SHORT = 'Short Answer (for casual conversations)';
+const LONG = 'Long Answer (for deeper conversations)';
 
 export function Training() {
 	const [transcript, setTranscript] = useState('');
@@ -50,7 +54,7 @@ export function Training() {
 		console.log('yes');
 		setTranscript('...');
 		setLoading(true);
-		generateGPTQuestion(messages)
+		generateGPTQuestion(messages, chatMode == SHORT ? 'short' : 'long')
 
 			.then((data) => {
 				setLoading(false);
@@ -62,12 +66,22 @@ export function Training() {
 				console.log(error);
 			});
 	};
+	const goBack = () => {
+		setChatMode('');
+		window.location.reload();
+	}
 	
 	useEffect(() => {
 		if (chatMode != '') {
-			setIntroMessages(prev => [...prev, { role: 'assistant', content: `You selected: ${chatMode} mode` }]);
-		
-			if (chatMode == 'long') {
+			if (chatMode == SHORT) {
+				setIntroMessages(prev => [...prev, { role: 'assistant', content: `You selected: ${chatMode} mode. The following questions will allow EasySpeak to get to know some basic information about you. 
+				Treat this like having causal small talk with a friend. Be as authentic as possible.`}]);
+			}
+			else {
+				setIntroMessages(prev => [...prev, { role: 'assistant', content: `You selected: ${chatMode} mode. The following questions will allow EasySpeak to get to know you on a deeper level, as well as your writing style. 
+				Treat this like something between writing a blog post or a journal entry (because blog posts are public, but journal entries are deep). These questions are meant to prompt ~200 word answers. Really go deep.` }]);
+			}
+			if (chatMode == LONG) {
 				setMessages([{role: 'system', content: START_PROMPT_LONG}]);
 			} else {
 				setMessages([{role: 'system', content: START_PROMPT_SHORT}]);
@@ -88,9 +102,15 @@ export function Training() {
 				<div className={styles.mainView}>
 					<ChatWindow mode={'training'} messages={messages} loading={loading} transcript={transcript} introMessages={introMessages}/>
 				</div>
+				
 				{chatMode == '' && <div className={styles.responseView}>
-					{<Responses responses={['short', 'long', 'other']} setInputText={setChatMode}/>}	
+					{<Responses responses={[SHORT, LONG]} setInputText={setChatMode}/>}	
 				</div>}
+				{chatMode != '' && <div className={styles.responseView}>
+					<RefreshButton handleRefresh={getSystemReply}/>
+					{<Responses responses={[' ', 'Select mode', ' ']} setInputText={goBack}/>}
+				</div>}
+
 				<div className={styles.footer}>
 					<InputBar loading={loading} inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
 				</div>

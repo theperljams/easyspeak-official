@@ -19,6 +19,12 @@
   justify-content: center;
 }
 
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+}
+
 .error {
   color: red
 }
@@ -31,7 +37,7 @@
 .header {
   display: flex;
   justify-content: space-between;
-  width: 90%
+  width: 90%;
 }
 
 .input {
@@ -71,10 +77,18 @@
 .subtitle {
   font-size: 60px;
   font-weight: normal;
+  margin-bottom: 10px;
 }
 
 .title {
   font-weight: bold;
   font-size: 30px;
   margin-bottom: 7vh;
+  text-decoration: none;
+  color: black;
+}
+
+.title:visited {
+  text-decoration: none;
+  color: black;
 }

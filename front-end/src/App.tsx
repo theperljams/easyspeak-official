@@ -1,14 +1,11 @@
 
 import {createClient, type Session} from '@supabase/supabase-js';
 import {useEffect, useState} from "react";
-import {Chat} from './Chat';
-import {Training} from './Training';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {Home} from './Home';
 import {Login} from './Login';
 import {signInWithEmail, signUpNewUser} from './Api';
 import {Signup} from './Signup';
-import type { Message } from './components/Interfaces';
 
 
 const SUPA_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -22,7 +19,8 @@ export function App() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [passConfirm, setPassConfirm] = useState('');
-	const [error, setError] = useState(false);
+	const [error, setError] = useState('');
+	const [messages, setMessage] = useState('');
 	
 	const login = async () => {
 		const response = await signInWithEmail({ body: { email: email, password: password }});
@@ -32,26 +30,28 @@ export function App() {
 				setSession(inSession);
 			});
 		} else {
-			setError(true);
+			setError('Error Loggin in');
 		}
 	};
 	
 	const signup = async () => {
 		if (password != passConfirm) {
-			setError(true);
+			setError('Passwords must match');
 			return;
+		} else {
+			setMessage('Please check your email for verification');
 		}
 		
 		const response = await signUpNewUser({ body: { email: email, password: password }});
 		
 		console.log(response);
 		
-		if  (response != null) {
+		if (response != null) {
 			supabase.auth.getSession().then(({ data: { session: inSession } }) => {
 				setSession(inSession);
 			});
 		} else {
-			setError(true);
+			setError('Error Signing Up');
 		}
 	};
 
@@ -108,6 +108,7 @@ export function App() {
 			<BrowserRouter>
 				<Routes>
 					<Route path="/" element={<Home />} />
+					<Route path="/signup" element={<Home />} />
 				</Routes>
 			</BrowserRouter>
 		);

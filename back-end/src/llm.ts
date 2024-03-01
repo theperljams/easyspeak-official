@@ -6,7 +6,7 @@ import { OpenAI } from 'openai';
 import { put } from "@vercel/blob";
 
 // Assuming these functions exist in './db'
-import { getContextLong, getContextShort } from './db';
+import { getContextAll, getContextLong, getContextShort } from './db';
 
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 const OPENAI_EMBEDDING_URL: string = 'https://api.openai.com/v1/embeddings';
@@ -68,15 +68,27 @@ export const generateResponses = async (content: string, messages: string[], use
     return parseNumberedList(response);
 }
 
-export const generateQuestion = async (messages: string[]) => {
-    const prompt: string = `You are asking questions to get to know the user as a friend
+export const generateQuestion = async (user_id: string, messages: string[], chat: string) => {
+    let context = await getContextAll(user_id);
+    
+    let short = chat.includes('short');
+    
+    const shortPrompt: string = `You are asking questions to get to know the user as a friend
     and also as if you were trying to write a book about them. 
     Ask one question at a time. Keep asking questions.
-    Do not say anything about yourself. If the assistant has asked a question, 
+    Do not say anything about yourself. This is all the information you know about the user
+    so far: ${context}. Do not ask questions if the answer is already containted in
+    the context. If the assistant has already asked a question, 
     do not ask it again. What follows is the conversation so far: ${messages}`;
+    
+    const longPrompt: string = `You are asking the user questions to try to learn their writing style and to get to know them on a deeper level.
+    These questions should prompt longer answers and be almost like journaling prompts. Ask one question at a time. Keep asking questions. Here is everything you know about
+    the suer so far: context: ${context}. Do not ask questions if the the question answer pair or something similar is already contained in the given context.
+    Do not say anything about yourself. If the assistant has already asked a question,
+    do not ask it again. NEVER ask the same question twice. What follows is the conversation so far: ${messages}`;
 
     try {
-        const response: string = await getChatCompletions(prompt, messages);
+        const response: string = await getChatCompletions(short ? shortPrompt : longPrompt, messages);
         return response;
     } catch (error: any) {
         console.error('Error in generateQuestion:', error);
