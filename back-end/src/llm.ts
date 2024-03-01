@@ -71,6 +71,8 @@ export const generateResponses = async (content: string, messages: string[], use
 export const generateQuestion = async (user_id: string, messages: string[], chat: string) => {
     let context = await getContextAll(user_id);
     
+    let short = chat.includes('short');
+    
     const shortPrompt: string = `You are asking questions to get to know the user as a friend
     and also as if you were trying to write a book about them. 
     Ask one question at a time. Keep asking questions.
@@ -86,7 +88,7 @@ export const generateQuestion = async (user_id: string, messages: string[], chat
     do not ask it again. NEVER ask the same question twice. What follows is the conversation so far: ${messages}`;
 
     try {
-        const response: string = await getChatCompletions(chat =='short' ? shortPrompt : longPrompt, messages);
+        const response: string = await getChatCompletions(short ? shortPrompt : longPrompt, messages);
         return response;
     } catch (error: any) {
         console.error('Error in generateQuestion:', error);
