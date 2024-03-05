@@ -51,7 +51,7 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 			.catch((error) => {
 				console.error('Error generating responses:', error);
 			});
-	}
+	};
 
 	const stopListening = () => {
 		SpeechRecognition.stopListening();
@@ -113,7 +113,7 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 				<div className={styles.mainView}>
 					<ChatWindow mode={'chat'} messages={messages} loading={isListening} transcript={transcript}/>
 				</div>
-					<RefreshButton handleRefresh={generate}/>
+				<RefreshButton handleRefresh={generate}/>
 				{userGeneratedResponses && <div className={styles.responseView}>
 					{<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>}	
 				</div>}

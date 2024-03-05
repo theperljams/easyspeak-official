@@ -32,17 +32,17 @@ export function Signup({ email, error, handleSignUp, password, passConfirm, setE
 		<div className={styles.container}>
 			<div className={styles.header}>
 				<Link to={'https://easyspeak.framer.website/'} className={styles.title}>EasySpeak</Link>
-					<div className={styles.right}>
-						<div className={styles.signup}>
-							Already have an account? 
-							<Link to={'/'}><button onClick={swap} className={styles.signupbutton}>{'Sign In'}</button></Link>
-						</div>
-						<div className={styles.signup}>
-							By signing up, you agree to acknowledge our
-							<Link to={'https://www.privacypolicies.com/live/bc1e56af-76f4-4a30-a06a-9d516ed51c6a'}><button onClick={swap} className={styles.signupbutton}>{'privacy policy.'}</button></Link>
-						</div>
+				<div className={styles.right}>
+					<div className={styles.signup}>
+						Already have an account? 
+						<Link to={'/'}><button onClick={swap} className={styles.signupbutton}>{'Sign In'}</button></Link>
+					</div>
+					<div className={styles.signup}>
+						By signing up, you agree to acknowledge our
+						<Link to={'https://www.privacypolicies.com/live/bc1e56af-76f4-4a30-a06a-9d516ed51c6a'}><button onClick={swap} className={styles.signupbutton}>{'privacy policy.'}</button></Link>
 					</div>
 				</div>
+			</div>
 			<div className={styles.subtitle}>
 				Sign Up
 			</div>
