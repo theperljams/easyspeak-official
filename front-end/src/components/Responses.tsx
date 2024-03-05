@@ -16,21 +16,21 @@ export function Responses({ responses, setInputText }: Props) {
 						// <div className="buttons-wrapper">
 						// </div>
 
-							<button
-								className={styles.response}
-								key={index}
-								onClick={() => {
-									setInputText(response);
-								}}
-								style={{
-									visibility: response == ' ' ? 'hidden' : 'visible',
-									pointerEvents: response == ' ' ? 'none' : 'auto',
-									width: response == 'Select mode' ? '45%' : '100%',
-									height: response == 'Select mode' ? '45%' : '100%'
-									// position: response == 'Reselect training mode' ? 'relative' : 'absolute'// visibility:
-								}}>
-								{response}
-							</button>
+						<button
+							className={styles.response}
+							key={index}
+							onClick={() => {
+								setInputText(response);
+							}}
+							style={{
+								visibility: response == ' ' ? 'hidden' : 'visible',
+								pointerEvents: response == ' ' ? 'none' : 'auto',
+								width: response == 'Select mode' ? '45%' : '100%',
+								height: response == 'Select mode' ? '45%' : '100%'
+								// position: response == 'Reselect training mode' ? 'relative' : 'absolute'// visibility:
+							}}>
+							{response}
+						</button>
 					))}
 				</div>
 			)}

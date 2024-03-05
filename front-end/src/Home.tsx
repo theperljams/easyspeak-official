@@ -16,10 +16,10 @@ export function Home() {
 	const [messages, setMesssages] = useState<Message[]>([]);
 
 	useEffect(() => {
-		let storedScreen = localStorage.getItem('screen');
+		const storedScreen = localStorage.getItem('screen');
 		if (storedScreen != null)
 		{
-			setScreen(parseInt(storedScreen))
+			setScreen(parseInt(storedScreen));
 			setShowNav(false);
 		}
 	}, []);
