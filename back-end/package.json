@@ -9,7 +9,7 @@
     "add-build"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "nodemon src/tests/test_app.ts",
     "start": "nodemon src/app.ts",
     "build": "rimraf dist && tsc",
     "ts.check": "tsc --project tsconfig.json",

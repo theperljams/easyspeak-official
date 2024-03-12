@@ -1,0 +1,50 @@
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_API_KEY = process.env.SUPABASE_API_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_API_KEY) {
+    throw new Error('Supabase URL and API Key must be set in environment variables.');
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_API_KEY);
+
+const SIMILARITY_THRESHOLD = 0.1;
+const MATCH_COUNT = 10;
+
+export const getPearlContextLong = async (embedding: number[]) => {
+    try {
+      const { data, error } = await supabase.rpc('match_pearl_long', {
+        match_count: MATCH_COUNT,
+        query_embedding: embedding,
+        similarity_threshold: SIMILARITY_THRESHOLD
+      });
+      
+      let result: Array<string> = [];
+      for (const i in data) result.push(data[i].content);
+      return result;
+      
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  export const getPearlContextShort = async (embedding: number[]) => {
+    try {
+      const { data, error } = await supabase.rpc('match_pearl_short', {
+        match_count: MATCH_COUNT,
+        query_embedding: embedding,
+        similarity_threshold: SIMILARITY_THRESHOLD
+      });
+      
+      let result: Array<string> = [];
+      for (const i in data) result.push(data[i].content);
+      return result;
+      
+    } catch (error) {
+      throw error;
+    }
+  }
