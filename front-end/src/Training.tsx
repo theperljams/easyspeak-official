@@ -69,7 +69,7 @@ export function Training() {
 	const goBack = () => {
 		setChatMode('');
 		window.location.reload();
-	}
+	};
 	
 	useEffect(() => {
 		if (chatMode != '') {

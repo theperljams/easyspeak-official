@@ -44,19 +44,30 @@ export const signInWithEmail = async (req : SignInProps) => {
 
 export const sendQuestionAnswerPair = async (content: string, table: string) => {
 	const user_id = localStorage.getItem('user_id');
-  
+	let t_name: string = table
+	if (user_id == "seth@alscrowd.org") {
+		t_name = "seth_short_form"
+	}
+	else if (user_id == "pearl.k.hulbert@gmail.com") {
+		t_name = "seth_short_form"
+	}
+	console.log(t_name)
+	const request = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			content: content,
+			table_name: t_name,
+			user_id: user_id,
+		})
+	};
+	
+	console.log('Making request with:', request);
+	
 	try {
-		await fetch(`${SERVER_URL}/insert`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				content: content,
-				table_name: table,
-				user_id: user_id,
-			})
-		});
+		await fetch(`${SERVER_URL}/insert`, request);
 	} catch (error) {
 		console.error('Error inserting into db:', error);
 	}
