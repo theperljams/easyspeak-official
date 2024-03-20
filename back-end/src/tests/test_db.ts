@@ -12,8 +12,8 @@ if (!SUPABASE_URL || !SUPABASE_API_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_API_KEY);
 
-const SIMILARITY_THRESHOLD = 0.1;
-const MATCH_COUNT = 10;
+const SIMILARITY_THRESHOLD = -0.5;
+const MATCH_COUNT = 50;
 
 export const getPearlContextLong = async (embedding: number[]) => {
     try {
@@ -44,6 +44,70 @@ export const getPearlContextLong = async (embedding: number[]) => {
       for (const i in data) result.push(data[i].content);
       return result;
       
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  export const getPearlAllLong = async () => {
+    try {
+      const { data: longData, error: longError } = await supabase
+        .from('pearl_long_form')
+        .select('*');
+  
+      if (longError) {
+        throw new Error('Error fetching data from Supabase');
+      }
+  
+      let result: Array<string> = [];
+      
+      for (const j in longData) result.push(longData[j].content);
+  
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  export const getPearlAllShort = async () => {
+    try {
+
+      const { data: shortData, error: shortError } = await supabase
+        .from('pearl_short_form')
+        .select('*');
+
+      if (shortError) {
+        throw new Error('Error fetching data from Supabase');
+      }
+
+      let result: Array<string> = [];
+      for (const i in shortData) result.push(shortData[i].content);
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  export const getPearlContextAll = async () => {
+    try {
+      const { data: longData, error: longError } = await supabase
+        .from('pearl_long_form')
+        .select('*');
+  
+      const { data: shortData, error: shortError } = await supabase
+        .from('pearl_short_form')
+        .select('*');
+  
+      if (longError || shortError) {
+        throw new Error('Error fetching data from Supabase');
+      }
+      
+      let result: Array<string> = [];
+      for (const i in shortData) result.push(shortData[i].content);
+      for (const j in longData) result.push(longData[j].content);
+  
+      return result;
     } catch (error) {
       throw error;
     }

@@ -17,6 +17,7 @@ const MATCH_COUNT = 10;
 
 
 export const insertQAPair = async (user_id: string, content: string, embedding: number[], table_name: string) => {
+  console.log(table_name);
   try {
     await supabase.from(table_name).insert({
       user_id,
@@ -73,12 +74,13 @@ export const getContextLong = async (embedding: number[], user_id: string) => {
   }
 }
 
-export const getPearlContextLong = async (embedding: number[]) => {
+export const getContextShort = async (embedding: number[], user_id: string) => {
   try {
-    const { data, error } = await supabase.rpc('match_pearl_long', {
+    const { data, error } = await supabase.rpc('match_short', {
       match_count: MATCH_COUNT,
       query_embedding: embedding,
-      similarity_threshold: SIMILARITY_THRESHOLD
+      similarity_threshold: SIMILARITY_THRESHOLD,
+      userid: user_id
     });
     
     let result: Array<string> = [];
@@ -90,13 +92,48 @@ export const getPearlContextLong = async (embedding: number[]) => {
   }
 }
 
-export const getContextShort = async (embedding: number[], user_id: string) => {
+export const getSethContextShort = async (embedding: number[], user_id: string) => {
   try {
-    const { data, error } = await supabase.rpc('match_short', {
+    const { data, error } = await supabase.rpc('match_seth_short', {
       match_count: MATCH_COUNT,
       query_embedding: embedding,
       similarity_threshold: SIMILARITY_THRESHOLD,
       userid: user_id
+    });
+    
+    let result: Array<string> = [];
+    for (const i in data) result.push(data[i].content);
+    return result;
+    
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getSethContextLong = async (embedding: number[], user_id: string) => {
+  try {
+    const { data, error } = await supabase.rpc('match_seth_long', {
+      match_count: MATCH_COUNT,
+      query_embedding: embedding,
+      similarity_threshold: SIMILARITY_THRESHOLD,
+      userid: user_id
+    });
+    
+    let result: Array<string> = [];
+    for (const i in data) result.push(data[i].content);
+    return result;
+    
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getPearlContextLong = async (embedding: number[]) => {
+  try {
+    const { data, error } = await supabase.rpc('match_pearl_long', {
+      match_count: MATCH_COUNT,
+      query_embedding: embedding,
+      similarity_threshold: SIMILARITY_THRESHOLD
     });
     
     let result: Array<string> = [];

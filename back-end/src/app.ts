@@ -30,9 +30,10 @@ app.post('/generate', async (req, res) => {
 
 app.post('/insert', async (req, res) => { 
   const {user_id, table_name, content} = req.body;
+  console.log(req);
   try {
-    const embeiddingResponse = await getEmbedding(content);
-    await insertQAPair(user_id, content, embeiddingResponse, table_name);
+    const embeddingResponse = await getEmbedding(content);
+    await insertQAPair(user_id, content, embeddingResponse, table_name);
     res.json('Success');
   } catch (error) {
     res.status(500).send('Error inserting into DB');
