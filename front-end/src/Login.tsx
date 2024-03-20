@@ -23,7 +23,13 @@ export function Login({ email, error, handleSignIn, password, setEmail, setError
 		setShowPassword(false);
 		setError('');
 	};
-	
+
+	const handleKey = (e: { key: string; }) => {
+		if (e.key === 'Enter') {
+			handleSignIn();
+		}
+	}
+
 	return (
 		<div className={styles.container}>
 			<div className={styles.header}>
@@ -40,8 +46,8 @@ export function Login({ email, error, handleSignIn, password, setEmail, setError
 				Welcome back!
 			</div>
 			<div className={styles.form}>
-				<input className={styles.input} placeholder='Email' value={email} onChange={(event) => setEmail(event.target.value)}/>
-				<input className={styles.input} placeholder='Password' type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)}/>
+				<input className={styles.input} placeholder='Email' value={email} onKeyDown={handleKey} onChange={(event) => setEmail(event.target.value)}/>
+				<input className={styles.input} placeholder='Password' type={showPassword ? 'text' : 'password'} value={password} onKeyDown={handleKey} onChange={(event) => setPassword(event.target.value)}/>
 				<button className={styles.showPassword} onClick={() => setShowPassword(!showPassword)}>
 					{showPassword ? <IoEye size={35}/> : <IoEyeOutline size={35}/>}
 				</button>
