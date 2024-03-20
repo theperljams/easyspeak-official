@@ -22,6 +22,8 @@ export function Home() {
 			setShowNav(false);
 		}
 	}, []);
+
+	
   
 	return (
 		<div className={styles.mainView}>
