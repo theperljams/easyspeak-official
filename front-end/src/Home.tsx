@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import {Navbar} from './components/Navbar';
 import {Chat} from './Chat';
+import {Test} from './Test';
 
 import styles from './styles/Home.module.css';
 import {Training} from './Training';
@@ -28,7 +29,7 @@ export function Home() {
 		<div className={styles.mainView}>
 			{ showNav && <Navbar setScreen={setScreen} setShowNav={() => setShowNav(false)}/> } 
 			{ !showNav && <div className={styles.close} onClick={() => setShowNav(true)}><IoIosArrowForward size={45}/></div>}
-			{/* { screen == 0 && <Dash/>} */}
+			{ screen == 0 && <Test/>}
 			{ screen == 1 && <Chat messageHistory={messages ? messages : []} setMessageHistory={setMesssages}/> }
 			{ screen == 2 && <Training/> }
 		</div>

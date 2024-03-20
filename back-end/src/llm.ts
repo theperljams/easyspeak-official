@@ -6,7 +6,7 @@ import { OpenAI } from 'openai';
 import { put } from "@vercel/blob";
 
 // Assuming these functions exist in './db'
-import { getContextAll, getContextLong, getContextShort, getSethContextLong, getSethContextShort, getPearlContextLong, getPearlContextShort } from './db';
+import { getContextAll, getContextLong, getContextShort} from './db';
 
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 const OPENAI_EMBEDDING_URL: string = 'https://api.openai.com/v1/embeddings';
@@ -36,22 +36,9 @@ export const getEmbedding = async (content: string) => {
 }
 
 export const generateResponses = async (content: string, messages: string[], user_id: string) => {
-    let contextShort: string[] = [];
-    let contextLong: string[] = [];
-    if (user_id == "seth@alscrowd.org") {
-        contextShort = await getSethContextShort(await getEmbedding(content), user_id);
-        contextLong = await getSethContextLong(await getEmbedding(content), user_id);
-    } 
-    else if (user_id == "pearl.k.hulbert@gmail.com") {
-        console.log("Pearl context");
-        contextShort = await getPearlContextShort(await getEmbedding(content));
-        contextLong = await getPearlContextLong(await getEmbedding(content));
-    } else {
-        contextShort = await getContextShort(await getEmbedding(content), user_id);
-        contextLong = await getContextLong(await getEmbedding(content), user_id);
-    }
-    (await getContextShort(await getEmbedding(content), user_id));
-    (await getContextLong(await getEmbedding(content), user_id));
+    let contextShort: string[] = (await getContextShort(await getEmbedding(content), user_id));
+    let contextLong: string[] =   (await getContextLong(await getEmbedding(content), user_id));
+
 
     const prompt: string = `You are an assistant drafting texts for ${user_id}. Your goal is to sound as much like them as possible. Follow these steps to learn how to do this.
 
