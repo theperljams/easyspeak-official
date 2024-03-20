@@ -1,5 +1,6 @@
 import {createClient} from '@supabase/supabase-js';
 import type {Message} from './components/Interfaces';
+import { IoTabletLandscape } from 'react-icons/io5';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -44,14 +45,6 @@ export const signInWithEmail = async (req : SignInProps) => {
 
 export const sendQuestionAnswerPair = async (content: string, table: string) => {
 	const user_id = localStorage.getItem('user_id');
-	let t_name: string = table
-	if (user_id == "seth@alscrowd.org") {
-		t_name = "seth_short_form"
-	}
-	else if (user_id == "pearl.k.hulbert@gmail.com") {
-		t_name = "seth_short_form"
-	}
-	console.log(t_name)
 	const request = {
 		method: 'POST',
 		headers: {
@@ -59,7 +52,7 @@ export const sendQuestionAnswerPair = async (content: string, table: string) => 
 		},
 		body: JSON.stringify({
 			content: content,
-			table_name: t_name,
+			table_name: table,
 			user_id: user_id,
 		})
 	};
