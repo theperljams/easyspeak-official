@@ -11,11 +11,11 @@ interface Props {
 
 const saveScreen = (screenNum: string) => {
 	localStorage.setItem('screen', screenNum);
-}
+};
 
 export function NavButton({ label, setScreen, setShowNav, screenValue } : Props) {
 	return (
-		<div className={styles.navButton} onClick={() => {setScreen(screenValue); setShowNav(); saveScreen(screenValue.toString())}}>
+		<div className={styles.navButton} onClick={() => {setScreen(screenValue); setShowNav(); saveScreen(screenValue.toString());}}>
 			<div className={styles.link}>
 				{label}
 			</div>

@@ -91,4 +91,3 @@ export const getContextShort = async (embedding: number[], user_id: string) => {
     throw error;
   }
 }
-

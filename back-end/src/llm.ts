@@ -5,7 +5,6 @@ import { OpenAI } from 'openai';
 
 import { put } from "@vercel/blob";
 
-// Assuming these functions exist in './db'
 import { getContextAll, getContextLong, getContextShort} from './db';
 
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
@@ -38,7 +37,6 @@ export const getEmbedding = async (content: string) => {
 export const generateResponses = async (content: string, messages: string[], user_id: string) => {
     let contextShort: string[] = (await getContextShort(await getEmbedding(content), user_id));
     let contextLong: string[] =   (await getContextLong(await getEmbedding(content), user_id));
-
 
     const prompt: string = `You are an assistant drafting texts for ${user_id}. Your goal is to sound as much like them as possible. Follow these steps to learn how to do this.
 
