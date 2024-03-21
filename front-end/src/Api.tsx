@@ -137,4 +137,3 @@ export const signOut = async () => {
 	const { error } = await supabase.auth.signOut();
 };
 
-// NOTE: you can use the LLM to make a decision based on the info that it gets back
