@@ -13,7 +13,7 @@ if (!SUPABASE_URL || !SUPABASE_API_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_API_KEY);
 
 const SIMILARITY_THRESHOLD = 0.1;
-const MATCH_COUNT = 10;
+const MATCH_COUNT = 50;
 
 
 export const insertQAPair = async (user_id: string, content: string, embedding: number[], table_name: string) => {
