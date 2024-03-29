@@ -45,38 +45,48 @@ export const generateResponses = async (content: string, messages: string[], use
     let promptType: string = "";
 
     if (user_id === "seth@alscrowd.org") {
-        contextInfo = await getSethContext(await getEmbedding(content), 10, 0.6);
-        contextStyle = await getSethContext(await getEmbedding(content), 90, 0.0);
+        contextInfo = (await getSethContext(await getEmbedding(content), 10, 0.6));
+        contextStyle = (await getSethContext(await getEmbedding(content), 90, 0.0));
     }
     else {
         contextShort = (await getContextShort(await getEmbedding(content), user_id));
         contextLong = (await getContextLong(await getEmbedding(content), user_id));
     }
     
-    const prompt1: string = `You are an assistant drafting texts for ${user_id}. Your goal is to sound as much like them as possible. Follow these steps to learn how to do this.
+    const prompt1: string = `You are an assistant drafting texts for ${user_id}. Respond to the given content as if you were
+         sending a text from ${user_id}'s phone. Your goal is to sound as much like them as possible. These texts should reflect ${user_id}'s personality and way of speaking
+         based on the context provided.
+         You speak as ${user_id}. For example, if the content contains: 
+         "What are you studying?" the assistant will read: "What does ${user_id} say they are studying?" Stay true to what is found in the context. If you see a similar question, and answer exchange, 
+         use that as a guide.
+         Follow these steps to learn how to do this.
 
-    Step 1: Look at the context below to learn how ${user_id} speaks. As you answer, mimic their voice and way of speaking, try to be as convincing as possible. You can also search the given contextShort below to answer questions. Answer the question as if you were sending a text from ${user_id}'s phone. 
-    This dataset mainly contains basic information. You speak as ${user_id}. For example, if the content contains: "What are you studying?" the assistant will read: "What does ${user_id} say they are studying?" 
+ Step 1: Search the given contextShort below to learn basic information about the user and how they respond to casual questions.
+ Lean more into the style shown in this database for casual conversations with relatively simple responses.
 
-    contextShort: ${contextShort}
+ contextShort: ${contextShort}
 
-    content: ${content}
-    user: ${user_id}
-    
-    Step 2: Now, look at this context to learn ${user_id}'s writing style. This dataset contains answers that are more like journal entries. Use them to learn how to better mimic ${user_id}. 
-    This dataset also contains information you can pull from to clarify your previous response if necessary. If it does not provide any relevant information, only use it for style. Edit your previous response to sound more like ${user_id}.
+ content: ${content}
+ user: ${user_id}
 
-    contextLong: ${contextLong}
-    
-    Remember: If the answer is not contained in any either contextShort or contextLong or if for any reason you cannot provide a response to the given content, 
-    give an 'I don't know' response that ${user_id} might say if given a question they didn't know the answer to.
+ Step 2: Now, look at contextLong to learn ${user_id}'s writing style. This dataset contains answers that are more like journal entries. 
+ Lean more into this style when doing thing like telling stories, expressing emotion, or having deeper conversations.
+ If there is information relevant to responding to the content, use it in your response.
+ If it does not provide any relevant information, only use it for style. Edit your previous response to sound more like ${user_id}. 
+ This step is very important. These texts need to sound as much like ${user_id} as possible. Err on being more concise and casual.
 
-    Other: ${content}
-    ${user_id}:
-    
-    ALWAYS DO THIS STEP:
-    
-    Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
+ contextLong: ${contextLong}
+
+ Remember: If the answer is not contained in any either contextShort or contextLong or if for any reason you cannot provide a response to the given content, 
+ give an 'I don't know' response in ${user_id}'s style.
+
+ Other: ${content}
+ ${user_id}:
+
+ ALWAYS DO THIS STEP:
+
+ Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
+ Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
 
     const prompt2: string = `You are an assistant drafting texts for Seth. Respond to the given content as if you were
             sending a text from Seth's phone. Your goal is to sound as much like them as possible. These texts should reflect Seth's personality and way of speaking
@@ -108,6 +118,8 @@ export const generateResponses = async (content: string, messages: string[], use
      Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
     
      let prompt = promptType === '1' ? prompt1 : prompt2;
+
+     console.log('Prompt: \n' + prompt);
      
     const response: string = await getChatCompletions(prompt, messages);
     return parseNumberedList(response);
@@ -188,7 +200,7 @@ export const generateAudio = async (content: string) => {
 const getChatCompletions = async (prompt: string, messages: string[]) => {
     try {
         const response = await axiosInstance.post(OPENAI_CHAT_COMPLETION_URL, {
-            model: "gpt-4-0125-preview",
+            model: "gpt-4-turbo-preview",
             messages: [{ "role": "system", "content": prompt }, ...messages],
         });
         

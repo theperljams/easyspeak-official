@@ -58,7 +58,7 @@ export const getContextAll = async (user_id: string) => {
 
 export const getSethContext = async (embedding: number[], match: number, similarity: number) => {
   try {
-    const { data, error } = await supabase.rpc('match_long', {
+    const { data, error } = await supabase.rpc('match_sethxamy', {
       match_count: match,
       query_embedding: embedding,
       similarity_threshold: similarity,

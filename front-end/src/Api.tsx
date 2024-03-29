@@ -114,11 +114,12 @@ export const generateUserAudio = async (input: string) => {
 };
 
 export const generateUserResponses = async (question: string, messages: Message[]) => {
+	// localStorage.getItem('user_id') 
 	try {
 		console.log(JSON.stringify({ content: question }));
 		const res = await fetch(`${SERVER_URL}/generate`, {
 			method: 'POST',
-			body: JSON.stringify({ content: question, messages: messages, user_id: localStorage.getItem('user_id') }),
+			body: JSON.stringify({ content: question, messages: messages, user_id: "seth@alscrowd.org"}),
 			headers: {
 				'Content-Type': 'application/json',
 				'accept': 'application/json',
