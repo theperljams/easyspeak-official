@@ -10,7 +10,7 @@ const cors = require('cors');
 app.use(cors());
 
 app.get('/ping', (req, res) => {
-  return res.send('pong 🏓')
+  return res.send('IS it stale 🏓')
 })
 
 app.post('/generate', async (req, res) => {
@@ -20,6 +20,7 @@ app.post('/generate', async (req, res) => {
   }
 
   try {
+    console.error(`USER ID: ${user_id}`)
     const openAiResponse = await generateResponses(content, messages, user_id);
     res.json(openAiResponse);
   } catch (error) {
