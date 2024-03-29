@@ -7,7 +7,6 @@ app.use(express.json());
 app.use(express.static('tmp'));
 const cors = require('cors');
 
-// Use CORS middleware
 app.use(cors());
 
 app.get('/ping', (req, res) => {
