@@ -162,8 +162,6 @@ Treat them as 3 separate sentences in different contexts. You can use either of 
      else if (promptType === '3') {
         prompt = prompt3;
      }
-
-     console.log('Prompt: \n' + prompt);
      
     const response: string = await getChatCompletions(prompt, messages);
     return parseNumberedList(response);
