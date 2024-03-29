@@ -151,8 +151,6 @@ ALWAYS DO THIS STEP:
 Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
 Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
 
-
-    
      let prompt = '';
 
      if (promptType === '1') {
