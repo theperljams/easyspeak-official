@@ -6,6 +6,7 @@ import { OpenAI } from 'openai';
 import { put } from "@vercel/blob";
 
 import { getContextAll, getContextLong, getContextShort, getSethContext} from './db';
+import {getContext} from './tests/test_db';
 import { get } from 'http';
 
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
@@ -47,6 +48,12 @@ export const generateResponses = async (content: string, messages: string[], use
     if (user_id === "seth@alscrowd.org") {
         contextInfo = (await getSethContext(await getEmbedding(content), 10, 0.6));
         contextStyle = (await getSethContext(await getEmbedding(content), 90, 0.0));
+        promptType = "2";
+    }
+    else if (user_id === "pearl.k.hulbert@gmail.com") {
+        contextInfo = (await getContext(await getEmbedding(content), 10, 0.6));
+        contextStyle = (await getContext(await getEmbedding(content), 90, 0.0));
+        promptType = "3";
     }
     else {
         contextShort = (await getContextShort(await getEmbedding(content), user_id));
@@ -116,8 +123,44 @@ export const generateResponses = async (content: string, messages: string[], use
     
      Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
      Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
+
+     const prompt3: string = `You are an assistant drafting texts for ${user_id}. Your goal is to sound as much like them as possible. Follow these steps to learn how to do this.
+
+ Step 1: Look at the context below to learn how ${user_id} speaks. As you answer, mimic their voice and way of speaking, try to be as convincing as possible. 
+ You can also search the given context below to answer questions. Answer the question as if you were sending a text from ${user_id}'s phone. 
+ This dataset contains sample texts between ${user_id} and her friend Camille. Use these as a reference for how Pearl texts.
+ Pay very close attention to the writing style, getting it right is very important. Err on the side of being concise and casual. The content is another text from Camille. 
+ Continue the converstaion as if you were Pearl conversing with Camille.
+
+ context: ${contextStyle}
+
+ content: ${content}
+ user: ${user_id}
+
+ Remember: If the answer is not contained the context or if for any reason you cannot provide a response to the given content, 
+ give an 'I don't know' response that ${user_id} might say if given a question they didn't know the answer to based on their writing style.
     
-     let prompt = promptType === '1' ? prompt1 : prompt2;
+ Camille: ${content}
+ ${user_id}:
+    
+ ALWAYS DO THIS STEP:
+    
+ Step 2: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
+ Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
+
+
+    
+     let prompt = '';
+
+     if (promptType === '1') {
+        prompt = prompt1;
+     } 
+     else if (promptType === '2') {
+        prompt = prompt2;
+     }
+     else if (promptType === '3') {
+        prompt = prompt3;
+     }
 
      console.log('Prompt: \n' + prompt);
      
