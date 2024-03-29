@@ -106,7 +106,6 @@ export const generateResponses = async (content: string, messages: string[], use
      contextInfo: ${contextInfo}
     
      content: ${content}
-     user: ${user_id}
     
      Step 2: contextStyle contains the rest of the message history between Seth and Amy. Look at these to get a sense of Seth's writing style and personality. 
      Use this to help you mimic Seth's voice. Edit your previous response to sound more like Seth based on the two contexts. This step is very important. 
@@ -116,40 +115,42 @@ export const generateResponses = async (content: string, messages: string[], use
      Remember: If the answer is not contained in any either contextInfo or contextStyle or if for any reason you cannot provide a response to the given content, 
      give an 'I don't know' response in ${user_id}'s style.
     
-     Other: ${content}
-     ${user_id}:
+     Amy: ${content}
+     Seth:
     
      ALWAYS DO THIS STEP:
     
      Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
      Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
 
-     const prompt3: string = `You are an assistant drafting texts for ${user_id}. Your goal is to sound as much like them as possible. Follow these steps to learn how to do this.
+     const prompt3: string = `You are an assistant drafting texts for Pearl. Respond to the given content as if you were
+     sending a text from Pearl's phone. Your goal is to sound as much like them as possible. These texts should reflect Pearl's personality and way of speaking
+     based on the context provided. The following contextInfo and contextStyle are sample texts between Pearl and her friend Camille. Contine the conversation as if you 
+     were responding to another text from Camille.
+     Follow these steps to learn how to do this.
 
- Step 1: Look at the context below to learn how ${user_id} speaks. As you answer, mimic their voice and way of speaking, try to be as convincing as possible. 
- You can also search the given context below to answer questions. Answer the question as if you were sending a text from ${user_id}'s phone. 
- This dataset contains sample texts between ${user_id} and her friend Camille. Use these as a reference for how Pearl texts.
- Pay very close attention to the writing style, getting it right is very important. Err on the side of being concise and casual. The content is another text from Camille. 
- Continue the converstaion as if you were Pearl conversing with Camille.
+Step 1: contextInfo contains the most relevant texts to the content. Use these for information to respond to Cammile's text.
 
- context: ${contextStyle}
+contextInfo: ${contextInfo}
 
- content: ${content}
- user: ${user_id}
+content: ${content}
 
- Remember: If the answer is not contained the context or if for any reason you cannot provide a response to the given content, 
- give an 'I don't know' response that ${user_id} might say if given a question they didn't know the answer to based on their writing style.
-    
- Camille: ${content}
- ${user_id}:
-    
- ALWAYS DO THIS STEP:
-    
- Step 2: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
- Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
+Step 2: contextStyle contains the rest of the message history between Pearl and Camille. Look at these to get a sense of Pearl's writing style and personality. 
+Use this to help you mimic Pearl's voice. Edit your previous response to sound more like Pearl based on the two contexts. This step is very important. 
 
+contextStyle: ${contextStyle}
 
-    
+Remember: If the answer is not contained in any either contextInfo or contextStyle or if for any reason you cannot provide a response to the given content, 
+give an 'I don't know' response in Pearl's style.
+
+Camille: ${content}
+Pearl:
+
+ALWAYS DO THIS STEP:
+
+Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
+Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
+
      let prompt = '';
 
      if (promptType === '1') {
@@ -161,8 +162,6 @@ export const generateResponses = async (content: string, messages: string[], use
      else if (promptType === '3') {
         prompt = prompt3;
      }
-
-     console.log('Prompt: \n' + prompt);
      
     const response: string = await getChatCompletions(prompt, messages);
     return parseNumberedList(response);
