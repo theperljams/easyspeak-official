@@ -13,7 +13,7 @@ if (!SUPABASE_URL || !SUPABASE_API_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_API_KEY);
 
 const SIMILARITY_THRESHOLD = 0.1;
-const MATCH_COUNT = 10;
+const MATCH_COUNT = 50;
 
 
 export const insertQAPair = async (user_id: string, content: string, embedding: number[], table_name: string) => {
@@ -51,6 +51,23 @@ export const getContextAll = async (user_id: string) => {
     for (const j in longData) result.push(longData[j].content);
 
     return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getSethContext = async (embedding: number[], match: number, similarity: number) => {
+  try {
+    const { data, error } = await supabase.rpc('match_sethxamy', {
+      match_count: match,
+      query_embedding: embedding,
+      similarity_threshold: similarity,
+    });
+    
+    let result: Array<string> = [];
+    for (const i in data) result.push(data[i].content);
+    return result;
+    
   } catch (error) {
     throw error;
   }

@@ -12,8 +12,8 @@ if (!SUPABASE_URL || !SUPABASE_API_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_API_KEY);
 
-const SIMILARITY_THRESHOLD = -0.5;
-const MATCH_COUNT = 50;
+const SIMILARITY_THRESHOLD = 0.9;
+const MATCH_COUNT = 15;
 
 export const getPearlContextLong = async (embedding: number[]) => {
     try {
@@ -108,6 +108,23 @@ export const getPearlContextLong = async (embedding: number[]) => {
       for (const j in longData) result.push(longData[j].content);
   
       return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  export const getContext = async (embedding: number[], match_count: number, similarity_threshold: number) => {
+    try {
+      const { data, error } = await supabase.rpc('match_pearlxcamille', {
+        match_count: match_count,
+        query_embedding: embedding,
+        similarity_threshold: similarity_threshold
+      });
+      
+      let result: Array<string> = [];
+      for (const i in data) result.push(data[i].content);
+      return result;
+      
     } catch (error) {
       throw error;
     }
