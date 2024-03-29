@@ -5,7 +5,8 @@ import { OpenAI } from 'openai';
 
 import { put } from "@vercel/blob";
 
-import { getContextAll, getContextLong, getContextShort} from './db';
+import { getContextAll, getContextLong, getContextShort, getSethContext} from './db';
+import { get } from 'http';
 
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 const OPENAI_EMBEDDING_URL: string = 'https://api.openai.com/v1/embeddings';
@@ -35,10 +36,24 @@ export const getEmbedding = async (content: string) => {
 }
 
 export const generateResponses = async (content: string, messages: string[], user_id: string) => {
-    let contextShort: string[] = (await getContextShort(await getEmbedding(content), user_id));
-    let contextLong: string[] =   (await getContextLong(await getEmbedding(content), user_id));
 
-    const prompt: string = `You are an assistant drafting texts for ${user_id}. Your goal is to sound as much like them as possible. Follow these steps to learn how to do this.
+    let contextShort : string[] = [];
+    let contextLong : string[] = [];
+    let contextInfo: string[] = [];
+    let contextStyle: string[] = [];
+
+    let promptType: string = "";
+
+    if (user_id === "seth@alscrowd.org") {
+        contextInfo = await getSethContext(await getEmbedding(content), 10, 0.6);
+        contextStyle = await getSethContext(await getEmbedding(content), 90, 0.0);
+    }
+    else {
+        contextShort = (await getContextShort(await getEmbedding(content), user_id));
+        contextLong = (await getContextLong(await getEmbedding(content), user_id));
+    }
+    
+    const prompt1: string = `You are an assistant drafting texts for ${user_id}. Your goal is to sound as much like them as possible. Follow these steps to learn how to do this.
 
     Step 1: Look at the context below to learn how ${user_id} speaks. As you answer, mimic their voice and way of speaking, try to be as convincing as possible. You can also search the given contextShort below to answer questions. Answer the question as if you were sending a text from ${user_id}'s phone. 
     This dataset mainly contains basic information. You speak as ${user_id}. For example, if the content contains: "What are you studying?" the assistant will read: "What does ${user_id} say they are studying?" 
@@ -63,6 +78,37 @@ export const generateResponses = async (content: string, messages: string[], use
     
     Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
 
+    const prompt2: string = `You are an assistant drafting texts for Seth. Respond to the given content as if you were
+            sending a text from Seth's phone. Your goal is to sound as much like them as possible. These texts should reflect Seth's personality and way of speaking
+            based on the context provided. The following contextInfo and contextStyle are sample texts between Seth and his wife Amy. Contine the conversation as if you 
+            were responding to another text from Amy.
+            Follow these steps to learn how to do this.
+
+     Step 1: contextInfo contains the most relevant texts to the content. Use these for information to respond to Amy's text.
+    
+     contextInfo: ${contextInfo}
+    
+     content: ${content}
+     user: ${user_id}
+    
+     Step 2: contextStyle contains the rest of the message history between Seth and Amy. Look at these to get a sense of Seth's writing style and personality. 
+     Use this to help you mimic Seth's voice. Edit your previous response to sound more like Seth based on the two contexts. This step is very important. 
+    
+     contextStyle: ${contextStyle}
+    
+     Remember: If the answer is not contained in any either contextInfo or contextStyle or if for any reason you cannot provide a response to the given content, 
+     give an 'I don't know' response in ${user_id}'s style.
+    
+     Other: ${content}
+     ${user_id}:
+    
+     ALWAYS DO THIS STEP:
+    
+     Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
+     Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
+    
+     let prompt = promptType === '1' ? prompt1 : prompt2;
+     
     const response: string = await getChatCompletions(prompt, messages);
     return parseNumberedList(response);
 }

@@ -4,10 +4,14 @@ import { generateResponses } from './test_llm';
 // const questions = ["Tell me about your family", "How many siblings do you have", "What is your favorite movie", "What are you doing this weekend", "How was your week",
 // "Oh my gosh I am so exhausted right now", "Work was really stressful and I wanna cry", "Are you reading any good books right now?", "Are you going to family dinner tonight?"];
 
-const questions = ["Tell me about yourself", "How's school going?", "What are you studying?", "What is your favorite book?", "Oh my gosh I am so exhausted right now", "What has been the best vacation you've ever been on?",
-"Work was really stressful and I wanna cry", "Are you reading any good books right now?", "Are you going to family dinner tonight?"]
+// const questions = ["Tell me about yourself", "How's school going?", "What are you studying?", "What is your favorite book?", "Oh my gosh I am so exhausted right now", "What has been the best vacation you've ever been on?",
+// "Work was really stressful and I wanna cry", "Are you reading any good books right now?", "Are you going to family dinner tonight?"]
 
-const user_id = "pearl.k.hulbert@gmail.com";
+const questions = ["How did your party go?", "Hey girl, are we meeting today?", "Did Brendan say he was working with us?", "Is Sid coming?", "Is Brendan gonna work with us?", 
+"Where r we meeting?", "R u going to class?", "How are you doing?", "Are you dating anyone rn?", "What are your plans for the weekend?", 
+"Are you reading any good books right now?", "How's Ashley doing?"]
+
+const user_id = "Pearl";
 
 const rl = readline.createInterface({
   input: process.stdin,
