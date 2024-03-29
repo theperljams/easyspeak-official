@@ -19,10 +19,9 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.static('tmp'));
 const cors = require('cors');
-// Use CORS middleware
 app.use(cors());
 app.get('/ping', (req, res) => {
-    return res.send('pong 🏓');
+    return res.send('IS it stale 🏓');
 });
 app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { content, messages, user_id } = req.body;
@@ -30,6 +29,7 @@ app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         return res.status(400).send('Question is required');
     }
     try {
+        console.error(`USER ID: ${user_id}`);
         const openAiResponse = yield (0, llm_1.generateResponses)(content, messages, user_id);
         res.json(openAiResponse);
     }
@@ -39,9 +39,10 @@ app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 app.post('/insert', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { user_id, table_name, content } = req.body;
+    console.log(req);
     try {
-        const embeiddingResponse = yield (0, llm_1.getEmbedding)(content);
-        yield (0, db_1.insertQAPair)(user_id, content, embeiddingResponse, table_name);
+        const embeddingResponse = yield (0, llm_1.getEmbedding)(content);
+        yield (0, db_1.insertQAPair)(user_id, content, embeddingResponse, table_name);
         res.json('Success');
     }
     catch (error) {
@@ -80,9 +81,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port  ${PORT}`);
 });
-// import express from "express";
-// const app = express();
-// const port = 3000;
 // app.use(express.static("public"));
 // app.get("/", (req, res) => {
 //   res.send("Hello world");

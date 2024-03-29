@@ -45,8 +45,6 @@ export const generateResponses = async (content: string, messages: string[], use
 
     let promptType: string = "";
 
-    console.log(`User ID for specific contexts: ${user_id}`)
-
     if (user_id === "seth@alscrowd.org") {
         contextInfo = (await getSethContext(await getEmbedding(content), 10, 0.6));
         contextStyle = (await getSethContext(await getEmbedding(content), 90, 0.0));
