@@ -68,7 +68,20 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 		if (textInput !== '') {
 			console.log('text input: ', textInput);
 			setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
-			sendQuestionAnswerPair(`Other: ${question} User: ${textInput}`, 'short');
+			let table_name: string = "";
+			let name1 = "";
+			let name2 = "";
+			if (localStorage.getItem('user_id') === "seth@alscrowd.org"){
+				table_name = "sethxamy";
+				name1 = "Amy: ";
+				name2 = "Seth: ";
+			}
+			else {
+				table_name = "short";
+				name1 = "Q: ";
+				name2= "A: ";
+			}
+			sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, table_name);
 
 			// Call generateUserAudio directly here
 			generateUserAudio(textInput)
