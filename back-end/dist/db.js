@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContextShort = exports.getContextLong = exports.getContextAll = exports.insertQAPair = void 0;
+exports.getContextShort = exports.getContextLong = exports.getSethContext = exports.getContextAll = exports.insertQAPair = void 0;
 const supabase_js_1 = require("@supabase/supabase-js");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
@@ -23,8 +23,9 @@ if (!SUPABASE_URL || !SUPABASE_API_KEY) {
 }
 const supabase = (0, supabase_js_1.createClient)(SUPABASE_URL, SUPABASE_API_KEY);
 const SIMILARITY_THRESHOLD = 0.1;
-const MATCH_COUNT = 10;
+const MATCH_COUNT = 50;
 const insertQAPair = (user_id, content, embedding, table_name) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(table_name);
     try {
         yield supabase.from(table_name).insert({
             user_id,
@@ -62,6 +63,23 @@ const getContextAll = (user_id) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getContextAll = getContextAll;
+const getSethContext = (embedding, match, similarity) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { data, error } = yield supabase.rpc('match_sethxamy', {
+            match_count: match,
+            query_embedding: embedding,
+            similarity_threshold: similarity,
+        });
+        let result = [];
+        for (const i in data)
+            result.push(data[i].content);
+        return result;
+    }
+    catch (error) {
+        throw error;
+    }
+});
+exports.getSethContext = getSethContext;
 const getContextLong = (embedding, user_id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { data, error } = yield supabase.rpc('match_long', {
