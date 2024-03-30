@@ -40,7 +40,7 @@ export function Login({ email, error, handleSignIn, password, setEmail, setError
 				</div>
 			</div>
 			<div className={styles.subtitle}>
-				Deployment successful
+				Sign In
 			</div>
 			<div className={styles.message}>
 				Welcome back!
