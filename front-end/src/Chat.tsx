@@ -40,17 +40,6 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
             .catch(error => console.error('Error generating responses:', error));
     };
 
-    const handleUserInputSubmit = () => {
-        if (textInput !== '') {
-            setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
-            sendQuestionAnswerPair(`${question} ${textInput}`, "tableName");
-            generateUserAudio(textInput)
-                .then(tempURL => setAudioURL(tempURL))
-                .catch(error => console.error('Error speaking:', error));
-            setTextInput('');
-        }
-    };
-
     useEffect(() => {
         if (finalTranscript) {
             setMessages(prev => [...prev, { content: finalTranscript, role: 'user' }]);
@@ -59,6 +48,27 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
             resetTranscript();
         }
     }, [finalTranscript]);
+    
+	const handleUserInputSubmit = () => {
+		console.log('handle User input submit');
+		if (textInput !== '') {
+			console.log('text input: ', textInput);
+			setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
+			let table_name: string = "";
+			let name1 = "";
+			let name2 = "";
+			if (localStorage.getItem('user_id') === "seth@alscrowd.org"){
+				table_name = "sethxamy";
+				name1 = "Amy: ";
+				name2 = "Seth: ";
+			}
+			else {
+				table_name = "short";
+				name1 = "Q: ";
+				name2= "A: ";
+			}
+			sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, table_name);
+    }
 
     useEffect(() => {
         setMessageHistory(messages);
