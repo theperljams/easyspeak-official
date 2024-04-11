@@ -68,6 +68,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 				name2= "A: ";
 			}
 			sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, table_name);
+		}
     }
 
     useEffect(() => {
