@@ -87,6 +87,8 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 				.catch((error) => {
 					console.error('Error speaking:', error);
 				});
+
+        }
 		
     }
 
@@ -114,7 +116,6 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
                     <Responses responses={userGeneratedResponses} setInputText={setTextInput} isGenerating={isGenerating}/>  
                 </div>
                 <div className={styles.footer}>
-                    <Listen listen={isListening} toggleListen={() => setIsListening(prev => !prev)}/>
                     <InputBar inputText={textInput} setInput={setTextInput} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsListening={setIsListening}/>
                 </div>
             </div>
