@@ -19,7 +19,6 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.static('tmp'));
 const cors = require('cors');
-// Use CORS middleware
 app.use(cors());
 app.get('/ping', (req, res) => {
     return res.send('pong 🏓');
@@ -39,9 +38,10 @@ app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 app.post('/insert', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { user_id, table_name, content } = req.body;
+    console.log(req);
     try {
-        const embeiddingResponse = yield (0, llm_1.getEmbedding)(content);
-        yield (0, db_1.insertQAPair)(user_id, content, embeiddingResponse, table_name);
+        const embeddingResponse = yield (0, llm_1.getEmbedding)(content);
+        yield (0, db_1.insertQAPair)(user_id, content, embeddingResponse, table_name);
         res.json('Success');
     }
     catch (error) {
