@@ -21,7 +21,8 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
     const [audioURL, setAudioURL] = useState<string | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [userGeneratedResponses, setUserGeneratedResponses] = useState(['', '', '']);
-	const [isGenerating, setIsGenerating] = useState(false);
+
+	  const [isGenerating, setIsGenerating] = useState(false);
     const [question, setQuestion] = useState('');
 
     const { transcript, browserSupportsSpeechRecognition, finalTranscript, resetTranscript } = useSpeechRecognition();
@@ -86,7 +87,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 				.catch((error) => {
 					console.error('Error speaking:', error);
 				});
-		}
+		
     }
 
     useEffect(() => {
