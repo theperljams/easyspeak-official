@@ -68,6 +68,7 @@ export const generateResponses = async (content: string, messages: string[], use
          use that as a guide.
          Follow these steps to learn how to do this.
 
+
  Step 1: Search the given contextShort below to learn basic information about the user and how they respond to casual questions.
  Lean more into the style shown in this database for casual conversations with relatively simple responses.
 

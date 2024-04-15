@@ -6,63 +6,58 @@ import { Responses } from "./components/Responses.js";
 import { InputBar } from "./components/InputBar.js";
 
 import styles from "./styles/Chat.module.css";
-
-
-// functions for communicating with API
 import { generateUserAudio, generateUserResponses, sendQuestionAnswerPair } from "./Api.js";
 import type { Message } from "./components/Interfaces.js";
 import { RefreshButton } from "./components/RefreshButton.js";
 
 interface Props {
-	messageHistory: Message[];
-	setMessageHistory: (x: Message[]) => void;
+    messageHistory: Message[];
+    setMessageHistory: (x: Message[]) => void;
 }
 
-export function Chat ({messageHistory, setMessageHistory} : Props) {
-	const [initialLoad, setInitialLoad] = useState(false);
-	const [isListening, setIsListening] = useState(false);
+export function Chat({ messageHistory, setMessageHistory }: Props) {
+    const [isListening, setIsListening] = useState(true);
+    const [textInput, setTextInput] = useState('');
+    const [audioURL, setAudioURL] = useState<string | null>(null);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [userGeneratedResponses, setUserGeneratedResponses] = useState(['', '', '']);
 
-	const [textInput, setTextInput] = useState('');
-	const [audioURL, setAudioURL] = useState<string | null>(null);
-	const [messages, setMessages] = useState<Message[]>([]);
-	const [userGeneratedResponses, setUserGeneratedResponses] = useState(['', '', '']);
-	
-	// for use later: sending quesiton answer pairs to the database 
-	const [question, setQuestion] = useState('');
+	  const [isGenerating, setIsGenerating] = useState(false);
+    const [question, setQuestion] = useState('');
 
-	const { transcript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
+    const { transcript, browserSupportsSpeechRecognition, finalTranscript, resetTranscript } = useSpeechRecognition();
 
-	if (!browserSupportsSpeechRecognition) {
-		return (<p>Browser does not support speech recognition...</p>);
-	}
+    if (!browserSupportsSpeechRecognition) {
+        return <p>Browser does not support speech recognition...</p>;
+    }
 
-	const startListening = () => {
-		setAudioURL(null);
-		resetTranscript();
-		SpeechRecognition.startListening({ continuous: true, language: 'en-IN' });
-	};
-	
-	const generate = () => {
-		setUserGeneratedResponses(['', '', '']);
-		generateUserResponses(transcript, [...messages, { content: transcript, role: 'user' }])
-			.then((r) => {
-				setUserGeneratedResponses(r);
-			})
-			.catch((error) => {
-				console.error('Error generating responses:', error);
-			});
-	};
+    const startListening = () => {
+        SpeechRecognition.startListening({ continuous: true, language: 'en-IN' });
+    };
 
-	const stopListening = () => {
-		SpeechRecognition.stopListening();
+	const generateResponses = (newTranscript: string) => {
+        setIsGenerating(true); // Start generating
+        setUserGeneratedResponses(['...', '...', '...']); // Temporarily set responses to ...
+        generateUserResponses(newTranscript, [...messages, { content: newTranscript, role: 'user' }])
+            .then(r => {
+                setUserGeneratedResponses(r);
+                setIsGenerating(false); // Finish generating
+            })
+            .catch(error => {
+                console.error('Error generating responses:', error);
+                setIsGenerating(false);
+            });
+    };
 
-		if (transcript) {
-			setMessages(prev => [...prev, { content: transcript, role: 'user' }]);
-			setQuestion(transcript);
-			generate();
-		}
-	};
-
+    useEffect(() => {
+        if (finalTranscript) {
+            setMessages(prev => [...prev, { content: finalTranscript, role: 'user' }]);
+            setQuestion(finalTranscript);
+            generateResponses(finalTranscript);
+            resetTranscript();
+        }
+    }, [finalTranscript]);
+    
 	const handleUserInputSubmit = () => {
 		console.log('handle User input submit');
 		if (textInput !== '') {
@@ -82,9 +77,8 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 				name2= "A: ";
 			}
 			sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, table_name);
-
-			// Call generateUserAudio directly here
-			generateUserAudio(textInput)
+            
+            generateUserAudio(textInput)
 				.then((tempURL) => {
 					console.log('audio URL:', tempURL);
 					setAudioURL(tempURL);
@@ -93,48 +87,38 @@ export function Chat ({messageHistory, setMessageHistory} : Props) {
 				.catch((error) => {
 					console.error('Error speaking:', error);
 				});
-		}
-	};
 
-	useEffect(() => {
-		setMessageHistory(messages);
-	}, [messages]);
-	
-	useEffect(() => {
-		if (initialLoad) {
-			if (isListening) {
-				startListening();
-			}
-			else {
-				stopListening();
-			}
-		}
-		else {
-			setInitialLoad(true);
-		}
-	}, [isListening]);
-	
-	useEffect(() => {
-		if (messageHistory) {
-			setMessages(messageHistory);
-		}	
-	}, []);
+        }
+		
+    }
 
-	return (
-		<div className={styles.app}>
-			<div className={styles.container}>
-				<div className={styles.mainView}>
-					<ChatWindow mode={'chat'} messages={messages} loading={isListening} transcript={transcript}/>
-				</div>
-				<RefreshButton handleRefresh={generate}/>
-				{userGeneratedResponses && <div className={styles.responseView}>
-					{<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>}	
-				</div>}
-				<div className={styles.footer}>
-					<Listen listen={isListening} toggleListen={() => {setIsListening((prev) => !prev);}}></Listen>
-					<InputBar inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setButton={() => console.log('test')}/>
-				</div>
-			</div>
-		</div>
-	);
+    useEffect(() => {
+        setMessageHistory(messages);
+    }, [messages]);
+
+    useEffect(() => {
+		if (isListening) {
+			startListening();
+		}
+        else {
+			SpeechRecognition.stopListening();
+        }
+    }, [isListening]);
+
+    return (
+        <div className={styles.app}>
+            <div className={styles.container}>
+                <div className={styles.mainView}>
+                    <ChatWindow mode={'chat'} messages={messages} loading={isListening} transcript={transcript}/>
+                </div>
+                <RefreshButton handleRefresh={() => generateResponses(question)}/>
+                <div className={styles.responseView}>
+                    <Responses responses={userGeneratedResponses} setInputText={setTextInput} isGenerating={isGenerating}/>  
+                </div>
+                <div className={styles.footer}>
+                    <InputBar inputText={textInput} setInput={setTextInput} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsListening={setIsListening}/>
+                </div>
+            </div>
+        </div>
+    );
 }

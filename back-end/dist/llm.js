@@ -49,7 +49,7 @@ const generateResponses = (content, messages, user_id) => __awaiter(void 0, void
     let contextInfo = [];
     let contextStyle = [];
     let promptType = "";
-    console.log(`User ID for specific contexts: ${user_id}`);
+
     if (user_id === "seth@alscrowd.org") {
         contextInfo = (yield (0, db_1.getSethContext)(yield (0, exports.getEmbedding)(content), 10, 0.6));
         contextStyle = (yield (0, db_1.getSethContext)(yield (0, exports.getEmbedding)(content), 90, 0.0));
