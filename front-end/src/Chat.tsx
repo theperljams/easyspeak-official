@@ -21,6 +21,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
     const [audioURL, setAudioURL] = useState<string | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [userGeneratedResponses, setUserGeneratedResponses] = useState(['', '', '']);
+	const [isGenerating, setIsGenerating] = useState(false);
     const [question, setQuestion] = useState('');
 
     const { transcript, browserSupportsSpeechRecognition, finalTranscript, resetTranscript } = useSpeechRecognition();
@@ -33,11 +34,18 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
         SpeechRecognition.startListening({ continuous: true, language: 'en-IN' });
     };
 
-    const generateResponses = (newTranscript: string) => {
-        setUserGeneratedResponses(['', '', '']);
+	const generateResponses = (newTranscript: string) => {
+        setIsGenerating(true); // Start generating
+        setUserGeneratedResponses(['...', '...', '...']); // Temporarily set responses to ...
         generateUserResponses(newTranscript, [...messages, { content: newTranscript, role: 'user' }])
-            .then(r => setUserGeneratedResponses(r))
-            .catch(error => console.error('Error generating responses:', error));
+            .then(r => {
+                setUserGeneratedResponses(r);
+                setIsGenerating(false); // Finish generating
+            })
+            .catch(error => {
+                console.error('Error generating responses:', error);
+                setIsGenerating(false);
+            });
     };
 
     useEffect(() => {
@@ -68,6 +76,17 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 				name2= "A: ";
 			}
 			sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, table_name);
+            
+            generateUserAudio(textInput)
+				.then((tempURL) => {
+					console.log('audio URL:', tempURL);
+					setAudioURL(tempURL);
+					setTextInput('');
+				})
+				.catch((error) => {
+					console.error('Error speaking:', error);
+				});
+		}
     }
 
     useEffect(() => {
@@ -91,7 +110,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
                 </div>
                 <RefreshButton handleRefresh={() => generateResponses(question)}/>
                 <div className={styles.responseView}>
-                    <Responses responses={userGeneratedResponses} setInputText={setTextInput}/>  
+                    <Responses responses={userGeneratedResponses} setInputText={setTextInput} isGenerating={isGenerating}/>  
                 </div>
                 <div className={styles.footer}>
                     <Listen listen={isListening} toggleListen={() => setIsListening(prev => !prev)}/>
