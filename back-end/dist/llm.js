@@ -49,7 +49,6 @@ const generateResponses = (content, messages, user_id) => __awaiter(void 0, void
     let contextInfo = [];
     let contextStyle = [];
     let promptType = "";
-
     if (user_id === "seth@alscrowd.org") {
         contextInfo = (yield (0, db_1.getSethContext)(yield (0, exports.getEmbedding)(content), 10, 0.6));
         contextStyle = (yield (0, db_1.getSethContext)(yield (0, exports.getEmbedding)(content), 90, 0.0));
@@ -71,6 +70,7 @@ const generateResponses = (content, messages, user_id) => __awaiter(void 0, void
          "What are you studying?" the assistant will read: "What does ${user_id} say they are studying?" Stay true to what is found in the context. If you see a similar question, and answer exchange, 
          use that as a guide.
          Follow these steps to learn how to do this.
+
 
  Step 1: Search the given contextShort below to learn basic information about the user and how they respond to casual questions.
  Lean more into the style shown in this database for casual conversations with relatively simple responses.

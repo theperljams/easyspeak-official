@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContextShort = exports.getContextLong = exports.getSethContext = exports.getContextAll = exports.insertQAPair = void 0;
+exports.getUserData = exports.getContextShort = exports.getContextLong = exports.getSethContext = exports.getContextAll = exports.insertQAPair = void 0;
 const supabase_js_1 = require("@supabase/supabase-js");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
@@ -116,4 +116,9 @@ const getContextShort = (embedding, user_id) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.getContextShort = getContextShort;
+const getUserData = (token) => __awaiter(void 0, void 0, void 0, function* () {
+    const { data: { user } } = yield supabase.auth.getUser(token);
+    return user;
+});
+exports.getUserData = getUserData;
 //# sourceMappingURL=db.js.map

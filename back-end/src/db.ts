@@ -108,3 +108,9 @@ export const getContextShort = async (embedding: number[], user_id: string) => {
     throw error;
   }
 }
+
+export const getUserData = async (token: string) => {
+  const { data: { user } } = await supabase.auth.getUser(token);
+
+  return user;
+}

@@ -21,15 +21,17 @@ app.use(express_1.default.static('tmp'));
 const cors = require('cors');
 app.use(cors());
 app.get('/ping', (req, res) => {
-    return res.send('IS it stale 🏓');
+    return res.send('pong 🏓');
 });
 app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { content, messages, user_id } = req.body;
+    const { content, messages, /*user_id*/ jwt } = req.body;
+    const { access_token } = JSON.parse(jwt);
+    const { email: user_id } = yield (0, db_1.getUserData)(access_token);
+    console.log(user_id);
     if (!content) {
         return res.status(400).send('Question is required');
     }
     try {
-        console.error(`USER ID: ${user_id}`);
         const openAiResponse = yield (0, llm_1.generateResponses)(content, messages, user_id);
         res.json(openAiResponse);
     }
@@ -39,6 +41,7 @@ app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 app.post('/insert', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { user_id, table_name, content } = req.body;
+    //TODO validate user ID with token
     console.log(req);
     try {
         const embeddingResponse = yield (0, llm_1.getEmbedding)(content);
@@ -81,6 +84,9 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port  ${PORT}`);
 });
+// import express from "express";
+// const app = express();
+// const port = 3000;
 // app.use(express.static("public"));
 // app.get("/", (req, res) => {
 //   res.send("Hello world");

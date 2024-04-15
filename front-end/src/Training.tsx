@@ -25,6 +25,7 @@ export function Training() {
 	const [loading, setLoading] = useState(false);
 	const [chatMode, setChatMode] = useState('');
 	const [messages, setMessages] = useState<Message[]>([]);
+	// const [isListening, setIsListening] = useState(false)
 	
 	const [introMessages, setIntroMessages] = useState<Message[]>([
 		{
@@ -112,7 +113,7 @@ export function Training() {
 				</div>}
 
 				<div className={styles.footer}>
-					<InputBar loading={loading} inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
+					<InputBar loading={loading} setIsListening={(foo) => {}} inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={null}/> {/*setButton={() => console.log('test')}*/}
 				</div>
 			</div>
 		</div>
