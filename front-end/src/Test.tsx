@@ -68,7 +68,7 @@ export function Test ({messageHistory, setMessageHistory} : Props) {
 					<TestChat mode={'chat'} messages={messages}/>
 				</div>
 				{userGeneratedResponses && <div className={styles.responseView}>
-					{<Responses responses={userGeneratedResponses} setInputText={setTextInput}/>}	
+					{<Responses responses={userGeneratedResponses} setInputText={setTextInput} isGenerating={false}/>}
 				</div>}
 				<div className={styles.footer}>
 					<TestInputBar inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} generate={generate}/>
