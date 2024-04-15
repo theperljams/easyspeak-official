@@ -77,7 +77,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 				name2= "A: ";
 			}
 			sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, table_name);
-
+            
             generateUserAudio(textInput)
 				.then((tempURL) => {
 					console.log('audio URL:', tempURL);
@@ -87,6 +87,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 				.catch((error) => {
 					console.error('Error speaking:', error);
 				});
+
         }
 		
     }
