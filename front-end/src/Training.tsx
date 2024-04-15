@@ -105,11 +105,11 @@ export function Training() {
 				</div>
 				
 				{chatMode == '' && <div className={styles.responseView}>
-					{<Responses responses={[SHORT, LONG]} setInputText={setChatMode}/>}	
+					{<Responses responses={[SHORT, LONG]} setInputText={setChatMode} isGenerating={false}/>}
 				</div>}
 				{chatMode != '' && <div className={styles.responseView}>
 					<RefreshButton handleRefresh={getSystemReply}/>
-					{<Responses responses={[' ', 'Select mode', ' ']} setInputText={goBack}/>}
+					{<Responses responses={[' ', 'Select mode', ' ']} setInputText={goBack} isGenerating={false}/>}
 				</div>}
 
 				<div className={styles.footer}>
