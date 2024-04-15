@@ -87,6 +87,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 				.catch((error) => {
 					console.error('Error speaking:', error);
 				});
+        }
 		
     }
 
