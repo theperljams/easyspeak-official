@@ -76,7 +76,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 				name2= "A: ";
 			}
 			sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, table_name);
-            
+
             generateUserAudio(textInput)
 				.then((tempURL) => {
 					console.log('audio URL:', tempURL);
@@ -113,7 +113,6 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
                     <Responses responses={userGeneratedResponses} setInputText={setTextInput} isGenerating={isGenerating}/>  
                 </div>
                 <div className={styles.footer}>
-                    <Listen listen={isListening} toggleListen={() => setIsListening(prev => !prev)}/>
                     <InputBar inputText={textInput} setInput={setTextInput} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsListening={setIsListening}/>
                 </div>
             </div>
