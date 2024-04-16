@@ -67,7 +67,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 			let name1 = "";
 			let name2 = "";
 			if (localStorage.getItem('user_id') === "seth@alscrowd.org"){
-				table_name = "sethxamy";
+				table_name = "sethxpearl";
 				name1 = "Amy: ";
 				name2 = "Seth: ";
 			}
