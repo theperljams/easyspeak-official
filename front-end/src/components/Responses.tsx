@@ -11,11 +11,7 @@ interface Props {
 export function Responses({ responses, setInputText, isGenerating }: Props) {
     return (
         <div className={styles.responses}>
-            {isGenerating ? (
-                <div className={styles.response} style={{ pointerEvents: 'none' }}>
-                    ...
-                </div>
-            ) : (
+            
                 <div className={styles.responsesList}>
                     {responses.map((response, index) => (
                         <button
@@ -32,7 +28,6 @@ export function Responses({ responses, setInputText, isGenerating }: Props) {
                         </button>
                     ))}
                 </div>
-            )}
         </div>
     );
 }
