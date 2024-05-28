@@ -10,9 +10,19 @@ const cors = require('cors');
 
 app.use(cors());
 
+const isTestMode = process.env.TEST_MODE === 'true';
+
+// Define an array of hardcoded responses
+const hardcodedResponses = [
+  ['Response set 1 - Response 1', 'Response set 1 - Response 2', 'Response set 1 - Response 3'],
+  ['Response set 2 - Response 1', 'Response set 2 - Response 2', 'Response set 2 - Response 3'],
+  ['Response set 3 - Response 1', 'Response set 3 - Response 2', 'Response set 3 - Response 3']
+];
+let responseCounter = 0;
+
 app.get('/ping', (req, res) => {
-  return res.send('pong 🏓')
-})
+  return res.send('pong 🏓');
+});
 
 app.post('/generate', async (req, res) => {
   const { content, messages, /*user_id*/ jwt } = req.body;
@@ -26,6 +36,13 @@ app.post('/generate', async (req, res) => {
     return res.status(400).send('Question is required');
   }
 
+  if (isTestMode) {
+    // Rotate through hardcoded responses in test mode
+    const response = hardcodedResponses[responseCounter % hardcodedResponses.length];
+    responseCounter++;
+    return res.json(response);
+  }
+
   try {
     const openAiResponse = await generateResponses(content, messages, user_id);
     res.json(openAiResponse);
@@ -35,6 +52,7 @@ app.post('/generate', async (req, res) => {
 });
 
 app.post('/insert', async (req, res) => {
+
   const {user_id, table_name, content} = req.body;
 
   //TODO validate user ID with token
@@ -80,19 +98,6 @@ app.post('/tts', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port  ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
-// import express from "express";
 
-// const app = express();
-// const port = 3000;
-
-// app.use(express.static("public"));
-
-// app.get("/", (req, res) => {
-//   res.send("Hello world");
-// });
-
-// app.listen(port, () => {
-//   console.log("Listening now");
-// });

@@ -37,7 +37,7 @@ export function Test ({messageHistory, setMessageHistory} : Props) {
 			.catch((error) => {
 				console.error('Error generating responses:', error);
 			});
-	}
+	};
 
 
 	const handleUserInputSubmit = () => {

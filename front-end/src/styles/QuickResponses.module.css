@@ -1,0 +1,22 @@
+.container {
+    display: flex;
+    flex-direction: column; /* Aligns the buttons vertically */
+    align-items: center; /* Center aligns the buttons horizontally */
+    gap: 20px; /* Increased space between the buttons but less than before */
+}
+
+.button {
+    padding: 20px 40px; /* Scaled padding for larger button size */
+    font-size: 32px; /* Larger text, but not as large as the previous adjustment */
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 10px; /* Slightly larger border-radius for aesthetic proportionality */
+    transition: background-color 0.3s;
+
+    /* Add effects on hover */
+    &:hover {
+        background-color: #0056b3;
+    }
+}
