@@ -10,9 +10,10 @@ interface Props {
     audioURL: string | null;
     loading?: boolean;
     setIsListening: (isListening: boolean) => void;
+    setDisplayResponses: (display: boolean) => void;
 }
 
-export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, setIsListening, loading }: Props) {
+export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, setIsListening, loading, setDisplayResponses }: Props) {
 
     const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -49,7 +50,10 @@ export function InputBar({ inputText, setInput, handleSubmitInput, audioURL, set
                         id="" 
                         value={inputText}
                         onKeyDown={onTextareaKeyDown}
-                        onChange={e => setInput(e.target.value)}
+                        onChange={e => {
+                            setInput(e.target.value);
+                            setDisplayResponses(false); 
+                        }}
                     />
                     {
                         audioURL != null && (

@@ -56,6 +56,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
         if (finalTranscript) {
             setMessages(prev => [...prev, { content: finalTranscript, role: 'user' }]);
             setQuestion(finalTranscript);
+            generateResponses(finalTranscript);
             if (responseQueue.length == 0) { 
                 setDisplayResponse(true);
             }
@@ -66,11 +67,13 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
                 setDisplayResponse(true);
             }
             console.log("displayResponse: ", displayResponse);
-            generateResponses(finalTranscript);
             if (displayResponse) {
                 setCurrResponses(responseQueue);
             }
             resetTranscript();
+        }
+        if (responseQueue.length > 0 && textInput != '') {
+            setCurrResponses(responseQueue);
         }
     }, [finalTranscript, displayResponse, textInput]);
 
@@ -95,18 +98,19 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
             }
             sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, tableName);
 
+            if (responseQueue.length > 3) {
+                console.log(responseQueue);
+                responseQueue.splice(0,3);
+                console.log("responseQueue: ", responseQueue);
+                setCurrResponses(responseQueue.slice(0,3));
+                console.log("currResponses: ", currResponses);
+            }
+            setDisplayResponse(true);
             generateUserAudio(textInput)
                 .then(tempURL => {
                     console.log('audio URL:', tempURL);
                     setAudioURL(tempURL);
                     setTextInput('');
-                    if (responseQueue.length > 3) {
-                        console.log(responseQueue);
-                        responseQueue.splice(0,3);
-                        console.log("responseQueue: ", responseQueue);
-                        setCurrResponses(responseQueue.slice(0,3));
-                        console.log("currResponses: ", currResponses);
-                    }
                 })
                 .catch(error => {
                     console.error('Error speaking:', error);
@@ -133,7 +137,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
                 <div className={styles.responseView}>
                     <Responses responses={currResponses} setInputText={setTextInput} isGenerating={isGenerating}/>  
                 </div>
-                <InputBar inputText={textInput} setInput={setTextInput} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsListening={setIsListening}/>
+                <InputBar inputText={textInput} setInput={setTextInput} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsListening={setIsListening} setDisplayResponses={setDisplayResponse}/>
                 <QuickResponses generateUserAudio={generateUserAudio}/>
             </div>
         </div>
