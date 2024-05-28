@@ -25,6 +25,7 @@ export function Training() {
 	const [loading, setLoading] = useState(false);
 	const [chatMode, setChatMode] = useState('');
 	const [messages, setMessages] = useState<Message[]>([]);
+	// const [isListening, setIsListening] = useState(false)
 	
 	const [introMessages, setIntroMessages] = useState<Message[]>([
 		{
@@ -104,15 +105,15 @@ export function Training() {
 				</div>
 				
 				{chatMode == '' && <div className={styles.responseView}>
-					{<Responses responses={[SHORT, LONG]} setInputText={setChatMode}/>}	
+					{<Responses responses={[SHORT, LONG]} setInputText={setChatMode} isGenerating={false}/>}
 				</div>}
 				{chatMode != '' && <div className={styles.responseView}>
 					<RefreshButton handleRefresh={getSystemReply}/>
-					{<Responses responses={[' ', 'Select mode', ' ']} setInputText={goBack}/>}
+					{<Responses responses={[' ', 'Select mode', ' ']} setInputText={goBack} isGenerating={false}/>}
 				</div>}
 
 				<div className={styles.footer}>
-					<InputBar loading={loading} inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={null} setButton={() => console.log('test')}/>
+					<InputBar loading={loading} setIsListening={(foo) => {}} inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} audioURL={null}/> {/*setButton={() => console.log('test')}*/}
 				</div>
 			</div>
 		</div>

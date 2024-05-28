@@ -24,7 +24,10 @@ app.get('/ping', (req, res) => {
     return res.send('pong 🏓');
 });
 app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { content, messages, user_id } = req.body;
+    const { content, messages, /*user_id*/ jwt } = req.body;
+    const { access_token } = JSON.parse(jwt);
+    const { email: user_id } = yield (0, db_1.getUserData)(access_token);
+    console.log(user_id);
     if (!content) {
         return res.status(400).send('Question is required');
     }
@@ -38,6 +41,7 @@ app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 app.post('/insert', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { user_id, table_name, content } = req.body;
+    //TODO validate user ID with token
     console.log(req);
     try {
         const embeddingResponse = yield (0, llm_1.getEmbedding)(content);

@@ -49,6 +49,7 @@ const generateResponses = (content, messages, user_id) => __awaiter(void 0, void
     let contextInfo = [];
     let contextStyle = [];
     let promptType = "";
+
     if (user_id === "seth@alscrowd.org") {
         contextInfo = (yield (0, db_1.getSethContext)(yield (0, exports.getEmbedding)(content), 10, 0.6));
         contextStyle = (yield (0, db_1.getSethContext)(yield (0, exports.getEmbedding)(content), 90, 0.0));
@@ -98,6 +99,7 @@ const generateResponses = (content, messages, user_id) => __awaiter(void 0, void
 
  Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
  Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`;
+  
     const prompt2 = `You are an assistant drafting texts for Seth. Respond to the given content as if you were
             sending a text from Seth's phone. Your goal is to sound as much like them as possible. These texts should reflect Seth's personality and way of speaking
             based on the context provided. The following contextInfo and contextStyle are sample texts between Seth and his wife Amy. Contine the conversation as if you 
@@ -125,6 +127,7 @@ const generateResponses = (content, messages, user_id) => __awaiter(void 0, void
     
      Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
      Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`;
+  
     const prompt3 = `You are an assistant drafting texts for Pearl. Respond to the given content as if you were
      sending a text from Pearl's phone. Your goal is to sound as much like them as possible. These texts should reflect Pearl's personality and way of speaking
      based on the context provided. The following contextInfo and contextStyle are sample texts between Pearl and her friend Camille. Contine the conversation as if you 
@@ -152,6 +155,7 @@ ALWAYS DO THIS STEP:
 
 Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
 Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`;
+  
     let prompt = '';
     if (promptType === '1') {
         prompt = prompt1;

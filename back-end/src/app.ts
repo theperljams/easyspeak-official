@@ -1,11 +1,12 @@
-import express from 'express';
+import express, {json} from 'express';
 import { generateAudio, generateQuestion, generateResponses, getEmbedding } from './llm';
-import { getContextAll, insertQAPair } from './db';
+import {getContextAll, getUserData, insertQAPair} from './db';
 
 const app = express();
 app.use(express.json());
 app.use(express.static('tmp'));
 const cors = require('cors');
+
 
 app.use(cors());
 
@@ -24,7 +25,13 @@ app.get('/ping', (req, res) => {
 });
 
 app.post('/generate', async (req, res) => {
-  const { content, messages, user_id } = req.body;
+  const { content, messages, /*user_id*/ jwt } = req.body;
+
+  const { access_token } = JSON.parse(jwt);
+
+  const {email: user_id}= await getUserData(access_token);
+  console.log(user_id)
+
   if (!content) {
     return res.status(400).send('Question is required');
   }
@@ -45,7 +52,11 @@ app.post('/generate', async (req, res) => {
 });
 
 app.post('/insert', async (req, res) => {
-  const { user_id, table_name, content } = req.body;
+
+  const {user_id, table_name, content} = req.body;
+
+  //TODO validate user ID with token
+
   console.log(req);
   try {
     const embeddingResponse = await getEmbedding(content);
@@ -65,7 +76,7 @@ app.post('/training', async (req, res) => {
     const response = await generateQuestion(user_id, messages, chat);
     res.json(response);
   } catch (error) {
-    res.status(500).send('Error in training');
+    res.status(500).send('Error in training')
   }
 });
 
