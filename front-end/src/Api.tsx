@@ -61,7 +61,8 @@ export const sendQuestionAnswerPair = async (content: string, table: string) => 
 	
 	try {
 		await fetch(`${SERVER_URL}/insert`, request);
-	} catch (error) {
+	} 
+	catch (error) {
 		console.error('Error inserting into db:', error);
 	}
 };
