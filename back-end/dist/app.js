@@ -20,6 +20,14 @@ app.use(express_1.default.json());
 app.use(express_1.default.static('tmp'));
 const cors = require('cors');
 app.use(cors());
+const isTestMode = process.env.TEST_MODE === 'true';
+// Define an array of hardcoded responses
+const hardcodedResponses = [
+    ['Response set 1 - Response 1', 'Response set 1 - Response 2', 'Response set 1 - Response 3'],
+    ['Response set 2 - Response 1', 'Response set 2 - Response 2', 'Response set 2 - Response 3'],
+    ['Response set 3 - Response 1', 'Response set 3 - Response 2', 'Response set 3 - Response 3']
+];
+let responseCounter = 0;
 app.get('/ping', (req, res) => {
     return res.send('pong 🏓');
 });
@@ -30,6 +38,12 @@ app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     console.log(user_id);
     if (!content) {
         return res.status(400).send('Question is required');
+    }
+    if (isTestMode) {
+        // Rotate through hardcoded responses in test mode
+        const response = hardcodedResponses[responseCounter % hardcodedResponses.length];
+        responseCounter++;
+        return res.json(response);
     }
     try {
         const openAiResponse = yield (0, llm_1.generateResponses)(content, messages, user_id);
@@ -82,16 +96,6 @@ app.post('/tts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port  ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
-// import express from "express";
-// const app = express();
-// const port = 3000;
-// app.use(express.static("public"));
-// app.get("/", (req, res) => {
-//   res.send("Hello world");
-// });
-// app.listen(port, () => {
-//   console.log("Listening now");
-// });
 //# sourceMappingURL=app.js.map

@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react';
 
 interface Props {
 	messages: Message[];
-    mode: 'chat' | 'training';
+	mode: 'chat' | 'training';
 }
 
 export function TestChat({ messages, mode}: Props) {

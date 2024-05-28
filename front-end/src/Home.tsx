@@ -4,7 +4,7 @@ import {Chat} from './Chat';
 import {Test} from './Test';
 
 import styles from './styles/Home.module.css';
-import {Training} from './Training';
+// import {Training} from './Training';
 import {Dash} from './Dash';
 
 import { IoIosArrowForward } from "react-icons/io";
@@ -31,9 +31,9 @@ export function Home() {
 		<div className={styles.mainView}>
 			{ showNav && <Navbar setScreen={setScreen} setShowNav={() => setShowNav(false)}/> } 
 			{ !showNav && <div className={styles.close} onClick={() => setShowNav(true)}><IoIosArrowForward size={45}/></div>}
-			{ screen == 0 && <Test messageHistory={messages ? messages : []} setMessageHistory={setMesssages}/>}
+			{/* { screen == 0 && <Test messageHistory={messages ? messages : []} setMessageHistory={setMesssages}/>} */}
 			{ screen == 1 && <Chat messageHistory={messages ? messages : []} setMessageHistory={setMesssages}/> }
-			{ screen == 2 && <Training/> }
+			{/* { screen == 2 && <Training/> } */}
 		</div>
 	);
 }

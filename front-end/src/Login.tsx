@@ -24,11 +24,11 @@ export function Login({ email, error, handleSignIn, password, setEmail, setError
 		setError('');
 	};
 
-	const handleKey = (e: { key: string; }) => {
+	const handleKey = (e: { key: string }) => {
 		if (e.key === 'Enter') {
 			handleSignIn();
 		}
-	}
+	};
 
 	return (
 		<div className={styles.container}>
