@@ -78,6 +78,7 @@ app.post('/training', async (req, res) => {
   } catch (error) {
     res.status(500).send('Error in training')
   }
+
 });
 
 app.post('/tts', async (req, res) => {
@@ -99,3 +100,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+

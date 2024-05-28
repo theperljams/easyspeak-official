@@ -72,11 +72,11 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
             }
             resetTranscript();
         }
+      
         if (responseQueue.length > 0 && textInput != '') {
             setCurrResponses(responseQueue);
         }
     }, [finalTranscript, displayResponse, textInput]);
-
 
 
     const handleUserInputSubmit = () => {
