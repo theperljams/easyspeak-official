@@ -230,7 +230,7 @@ exports.generateAudio = generateAudio;
 const getChatCompletions = (prompt, messages) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield axiosInstance.post(OPENAI_CHAT_COMPLETION_URL, {
-            model: "gpt-4-turbo-preview",
+            model: "gpt-4o",
             messages: [{ "role": "system", "content": prompt }, ...messages],
         });
         return response.data.choices[0].message.content;
