@@ -10,6 +10,7 @@ import { generateUserAudio, generateUserResponses, sendQuestionAnswerPair } from
 import type { Message } from "./components/Interfaces.js";
 import { RefreshButton } from "./components/RefreshButton.js";
 import QuickResponses from "./components/QuickResponses.js";
+import { text } from "stream/consumers";
 
 interface Props {
     messageHistory: Message[];
@@ -39,7 +40,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 
     const generateResponses = (newTranscript: string) => {
         setIsGenerating(true);
-        console.log("genereate: ", responseQueue);
+        console.log("generate: ", responseQueue);
         generateUserResponses(newTranscript, [...messages, { content: newTranscript, role: 'user' }])
             .then(r => {
                 setResponseQueue(r); // Queue the responses
@@ -58,13 +59,20 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
             if (responseQueue.length == 0) { 
                 setDisplayResponse(true);
             }
+            else if (textInput == '') {
+                setDisplayResponse(false);
+            }
+            else {
+                setDisplayResponse(true);
+            }
+            console.log("displayResponse: ", displayResponse);
             generateResponses(finalTranscript);
             if (displayResponse) {
                 setCurrResponses(responseQueue);
             }
             resetTranscript();
         }
-    }, [finalTranscript, displayResponse]);
+    }, [finalTranscript, displayResponse, textInput]);
 
 
 
@@ -93,7 +101,9 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
                     setAudioURL(tempURL);
                     setTextInput('');
                     if (responseQueue.length > 3) {
+                        console.log(responseQueue);
                         responseQueue.splice(0,3);
+                        console.log("responseQueue: ", responseQueue);
                         setCurrResponses(responseQueue.slice(0,3));
                         console.log("currResponses: ", currResponses);
                     }
