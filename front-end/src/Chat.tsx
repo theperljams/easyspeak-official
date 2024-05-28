@@ -75,7 +75,6 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 	}, [finalTranscript, displayResponse, textInput]);
 
 
-
 	const handleUserInputSubmit = () => {
 		console.log('handle User input submit');
 		if (textInput !== '') {
