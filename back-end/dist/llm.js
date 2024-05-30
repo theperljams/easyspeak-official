@@ -54,10 +54,15 @@ const generateResponses = (content, messages, user_id) => __awaiter(void 0, void
         contextStyle = (yield (0, db_1.getSethContext)(yield (0, exports.getEmbedding)(content), 90, 0.0));
         promptType = "2";
     }
-    else if (user_id === "pearl.k.hulbert@gmail.com") {
+    else if (user_id === "pearl.k.hulbert@gmail.com" || user_id === "kcamillealvarado@gmail.com") {
         contextInfo = (yield (0, test_db_1.getContext)(yield (0, exports.getEmbedding)(content), 10, 0.6));
         contextStyle = (yield (0, test_db_1.getContext)(yield (0, exports.getEmbedding)(content), 90, 0.0));
-        promptType = "3";
+        if (user_id === "pearl.k.hulbert@gmail.com") {
+            promptType = "3";
+        }
+        else {
+            promptType = "4";
+        }
     }
     else {
         contextShort = (yield (0, db_1.getContextShort)(yield (0, exports.getEmbedding)(content), user_id));
@@ -152,6 +157,33 @@ ALWAYS DO THIS STEP:
 
 Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
 Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`;
+    const prompt4 = `You are an assistant drafting texts for Camille. Respond to the given content as if you were
+sending a text from Camille's phone. Your goal is to sound as much like them as possible. These texts should reflect Camille's personality and way of speaking
+based on the context provided. The following contextInfo and contextStyle are sample texts between Camille and her friend Pearl. Contine the conversation as if you 
+were responding to another text from Pearl.
+Follow these steps to learn how to do this.
+
+Step 1: contextInfo contains the most relevant texts to the content. Use these for information to respond to Pearl's text.
+
+contextInfo: ${contextInfo}
+
+content: ${content}
+
+Step 2: contextStyle contains the rest of the message history between Camille and Pearl. Look at these to get a sense of Camille's writing style and personality. 
+Use this to help you mimic Camille's voice. Edit your previous response to sound more like Camille based on the two contexts. This step is very important. 
+
+contextStyle: ${contextStyle}
+
+Remember: If the answer is not contained in any either contextInfo or contextStyle or if for any reason you cannot provide a response to the given content, 
+give an 'I don't know' response in Camille's style.
+
+Pearl: ${content}
+Camille:
+
+ALWAYS DO THIS STEP:
+
+Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
+Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`;
     let prompt = '';
     if (promptType === '1') {
         prompt = prompt1;
@@ -161,6 +193,9 @@ Treat them as 3 separate sentences in different contexts. You can use either of 
     }
     else if (promptType === '3') {
         prompt = prompt3;
+    }
+    else if (promptType === '4') {
+        prompt = prompt4;
     }
     const response = yield getChatCompletions(prompt, messages);
     const responseList = parseNumberedList(response);
