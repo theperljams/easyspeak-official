@@ -202,7 +202,9 @@ Treat them as 3 separate sentences in different contexts. You can use either of 
      }
      
     const response: string = await getChatCompletions(prompt, messages);
-    return parseNumberedList(response);
+    const responseList: string[] = parseNumberedList(response);
+    console.log('Response:', responseList);
+    return responseList;
 }
 
 export const generateQuestion = async (user_id: string, messages: string[], chat: string) => {

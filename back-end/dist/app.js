@@ -35,7 +35,6 @@ app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const { content, messages, /*user_id*/ jwt } = req.body;
     const { access_token } = JSON.parse(jwt);
     const { email: user_id } = yield (0, db_1.getUserData)(access_token);
-    console.log(user_id);
     if (!content) {
         return res.status(400).send('Question is required');
     }
@@ -43,6 +42,7 @@ app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // Rotate through hardcoded responses in test mode
         const response = hardcodedResponses[responseCounter % hardcodedResponses.length];
         responseCounter++;
+        console.log('Returning hardcoded response:', response);
         return res.json(response);
     }
     try {

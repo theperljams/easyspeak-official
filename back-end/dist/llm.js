@@ -198,7 +198,9 @@ Treat them as 3 separate sentences in different contexts. You can use either of 
         prompt = prompt4;
     }
     const response = yield getChatCompletions(prompt, messages);
-    return parseNumberedList(response);
+    const responseList = parseNumberedList(response);
+    console.log('Response:', responseList);
+    return responseList;
 });
 exports.generateResponses = generateResponses;
 const generateQuestion = (user_id, messages, chat) => __awaiter(void 0, void 0, void 0, function* () {
