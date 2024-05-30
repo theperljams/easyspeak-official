@@ -23,7 +23,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [question, setQuestion] = useState('');
 	const [currResponses, setCurrResponses] = useState<string[]>([]);
-	const [displayResponse, setDisplayResponse] = useState(false);
+	const [displayResponse, setDisplayResponse] = useState(true);
 
 	const {finalTranscript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
 
@@ -37,7 +37,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 
 	const generateResponses = (newTranscript: string) => {
 		setIsGenerating(true);
-		console.log("generate: ", responseQueue);
+		console.log("responseQueue: ", responseQueue);
 		generateUserResponses(newTranscript, [...messages, { content: newTranscript, role: 'user' }])
 			.then(r => {
 				setResponseQueue(r); // Queue the responses
@@ -51,28 +51,33 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 
 	useEffect(() => {
 		if (finalTranscript) {
+			console.log(finalTranscript);
 			setMessages(prev => [...prev, { content: finalTranscript, role: 'user' }]);
 			setQuestion(finalTranscript);
-			if (responseQueue.length == 0) { 
-				setDisplayResponse(true);
-			}
-			else if (textInput == '') {
-				setDisplayResponse(false);
-			}
-			else {
-				setDisplayResponse(true);
-			}
-			console.log("displayResponse: ", displayResponse);
-			if (displayResponse) {
-				setCurrResponses(responseQueue);
-			}
 			generateResponses(finalTranscript);
 			resetTranscript();
+		}
+	}, [finalTranscript]);
+
+	useEffect(() => {	
+		console.log("responseQueue: ", responseQueue);
+		if (responseQueue.length == 0) { 
+			setDisplayResponse(true);
+		}
+		else if (textInput == '') {
+			setDisplayResponse(false);
+		}
+		else {
+			setDisplayResponse(true);
+		}
+		console.log("displayResponse: ", displayResponse);
+		if (displayResponse) {
+			setCurrResponses(responseQueue);
 		}
 		if (responseQueue.length > 0 && textInput != '') {
 			setCurrResponses(responseQueue);
 		}
-	}, [finalTranscript, displayResponse, textInput]);
+	}, [responseQueue, displayResponse, textInput]);
 
 
 	const handleUserInputSubmit = () => {
