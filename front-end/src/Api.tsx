@@ -126,6 +126,7 @@ export const generateUserResponses = async (question: string, messages: Message[
 			},
 		});
 		const data = await res.json() as string[];
+		console.log(data);
 		return data;
 	}
 	catch (error) {

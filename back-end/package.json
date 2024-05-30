@@ -10,7 +10,8 @@
   ],
   "scripts": {
     "test": "nodemon src/tests/test_app.ts",
-    "start": "TEST_MODE=true nodemon src/app.ts",
+    "start": "nodemon src/app.ts",
+    "start-test": "TEST_MODE=true nodemon src/app.ts",
     "build": "rimraf dist && tsc",
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add dist"
