@@ -3,12 +3,27 @@ import { generateAudio, generateQuestion, generateResponses, getEmbedding } from
 import {getContextAll, getUserData, insertQAPair} from './db';
 
 const app = express();
+const winston = require('winston');
 app.use(express.json());
 app.use(express.static('tmp'));
 const cors = require('cors');
 
 
 app.use(cors());
+
+// const logger = winston.createLogger({
+//   level: 'info',
+//   format: winston.format.combine(
+//     winston.format.colorize(),
+//     winston.format.timestamp(),
+//     winston.format.printf(({ timestamp, level, message }) => {
+//       return `${timestamp} ${level}: ${message}`;
+//     })
+//   ),
+//   transports: [
+//     new winston.transports.Console()
+//   ]
+// });
 
 const isTestMode = process.env.TEST_MODE === 'true';
 
@@ -94,6 +109,12 @@ app.post('/tts', async (req, res) => {
   } catch (error) {
     res.status(500).send('Error calling TTS API');
   }
+});
+
+app.post('/log', (req, res) => {
+  const logMessage: string = req.body.message;
+  console.log(`Client log: ${logMessage}`);
+  res.sendStatus(200);
 });
 
 const PORT = process.env.PORT || 3000;

@@ -135,6 +135,23 @@ export const generateUserResponses = async (question: string, messages: Message[
 	}
 };
 
+export const sendLogToServer = async (logMessage: string) => {
+	try {
+	  const response = await fetch(`${SERVER_URL}/log`, {
+		method: 'POST',
+		headers: {
+		  'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ message: logMessage }),
+	  });
+	  const data = await response.text();
+	  console.log('Log sent successfully:', data);
+	} catch (error) {
+	  console.error('Error sending log:', error);
+	}
+  }
+  
+
 export const signOut = async () => {
 	const { error } = await supabase.auth.signOut();
 };
