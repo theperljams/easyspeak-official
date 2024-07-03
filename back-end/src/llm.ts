@@ -50,7 +50,7 @@ export const generateResponses = async (content: string, messages: string[], use
         contextStyle = (await getSethContext(await getEmbedding(content), 90, 0.0));
         promptType = "2";
     }
-    else if (user_id === "pearl.k.hulbert@gmail.com" || user_id === "kcamillealvarado@gmail.com") {
+    else if (user_id === "pearl.k.hulbert@gmail.com" || user_id === "kcamillealvarado@gmail.com" || user_id === "pearl@easyspeak-aac.com") {
         contextInfo = (await getContext(await getEmbedding(content), 10, 0.6));
         contextStyle = (await getContext(await getEmbedding(content), 90, 0.0));
         if (user_id === "pearl.k.hulbert@gmail.com") {
