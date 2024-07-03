@@ -23,38 +23,56 @@ export function App() {
 	const [messages, setMessage] = useState('');
 	
 	const login = async () => {
-		const response = await signInWithEmail({ body: { email: email, password: password }});
-		
-		if  (response != null) {
+		setError('');
+	  
+		try {
+		  const response = await signInWithEmail({ body: { email, password } });
+		  
+		  if (response.error) {
+			setError(response.error);
+		  } else if (response.data) {
 			supabase.auth.getSession().then(({ data: { session: inSession } }) => {
-				setSession(inSession);
+			  setSession(inSession);
 			});
-		} else {
-			setError('Error Loggin in');
+		  } else {
+			setError('An unexpected error occurred. Please try again.');
+		  }
+		} catch (error) {
+		  console.error('Login error:', error);
+		  setError(error);
 		}
-	};
+	  };
+	  
 	
 	const signup = async () => {
-		if (password != passConfirm) {
-			setError('Passwords must match');
-			return;
-		} else {
-			setMessage('Please check your email for verification');
+		setError('');
+		setMessage('');
+	  
+		if (password !== passConfirm) {
+		  setError('Passwords must match.');
+		  return;
 		}
-		
-		const response = await signUpNewUser({ body: { email: email, password: password }});
-		
-		console.log(response);
-		
-		if (response != null) {
+	  
+		try {
+		  const response = await signUpNewUser({ body: { email, password } });
+		  
+		  if (response.error) {
+			setError(response.error);
+		  } else if (response.data) {
+			setMessage('Please check your email for verification.');
 			supabase.auth.getSession().then(({ data: { session: inSession } }) => {
-				setSession(inSession);
+			  setSession(inSession);
 			});
-		} else {
-			setError('Error Signing Up');
+		  } else {
+			setError('An unexpected error occurred. Please try again.');
+		  }
+		} catch (error) {
+		  console.error('Signup error:', error);
+		  setError(error);
 		}
-	};
+	  };
 
+	  
 	useEffect(() => {
 		supabase.auth.getSession().then(({ data: { session: tempSession } }) => {
 			setSession(tempSession);
