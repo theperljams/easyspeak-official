@@ -29,11 +29,9 @@ Github actions deploys both the front and back-end to Vercel whenever a pull req
 We can deploy into a test environment by merging a pull request into the `test-scroll` branch on the [forked repository](https://github.com/Taylorbrad/easyspeak-official). Use [this](https://easyspeak-frontend-git-test-scroll-taylorbrad.vercel.app) link to view the test deployment (the 'root directory' values will need to be changed in the respective Vercel projects for the deployment to succeed, as noted below in #2)
 
 ## Notes
-1. Environment variables for the website deployment are set in Vercel, in a project owned by Taylor Bradshaw. He will have to log in to change these values. (Teams in Vercel is a paid feature)
+1. When deploying through GitHub Actions, the 'root directory' value in the front and back-end Vercel project settings should be blank. If you are going to deploy to vercel by committing to Taylor's forked repository (any pushes to the main branch on that fork will automatically be seen by vercel and deployed), those values should be changed to 'front-end' and 'back-end' respectively.
 #####
-2. When deploying through GitHub Actions, the 'root directory' value in the front and back-end Vercel project settings should be blank. If you are going to deploy to vercel by committing to Taylor's forked repository (any pushes to the main branch on that fork will automatically be seen by vercel and deployed), those values should be changed to 'front-end' and 'back-end' respectively.
-#####
-3. When deploying when changes have been made to the back-end, you MUST run `npm run build` before you commit the changes. This script converts TypeScript to JS, and we must do this in order to deploy to Vercel, as it does not support TS as far as I understand.
+2. When deploying when changes have been made to the back-end, you MUST run `npm run build` before you commit the changes. This script converts TypeScript to JS, and we must do this in order to deploy to Vercel, as it does not support TS as far as I understand.
 #####
 [//]: # (4. )
 #####
