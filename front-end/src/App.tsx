@@ -19,37 +19,37 @@ export function App() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [passConfirm, setPassConfirm] = useState('');
-	const [error, setError] = useState('');
+	const [errorMessage, setErrorMessage] = useState('');
 	const [messages, setMessage] = useState('');
 	
 	const login = async () => {
-		setError('');
+		setErrorMessage('');
 	  
 		try {
 		  const response = await signInWithEmail({ body: { email, password } });
 		  
 		  if (response.error) {
-			setError(response.error);
+				setErrorMessage(response.error);
 		  } else if (response.data) {
-			supabase.auth.getSession().then(({ data: { session: inSession } }) => {
+				supabase.auth.getSession().then(({ data: { session: inSession } }) => {
 			  setSession(inSession);
-			});
+				});
 		  } else {
-			setError('An unexpected error occurred. Please try again.');
+				setErrorMessage('An unexpected error occurred. Please try again.');
 		  }
 		} catch (error) {
 		  console.error('Login error:', error);
-		  setError(error);
+		  setErrorMessage(error as string);
 		}
 	  };
 	  
 	
 	const signup = async () => {
-		setError('');
+		setErrorMessage('');
 		setMessage('');
 	  
 		if (password !== passConfirm) {
-		  setError('Passwords must match.');
+		  setErrorMessage('Passwords must match.');
 		  return;
 		}
 	  
@@ -57,18 +57,18 @@ export function App() {
 		  const response = await signUpNewUser({ body: { email, password } });
 		  
 		  if (response.error) {
-			setError(response.error);
+				setErrorMessage(response.error);
 		  } else if (response.data) {
-			setMessage('Please check your email for verification.');
-			supabase.auth.getSession().then(({ data: { session: inSession } }) => {
+				setMessage('Please check your email for verification.');
+				supabase.auth.getSession().then(({ data: { session: inSession } }) => {
 			  setSession(inSession);
-			});
+				});
 		  } else {
-			setError('An unexpected error occurred. Please try again.');
+				setErrorMessage('An unexpected error occurred. Please try again.');
 		  }
 		} catch (error) {
 		  console.error('Signup error:', error);
-		  setError(error);
+		  setErrorMessage(error as string);
 		}
 	  };
 
@@ -100,20 +100,20 @@ export function App() {
 			<BrowserRouter>
 				<Routes>
 					<Route path="/" element={<Login 
-						email={email} error={error} 
+						email={email} error={errorMessage} 
 						handleSignIn={login} 
 						password={password} 
 						setEmail={(e) => setEmail(e)} 
-						setError={(e) => setError(e)}
+						setError={(e) => setErrorMessage(e)}
 						setPassword={(e) => setPassword(e)}/>}/>
 					<Route path="/signup" element={<Signup 
 						email={email} 
-						error={error} 
+						error={errorMessage} 
 						handleSignUp={signup} 
 						password={password} 
 						passConfirm={passConfirm} 
 						setEmail={(e) => setEmail(e)} 
-						setError={(e) => setError(e)}
+						setError={(e) => setErrorMessage(e)}
 						setPassword={(e) => setPassword(e)} 
 						setPassConfirm={(e) => setPassConfirm(e)}/>}/>
 				</Routes>

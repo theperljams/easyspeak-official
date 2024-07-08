@@ -7,7 +7,6 @@ import { put } from "@vercel/blob";
 
 import { getContextAll, getContextLong, getContextShort, getSethContext} from './db';
 import {getContext} from './tests/test_db';
-import { get } from 'http';
 
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 const OPENAI_EMBEDDING_URL: string = 'https://api.openai.com/v1/embeddings';

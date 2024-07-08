@@ -54,10 +54,10 @@ const generateResponses = (content, messages, user_id) => __awaiter(void 0, void
         contextStyle = (yield (0, db_1.getSethContext)(yield (0, exports.getEmbedding)(content), 90, 0.0));
         promptType = "2";
     }
-    else if (user_id === "pearl.k.hulbert@gmail.com" || user_id === "kcamillealvarado@gmail.com") {
+    else if (user_id === "pearl.k.hulbert@gmail.com" || user_id === "kcamillealvarado@gmail.com" || user_id === "pearl@easyspeak-aac.com") {
         contextInfo = (yield (0, test_db_1.getContext)(yield (0, exports.getEmbedding)(content), 10, 0.6));
         contextStyle = (yield (0, test_db_1.getContext)(yield (0, exports.getEmbedding)(content), 90, 0.0));
-        if (user_id === "pearl.k.hulbert@gmail.com") {
+        if (user_id === "pearl.k.hulbert@gmail.com" || user_id === "pearl@easyspeak-aac.com") {
             promptType = "3";
         }
         else {

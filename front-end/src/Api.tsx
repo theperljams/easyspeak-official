@@ -22,7 +22,7 @@ interface SignInProps {
 	};
 }
 
-export const signUpNewUser = async (req: SignUpProps): Promise<{ data?: any, error?: string }> => {
+export const signUpNewUser = async (req: SignUpProps): Promise<{ data?: any; error?: string }> => {
 	const { email, password } = req.body;
   
 	if (!email || !password) {
@@ -35,17 +35,17 @@ export const signUpNewUser = async (req: SignUpProps): Promise<{ data?: any, err
   
 	try {
 	  const { data, error } = await supabase.auth.signUp({
-		email: email,
-		password: password,
-		options: {
+			email: email,
+			password: password,
+			options: {
 		  emailRedirectTo: 'https://easyspeak-aac.com/',
-		},
+			},
 	  });
   
 	  if (error) {
-		console.error('Supabase sign-up error:', error.message);
+			console.error('Supabase sign-up error:', error.message);
   
-		return {error: error.message};
+			return {error: error.message};
 	  }
   
 	  return { data };
@@ -53,10 +53,10 @@ export const signUpNewUser = async (req: SignUpProps): Promise<{ data?: any, err
 	  console.error('Unexpected error during sign up:', error);
 	  return { error: 'An unexpected error occurred. Please try again later.' };
 	}
-  };
+};
   
 
-  export const signInWithEmail = async (req: SignInProps): Promise<{ data?: any, error?: string }> => {
+export const signInWithEmail = async (req: SignInProps): Promise<{ data?: any; error?: string }> => {
 	const { email, password } = req.body;
   
 	if (!email || !password) {
@@ -65,14 +65,14 @@ export const signUpNewUser = async (req: SignUpProps): Promise<{ data?: any, err
   
 	try {
 	  const { data, error } = await supabase.auth.signInWithPassword({
-		email: email,
-		password: password,
+			email: email,
+			password: password,
 	  });
   
 	  if (error) {
-		console.error('Supabase sign-in error:', error.message);
+			console.error('Supabase sign-in error:', error.message);
   
-		return {error: error.message};
+			return {error: error.message};
 	  }
   
 	  return { data };
@@ -80,7 +80,7 @@ export const signUpNewUser = async (req: SignUpProps): Promise<{ data?: any, err
 	  console.error('Unexpected error during sign in:', error);
 	  return { error: 'An unexpected error occurred. Please try again later.' };
 	}
-  };
+};
   
 
 
