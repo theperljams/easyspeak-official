@@ -6,7 +6,7 @@ import styles from "./styles/Login.module.css";
 
 interface Props {
 	email: string;
-	error: string;
+	signupError: string;
 	password: string;
 	passConfirm: string;
 	handleSignUp: () => void;
@@ -16,7 +16,7 @@ interface Props {
 	setPassConfirm: (x : string) => void;
 }
 
-export function Signup({ email, error, handleSignUp, password, passConfirm, setEmail, setError, setPassword, setPassConfirm } : Props) {
+export function Signup({ email, signupError, handleSignUp, password, passConfirm, setEmail, setError, setPassword, setPassConfirm } : Props) {
 	const [showPassword, setShowPassword] = useState(false);
 	const [agreed, setAgreed] = useState(false);
 	
@@ -64,7 +64,7 @@ export function Signup({ email, error, handleSignUp, password, passConfirm, setE
 			<div className={styles.options}>
 				<button className={styles.button} onClick={handleSignUp}>Sign Up</button>
 			</div>
-			{ error && <div className={styles.error}>{renderErrorMessage(error)}</div>}
+			{ signupError && <div className={styles.error}>{renderErrorMessage(signupError)}</div>}
 		</div>
 	);
 }

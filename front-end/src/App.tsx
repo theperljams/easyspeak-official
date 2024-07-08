@@ -108,7 +108,7 @@ export function App() {
 						setPassword={(e) => setPassword(e)}/>}/>
 					<Route path="/signup" element={<Signup 
 						email={email} 
-						error={errorMessage} 
+						signupError={errorMessage} 
 						handleSignUp={signup} 
 						password={password} 
 						passConfirm={passConfirm} 
