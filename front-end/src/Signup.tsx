@@ -27,6 +27,10 @@ export function Signup({ email, error, handleSignUp, password, passConfirm, setE
 		setShowPassword(false);
 		setError('');
 	};
+
+	const renderErrorMessage = (error: string) => {
+		return error;
+	};
 	
 	return (
 		<div className={styles.container}>
@@ -60,10 +64,7 @@ export function Signup({ email, error, handleSignUp, password, passConfirm, setE
 			<div className={styles.options}>
 				<button className={styles.button} onClick={handleSignUp}>Sign Up</button>
 			</div>
-			{/* <div className={styles.options}>
-				<button className={styles.button} onClick={handleSignUp}>Sign Up</button>
-			</div> */}
-			{ error && <div className={styles.error}>ERROR SIGNING UP</div>}
+			{ error && <div className={styles.error}>{renderErrorMessage(error)}</div>}
 		</div>
 	);
 }

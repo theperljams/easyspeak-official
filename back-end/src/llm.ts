@@ -7,7 +7,6 @@ import { put } from "@vercel/blob";
 
 import { getContextAll, getContextLong, getContextShort, getSethContext} from './db';
 import {getContext} from './tests/test_db';
-import { get } from 'http';
 
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
 const OPENAI_EMBEDDING_URL: string = 'https://api.openai.com/v1/embeddings';
@@ -53,7 +52,7 @@ export const generateResponses = async (content: string, messages: string[], use
     else if (user_id === "pearl.k.hulbert@gmail.com" || user_id === "kcamillealvarado@gmail.com" || user_id === "pearl@easyspeak-aac.com") {
         contextInfo = (await getContext(await getEmbedding(content), 10, 0.6));
         contextStyle = (await getContext(await getEmbedding(content), 90, 0.0));
-        if (user_id === "pearl.k.hulbert@gmail.com") {
+        if (user_id === "pearl.k.hulbert@gmail.com" || user_id === "pearl@easyspeak-aac.com") {
             promptType = "3";
         }
         else {

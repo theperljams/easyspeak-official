@@ -19,42 +19,60 @@ export function App() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [passConfirm, setPassConfirm] = useState('');
-	const [error, setError] = useState('');
+	const [errorMessage, setErrorMessage] = useState('');
 	const [messages, setMessage] = useState('');
 	
 	const login = async () => {
-		const response = await signInWithEmail({ body: { email: email, password: password }});
-		
-		if  (response != null) {
-			supabase.auth.getSession().then(({ data: { session: inSession } }) => {
-				setSession(inSession);
-			});
-		} else {
-			setError('Error Loggin in');
+		setErrorMessage('');
+	  
+		try {
+		  const response = await signInWithEmail({ body: { email, password } });
+		  
+		  if (response.error) {
+				setErrorMessage(response.error);
+		  } else if (response.data) {
+				supabase.auth.getSession().then(({ data: { session: inSession } }) => {
+			  setSession(inSession);
+				});
+		  } else {
+				setErrorMessage('An unexpected error occurred. Please try again.');
+		  }
+		} catch (error) {
+		  console.error('Login error:', error);
+		  setErrorMessage(error as string);
 		}
-	};
+	  };
+	  
 	
 	const signup = async () => {
-		if (password != passConfirm) {
-			setError('Passwords must match');
-			return;
-		} else {
-			setMessage('Please check your email for verification');
+		setErrorMessage('');
+		setMessage('');
+	  
+		if (password !== passConfirm) {
+		  setErrorMessage('Passwords must match.');
+		  return;
 		}
-		
-		const response = await signUpNewUser({ body: { email: email, password: password }});
-		
-		console.log(response);
-		
-		if (response != null) {
-			supabase.auth.getSession().then(({ data: { session: inSession } }) => {
-				setSession(inSession);
-			});
-		} else {
-			setError('Error Signing Up');
+	  
+		try {
+		  const response = await signUpNewUser({ body: { email, password } });
+		  
+		  if (response.error) {
+				setErrorMessage(response.error);
+		  } else if (response.data) {
+				setMessage('Please check your email for verification.');
+				supabase.auth.getSession().then(({ data: { session: inSession } }) => {
+			  setSession(inSession);
+				});
+		  } else {
+				setErrorMessage('An unexpected error occurred. Please try again.');
+		  }
+		} catch (error) {
+		  console.error('Signup error:', error);
+		  setErrorMessage(error as string);
 		}
-	};
+	  };
 
+	  
 	useEffect(() => {
 		supabase.auth.getSession().then(({ data: { session: tempSession } }) => {
 			setSession(tempSession);
@@ -82,20 +100,20 @@ export function App() {
 			<BrowserRouter>
 				<Routes>
 					<Route path="/" element={<Login 
-						email={email} error={error} 
+						email={email} error={errorMessage} 
 						handleSignIn={login} 
 						password={password} 
 						setEmail={(e) => setEmail(e)} 
-						setError={(e) => setError(e)}
+						setError={(e) => setErrorMessage(e)}
 						setPassword={(e) => setPassword(e)}/>}/>
 					<Route path="/signup" element={<Signup 
 						email={email} 
-						error={error} 
+						error={errorMessage} 
 						handleSignUp={signup} 
 						password={password} 
 						passConfirm={passConfirm} 
 						setEmail={(e) => setEmail(e)} 
-						setError={(e) => setError(e)}
+						setError={(e) => setErrorMessage(e)}
 						setPassword={(e) => setPassword(e)} 
 						setPassConfirm={(e) => setPassConfirm(e)}/>}/>
 				</Routes>

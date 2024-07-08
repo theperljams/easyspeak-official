@@ -22,25 +22,66 @@ interface SignInProps {
 	};
 }
 
-export const signUpNewUser = async (req : SignUpProps) => {
+export const signUpNewUser = async (req: SignUpProps): Promise<{ data?: any; error?: string }> => {
 	const { email, password } = req.body;
-	const { data, error } = await supabase.auth.signUp({
-		email: email,
-		password: password,
-		options: {
-			emailRedirectTo: 'https://easyspeak-aac.com/'
-		}
-	});
+  
+	if (!email || !password) {
+	  return { error: 'Email and password are required.' };
+	}
+  
+	if (password.length < 8) {
+	  return { error: 'Password should be at least 8 characters long.' };
+	}
+  
+	try {
+	  const { data, error } = await supabase.auth.signUp({
+			email: email,
+			password: password,
+			options: {
+		  emailRedirectTo: 'https://easyspeak-aac.com/',
+			},
+	  });
+  
+	  if (error) {
+			console.error('Supabase sign-up error:', error.message);
+  
+			return {error: error.message};
+	  }
+  
+	  return { data };
+	} catch (error) {
+	  console.error('Unexpected error during sign up:', error);
+	  return { error: 'An unexpected error occurred. Please try again later.' };
+	}
 };
+  
 
-export const signInWithEmail = async (req : SignInProps) => {
+export const signInWithEmail = async (req: SignInProps): Promise<{ data?: any; error?: string }> => {
 	const { email, password } = req.body;
-	const response = await supabase.auth.signInWithPassword({
-		email: email,
-		password: password,
-	});
-	console.log(response);
+  
+	if (!email || !password) {
+	  return { error: 'Email and password are required.' };
+	}
+  
+	try {
+	  const { data, error } = await supabase.auth.signInWithPassword({
+			email: email,
+			password: password,
+	  });
+  
+	  if (error) {
+			console.error('Supabase sign-in error:', error.message);
+  
+			return {error: error.message};
+	  }
+  
+	  return { data };
+	} catch (error) {
+	  console.error('Unexpected error during sign in:', error);
+	  return { error: 'An unexpected error occurred. Please try again later.' };
+	}
 };
+  
 
 
 export const sendQuestionAnswerPair = async (content: string, table: string) => {
@@ -131,7 +172,7 @@ export const generateUserResponses = async (question: string, messages: Message[
 		return data;
 	}
 	catch (error) {
-		console.error('error doing this thing');
+		console.error('error generating responses');
 		return [];
 	}
 };

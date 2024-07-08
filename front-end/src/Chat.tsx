@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { Responses } from "./components/Responses.js";
 import { InputBar } from "./components/InputBar.js";
+import { ThreeDot } from "react-loading-indicators";
 
 import styles from "./styles/Chat.module.css";
 import { generateUserAudio, generateUserResponses, sendQuestionAnswerPair } from "./Api.js";
@@ -134,12 +135,18 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 	return (
 		<div className={styles.app}>
 			<div className={styles.container}>
-				<RefreshButton handleRefresh={() => generateResponses(question)}/>
-				<div className={styles.responseView}>
-					<Responses responses={currResponses} setInputText={setTextInput} isGenerating={isGenerating}/>  
+				<div className={styles.loadingIndicator}>
+					{isGenerating ? (
+						<ThreeDot color="#007BFF" size="medium" text="" textColor="" />
+					) : (
+						<RefreshButton handleRefresh={() => generateResponses(question)} />
+					)}
 				</div>
-				<InputBar inputText={textInput} setInput={setTextInput} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsListening={setIsListening} setDisplayResponses={setDisplayResponse}/>
-				<QuickResponses generateUserAudio={generateUserAudio}/>
+				<div className={styles.responseView}>
+					<Responses responses={currResponses} setInputText={setTextInput} isGenerating={isGenerating} />
+				</div>
+				<InputBar inputText={textInput} setInput={setTextInput} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsListening={setIsListening} setDisplayResponses={setDisplayResponse} />
+				<QuickResponses generateUserAudio={generateUserAudio} />
 			</div>
 		</div>
 	);

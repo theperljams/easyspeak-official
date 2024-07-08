@@ -33,7 +33,7 @@ export function Login({ email, error, handleSignIn, password, setEmail, setError
 	return (
 		<div className={styles.container}>
 			<div className={styles.header}>
-				<Link to={'https://easyspeak.framer.website/'} className={styles.title}>EasySpeak</Link>
+				<Link to={'https://www.easyspeakaac.com/'} className={styles.title}>EasySpeak</Link>
 				<div className={styles.signup}>
 					Don't have an account?
 					<Link to={'/signup'}><button onClick={swap}className={styles.signupbutton}>{'Sign Up'}</button></Link>
