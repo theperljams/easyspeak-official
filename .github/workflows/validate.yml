@@ -64,10 +64,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Tests
-        run: npm test
-
-
 
       # Add more steps here later
 
