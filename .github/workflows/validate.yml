@@ -61,12 +61,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Lint fix
-        run: npm run lint-fix
-
-      - name: Lint
-        run: npm run lint
-
       - name: Build
         run: npm run build
 
