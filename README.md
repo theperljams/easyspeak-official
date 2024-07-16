@@ -34,7 +34,7 @@ We can deploy into a test environment by merging a pull request into [another re
 
 ## Notes
 
-1. When deploying to the test environment, the 'root directory' values will need to be changed to 'front-end' and 'back-end' respectively. When deploying to main through GitHub Actions (this happens anytime `main` is committed to), the 'root directory' value in the front and back-end Vercel project settings should be blank, so make sure to reset the values after you've deployed to the test environment. 
+1. When deploying to the test environment, the 'root directory' values in the vercel projects will need to be changed to 'front-end' and 'back-end' respectively. When deploying to main through GitHub Actions (this happens anytime `main` is committed to), the 'root directory' value in the front and back-end Vercel project settings should be blank, so make sure to reset the values after you've deployed to the test environment. 
 #####
 2. When deploying changes to the back-end, you MUST run `npm run build` (in the back-end directory) before you commit the changes. It will not fail to deploy, but it will not update the backend if you don't run the command, it will use old code.<br>
 This script converts TypeScript to JS, and we must do this in order to deploy to Vercel, as it does not support TS as far as I understand.
