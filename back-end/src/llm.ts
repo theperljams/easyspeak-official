@@ -159,7 +159,7 @@ export const generateResponses = async (content: string, messages: string[], use
 // Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
 // Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
 
-const prompt3: string = 'Give me 3 facts about monkeys.'
+const prompt3: string = 'Give me 3 facts about whales.'
 
 const prompt4: string = `You are an assistant drafting texts for Camille. Respond to the given content as if you were
 sending a text from Camille's phone. Your goal is to sound as much like them as possible. These texts should reflect Camille's personality and way of speaking
