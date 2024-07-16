@@ -129,33 +129,35 @@ export const generateResponses = async (content: string, messages: string[], use
      Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
      Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
 
-     const prompt3: string = `You are an assistant drafting texts for Pearl. Respond to the given content as if you were
-     sending a text from Pearl's phone. Your goal is to sound as much like them as possible. These texts should reflect Pearl's personality and way of speaking
-     based on the context provided. The following contextInfo and contextStyle are sample texts between Pearl and her friend Camille. Contine the conversation as if you 
-     were responding to another text from Camille.
-     Follow these steps to learn how to do this.
+//      const prompt3: string = `You are an assistant drafting texts for Pearl. Respond to the given content as if you were
+//      sending a text from Pearl's phone. Your goal is to sound as much like them as possible. These texts should reflect Pearl's personality and way of speaking
+//      based on the context provided. The following contextInfo and contextStyle are sample texts between Pearl and her friend Camille. Contine the conversation as if you 
+//      were responding to another text from Camille.
+//      Follow these steps to learn how to do this.
 
-Step 1: contextInfo contains the most relevant texts to the content. Use these for information to respond to Cammile's text.
+// Step 1: contextInfo contains the most relevant texts to the content. Use these for information to respond to Cammile's text.
 
-contextInfo: ${contextInfo}
+// contextInfo: ${contextInfo}
 
-content: ${content}
+// content: ${content}
 
-Step 2: contextStyle contains the rest of the message history between Pearl and Camille. Look at these to get a sense of Pearl's writing style and personality. 
-Use this to help you mimic Pearl's voice. Edit your previous response to sound more like Pearl based on the two contexts. This step is very important. 
+// Step 2: contextStyle contains the rest of the message history between Pearl and Camille. Look at these to get a sense of Pearl's writing style and personality. 
+// Use this to help you mimic Pearl's voice. Edit your previous response to sound more like Pearl based on the two contexts. This step is very important. 
 
-contextStyle: ${contextStyle}
+// contextStyle: ${contextStyle}
 
-Remember: If the answer is not contained in any either contextInfo or contextStyle or if for any reason you cannot provide a response to the given content, 
-give an 'I don't know' response in Pearl's style.
+// Remember: If the answer is not contained in any either contextInfo or contextStyle or if for any reason you cannot provide a response to the given content, 
+// give an 'I don't know' response in Pearl's style.
 
-Camille: ${content}
-Pearl:
+// Camille: ${content}
+// Pearl:
 
-ALWAYS DO THIS STEP:
+// ALWAYS DO THIS STEP:
 
-Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
-Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
+// Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
+// Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
+
+const prompt3: string = 'Give me 3 facts about monkeys.'
 
 const prompt4: string = `You are an assistant drafting texts for Camille. Respond to the given content as if you were
 sending a text from Camille's phone. Your goal is to sound as much like them as possible. These texts should reflect Camille's personality and way of speaking
