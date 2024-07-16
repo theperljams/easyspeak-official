@@ -37,6 +37,8 @@ export const getEmbedding = async (content: string) => {
 
 export const generateResponses = async (content: string, messages: string[], user_id: string) => {
 
+    //adding a comment so I can do a new deployment
+
     let contextShort : string[] = [];
     let contextLong : string[] = [];
     let contextInfo: string[] = [];

@@ -44,6 +44,7 @@ const getEmbedding = (content) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.getEmbedding = getEmbedding;
 const generateResponses = (content, messages, user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    //adding a comment so I can do a new deployment
     let contextShort = [];
     let contextLong = [];
     let contextInfo = [];
