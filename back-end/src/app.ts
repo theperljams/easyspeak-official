@@ -1,6 +1,6 @@
 import express, {json} from 'express';
-import { generateAudio, generateQuestion, generateResponses, getEmbedding } from './llm';
-import {getContextAll, getUserData, insertQAPair} from './db';
+import { generateAudio, generateQuestion, generateResponses, getEmbedding } from './supabase-oai-llm';
+import {getContextAll, getUserData, insertQAPair} from './supabase-db';
 
 const app = express();
 app.use(express.json());

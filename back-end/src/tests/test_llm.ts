@@ -7,9 +7,9 @@ import { OpenAI } from 'openai';
 import { put } from "@vercel/blob";
 
 // Assuming these functions exist in './db'
-import { getContextAll, getContextShort } from '../db';
+import { getContextAll, getContextShort } from '../supabase-db';
 import { getContext } from './test_db';
-import { getContextLong } from '../db';
+import { getContextLong } from '../supabase-db';
 import { get } from 'http';
 
 const OPENAI_API_KEY: string = process.env.OPENAI_API_KEY!;
