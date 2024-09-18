@@ -245,7 +245,7 @@ const prompt2: string = `You are an assistant drafting texts for ${user_id}. You
 const getChatCompletions = async (prompt: string) => {
     try {
         const response = await axiosInstance.post(OPENAI_CHAT_COMPLETION_URL, {
-            model: "gpt-4-turbo-preview",
+            model: "gpt-4o-mini",
             messages: [{ "role": "system", "content": prompt }],
         });
         

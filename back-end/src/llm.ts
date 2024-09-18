@@ -285,7 +285,7 @@ export const generateAudio = async (content: string) => {
 const getChatCompletions = async (prompt: string, messages: string[]) => {
     try {
         const response = await axiosInstance.post(OPENAI_CHAT_COMPLETION_URL, {
-            model: "gpt-4o",
+            model: "gpt-4o-mini",
             messages: [{ "role": "system", "content": prompt }, ...messages],
         });
         
