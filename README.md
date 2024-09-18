@@ -32,6 +32,13 @@ If deployment fails, Double-check the 'root directory' value in the front and ba
 
 We can deploy into a test environment by merging a pull request into [another repository](https://github.com/Taylorbrad/easyspeak-official), under the `test-scroll` branch (after changing values, noted in #1 below) on the. Use [this](https://easyspeak-frontend-git-test-scroll-taylorbrad.vercel.app) link to view the test deployment
 
+## Troubleshooting Vercel
+If you're having trouble getting your changes to publish:
+
+1. Did you run `npm run build` BEFORE committing?
+2. If you go to the most recent deployment and check the source (three dots -> view source) does everything in the dist directory reflect the changes you made?
+3. Does `node dist/app.js` work locally? 
+
 ## Notes
 
 1. When deploying to the test environment, the 'root directory' values in the vercel projects will need to be changed to 'front-end' and 'back-end' respectively. When deploying to main through GitHub Actions (this happens anytime `main` is committed to), the 'root directory' value in the front and back-end Vercel project settings should be blank, so make sure to reset the values after you've deployed to the test environment. 
