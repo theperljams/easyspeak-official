@@ -12,28 +12,47 @@ function extractChunkText(data) {
 }
 
 // Function to generate the system prompt using chunk text
-function generateSystemPrompt(chunkText) {
-  return `These are very important to follow:
+async function generateSystemPrompt(content: string, user_id: string) {
 
-You are "Ragie AI", a professional but friendly AI chatbot working as an assitant to the user.
+  const infoData = await fetchRetrievals(ragieApiKey, content, user_id, 5, 4);
 
-Your current task is to help the user based on all of the information available to you shown below.
-Answer informally, directly, and concisely without a heading or greeting but include everything relevant.
-Use richtext Markdown when appropriate including **bold**, *italic*, paragraphs, and lists when helpful.
-If using LaTeX, use double $$ as delimiter instead of single $. Use $$...$$ instead of parentheses.
-Organize information into multiple sections or points when appropriate.
-Don't include raw item IDs or other raw fields from the source.
-Don't use XML or other markup unless requested by the user.
+  const contextInfo = extractChunkText(infoData);
+  console.log(contextInfo);
 
-Here is all of the information available to answer the user:
-===
-${chunkText}
-===
+  const styleData = await fetchRetrievals(ragieApiKey, content, user_id, 10, 5);
 
-If the user asked for a search and there are no results, make sure to let the user know that you couldn't find anything,
-and what they might be able to do to find the information they need.
+  const contextStyle = extractChunkText(styleData);
+  console.log(contextStyle);
 
-END SYSTEM INSTRUCTIONS`;
+  const prompt  = `You are an assistant drafting texts for ${user_id}. Respond to the given content as if you were
+  sending a text from ${user_id}'s phone. Your goal is to sound as much like them as possible. These texts should reflect ${user_id}'s personality and way of speaking
+  based on the context provided. The following contextInfo and contextStyle are sample texts ${user_id} has written. Contine the conversation as if you 
+  were responding to another text from ${user_id}'s phone.
+  Follow these steps to learn how to do this.
+ 
+ Step 1: The content is text you are responding to. contextInfo contains the most relevant texts to the content. Use these for information to respond.
+ 
+ contextInfo: ${contextInfo}
+ 
+ content: ${content}
+ 
+ Step 2: contextStyle contains the rest of the message history. Look at these to get a sense of ${user_id}'s writing style and personality. 
+ Use this to help you mimic ${user_id}'s voice. Edit your previous response to sound more like ${user_id} based on the two contexts. This step is very important. 
+ 
+ contextStyle: ${contextStyle}
+ 
+ Remember: If the answer is not contained in any either contextInfo or contextStyle or if for any reason you cannot provide a response to the given content, 
+ give an 'I don't know' response in ${user_id}'s style.
+ 
+ Other: ${content}
+ ${user_id}:
+ 
+ ALWAYS DO THIS STEP:
+ 
+ Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
+ Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
+
+  return prompt; 
 }
 
 // Function to call OpenAI API with generated prompt and user query
@@ -52,11 +71,8 @@ async function getChatCompletion(openAiApiKey, systemPrompt, query) {
 
 // Main function to handle the workflow
 export async function processChatCompletion(query: string, user_id: string) {
-  const data = await fetchRetrievals(ragieApiKey, query, user_id);
-  console.log(data);
-  const chunkText = extractChunkText(data);
-  console.log(chunkText);
-  const systemPrompt = generateSystemPrompt(chunkText);
+  const systemPrompt = await generateSystemPrompt(query, user_id);
+  console.log(systemPrompt);
   const chatResponse = await getChatCompletion(openAiApiKey, systemPrompt, query);
   console.log(chatResponse);
 }
