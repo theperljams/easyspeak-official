@@ -14,43 +14,28 @@ function extractChunkText(data) {
 // Function to generate the system prompt using chunk text
 async function generateSystemPrompt(content: string, user_id: string) {
 
-  const infoData = await fetchRetrievals(ragieApiKey, content, user_id, 5, 4);
-
+  const infoData = await fetchRetrievals(ragieApiKey, content, user_id, 25, 10, false);
+  console.log("contextInfo:", infoData);
   const contextInfo = extractChunkText(infoData);
-  console.log(contextInfo);
 
-  const styleData = await fetchRetrievals(ragieApiKey, content, user_id, 10, 5);
-
-  const contextStyle = extractChunkText(styleData);
-  console.log(contextStyle);
+  // const styleData = await fetchRetrievals(ragieApiKey, content, user_id, 20, 20, false);
+  // console.log("contextStyle:", styleData);
+  // const contextStyle = extractChunkText(styleData);
+  
 
   const prompt  = `You are an assistant drafting texts for ${user_id}. Respond to the given content as if you were
   sending a text from ${user_id}'s phone. Your goal is to sound as much like them as possible. These texts should reflect ${user_id}'s personality and way of speaking
-  based on the context provided. The following contextInfo and contextStyle are sample texts ${user_id} has written. Contine the conversation as if you 
+  based on the context provided. The following context is a sample of ${user_id}'s text conversations. Contine the conversation as if you 
   were responding to another text from ${user_id}'s phone.
-  Follow these steps to learn how to do this.
- 
- Step 1: The content is text you are responding to. contextInfo contains the most relevant texts to the content. Use these for information to respond.
- 
- contextInfo: ${contextInfo}
- 
- content: ${content}
- 
- Step 2: contextStyle contains the rest of the message history. Look at these to get a sense of ${user_id}'s writing style and personality. 
- Use this to help you mimic ${user_id}'s voice. Edit your previous response to sound more like ${user_id} based on the two contexts. This step is very important. 
- 
- contextStyle: ${contextStyle}
- 
- Remember: If the answer is not contained in any either contextInfo or contextStyle or if for any reason you cannot provide a response to the given content, 
- give an 'I don't know' response in ${user_id}'s style.
- 
- Other: ${content}
- ${user_id}:
- 
- ALWAYS DO THIS STEP:
- 
- Step 3: Now, take your previous response and come up with 2 other possible responses with different tones to the given question and format them as a numbered list like so: 1. \n 2. \n 3.  
- Treat them as 3 separate sentences in different contexts. You can use either of the previous datasets for help with this.`
+  
+  Here is the text you are responding to: ${content}
+
+  Here are the samples: ${contextInfo}
+
+  Craft a numbered list of 3 different responses in different contexts. Imitate ${user_id}'s style as shown in their sample texts. Pay attention to details such as common phrases they use,
+   anything that looks like it could be an inside joke, or anything else that makes their style distinct.
+ DO NOT share any information not contained in the samples. If there is a text you don't know how to 
+  respond to based on the samples, give 3 different "I don't know" responses that sound like something ${user_id} would say. You should ONLY rely on information that you know ${user_id} knows.`;
 
   return prompt; 
 }
@@ -72,7 +57,6 @@ async function getChatCompletion(openAiApiKey, systemPrompt, query) {
 // Main function to handle the workflow
 export async function processChatCompletion(query: string, user_id: string) {
   const systemPrompt = await generateSystemPrompt(query, user_id);
-  console.log(systemPrompt);
   const chatResponse = await getChatCompletion(openAiApiKey, systemPrompt, query);
   console.log(chatResponse);
 }

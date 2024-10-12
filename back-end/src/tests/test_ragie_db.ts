@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import fetch from 'node-fetch';
 
 
-export async function fetchRetrievals(apiKey: string, content: string, user_id: string, top_k: number, max_chunks: number) {
+export async function fetchRetrievals(apiKey: string, content: string, user_id: string, top_k: number, max_chunks: number, rerank: boolean) {
     try {
       const response = await fetch("https://api.ragie.ai/retrievals", {
         method: "POST",
@@ -16,7 +16,7 @@ export async function fetchRetrievals(apiKey: string, content: string, user_id: 
           "filter": {
             "user": user_id,
           },
-          "rerank": false,
+          "rerank": rerank,
           "max_chunks_per_document": max_chunks
         }),
       });
