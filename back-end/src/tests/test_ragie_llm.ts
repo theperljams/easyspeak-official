@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 import { fetchRetrievals } from './test_ragie_db';
 import OpenAI from 'openai';
+import { getContextLong } from '../supabase-db';
+import { getEmbedding } from '../supabase-oai-llm'
 
 dotenv.config();
 
@@ -14,8 +16,10 @@ function extractChunkText(data) {
 // Function to generate the system prompt using chunk text
 async function generateSystemPrompt(content: string, user_id: string) {
 
+  const currContext = await getContextLong(await getEmbedding(content), "pearl.k.hulbert@gmail.com");
+
   const infoData = await fetchRetrievals(ragieApiKey, content, user_id, 25, 10, false);
-  console.log("contextInfo:", infoData);
+  // console.log("contextInfo:", infoData);
   const contextInfo = extractChunkText(infoData);
 
   // const styleData = await fetchRetrievals(ragieApiKey, content, user_id, 20, 20, false);
@@ -30,12 +34,14 @@ async function generateSystemPrompt(content: string, user_id: string) {
   
   Here is the text you are responding to: ${content}
 
-  Here are the samples: ${contextInfo}
+  Here are the samples: ${currContext} ${contextInfo}
 
   Craft a numbered list of 3 different responses in different contexts. Imitate ${user_id}'s style as shown in their sample texts. Pay attention to details such as common phrases they use,
    anything that looks like it could be an inside joke, or anything else that makes their style distinct.
  DO NOT share any information not contained in the samples. If there is a text you don't know how to 
   respond to based on the samples, give 3 different "I don't know" responses that sound like something ${user_id} would say. You should ONLY rely on information that you know ${user_id} knows.`;
+
+  console.log(prompt);
 
   return prompt; 
 }

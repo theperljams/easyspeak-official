@@ -177,6 +177,17 @@ export const generateUserResponses = async (question: string, messages: Message[
 	}
 };
 
+export const getLatestMessage = async () => {
+	try {
+		const res = await fetch(`${SERVER_URL}/get-latest-message`);
+		const data = await res.json();
+		return data;
+	}
+	catch (error) {
+		console.error('Error fetching latest message:', error);
+	}
+};
+
 export const signOut = async () => {
 	const { error } = await supabase.auth.signOut();
 };
