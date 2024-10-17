@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
-import { getEmbedding } from './supabase-oai-llm';
+import { getEmbedding } from './llm';
 
 dotenv.config();
 

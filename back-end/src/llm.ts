@@ -2,12 +2,35 @@ import dotenv from 'dotenv';
 import { fetchRetrievals } from './tests/test_ragie_db';
 import OpenAI from 'openai';
 import { getContextConversation } from './supabase-db';
-import { getEmbedding } from './supabase-oai-llm'
+import axios, { AxiosInstance } from 'axios';
 
 dotenv.config();
 
 const ragieApiKey = process.env.RAGIE_API_KEY;
 const openAiApiKey = process.env.OPENAI_API_KEY;
+const OPENAI_EMBEDDING_URL: string = 'https://api.openai.com/v1/embeddings';
+
+const axiosInstance: AxiosInstance = axios.create({
+  headers: {
+      'Authorization': `Bearer ${openAiApiKey}`,
+      'Content-Type': 'application/json',
+  },
+});
+
+
+export const getEmbedding = async (content: string) => {
+  try {
+      const response = await axiosInstance.post(OPENAI_EMBEDDING_URL, {
+          model: "text-embedding-ada-002",
+          input: content,
+          encoding_format: "float",
+      });
+      return response.data.data[0].embedding;
+  } catch (error: any) {
+      console.error('Error in getEmbedding:', error);
+      throw error;
+  }
+}
 
 function extractChunkText(data) {
   return data.scored_chunks.map((chunk) => chunk.text);
@@ -18,8 +41,8 @@ async function generateSystemPrompt(content: string, user_id: string) {
 
   const currContext = await getContextConversation(await getEmbedding(content), "pearl@easyspeak-aac.com");
 
-  const infoData = await fetchRetrievals(ragieApiKey, content, user_id, 25, 10, false);
-  // console.log("contextInfo:", infoData);
+  const infoData = await fetchRetrievals(ragieApiKey, content, "pearl@easyspeak-aac.com", 25, 10, false);
+  console.log("contextInfo:", infoData);
   const contextInfo = extractChunkText(infoData);
 
   // const styleData = await fetchRetrievals(ragieApiKey, content, user_id, 20, 20, false);

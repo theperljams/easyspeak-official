@@ -5,7 +5,6 @@ import http, { get } from 'http';
 import { Server } from 'socket.io';
 import { processChatCompletion } from './llm'; 
 import { insertQAPair } from './supabase-db';
-import { getEmbedding } from './supabase-oai-llm';
 
 dotenv.config();
 
