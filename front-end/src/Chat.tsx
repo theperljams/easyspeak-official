@@ -39,6 +39,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 	const generateResponses = (newTranscript: string) => {
 		setIsGenerating(true);
 		console.log("responseQueue: ", responseQueue);
+		console.log("messages: ", messages);
 		generateUserResponses(newTranscript, [...messages, { content: newTranscript, role: 'user' }])
 			.then(r => {
 				setResponseQueue(r); // Queue the responses

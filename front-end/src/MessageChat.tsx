@@ -1,63 +1,89 @@
+// src/MessageChat.js
+
 import { useState, useEffect } from "react";
-import axios from 'axios';
 import { Responses } from "./components/Responses.js";
 import { ThreeDot } from "react-loading-indicators";
 import styles from "./styles/Chat.module.css";
-import { generateUserResponses } from "./Api.js";
+import { generateUserAudio, generateUserResponses, getLatestMessage, submitSelectedResponse } from "./Api.js";
 import type { Message } from "./components/Interfaces.js";
 import { RefreshButton } from "./components/RefreshButton.js";
+import { InputBar } from "./components/InputBar.js";
+import QuickResponses from "./components/QuickResponses.js";
+import io from 'socket.io-client'; // Import Socket.IO client
 
 interface Props {
   messageHistory: Message[];
   setMessageHistory: (x: Message[]) => void;
 }
 
-export function Chat({ messageHistory, setMessageHistory }: Props) {
-  const [latestMessage, setLatestMessage] = useState('');
-  const [latestMessageId, setLatestMessageId] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
+export function MessageChat({ messageHistory, setMessageHistory }: Props) {
+  const [textInput, setTextInput] = useState('');
+  const [audioURL, setAudioURL] = useState<string | null>(null);
   const [responseQueue, setResponseQueue] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [question, setQuestion] = useState('');
   const [currResponses, setCurrResponses] = useState<string[]>([]);
   const [displayResponse, setDisplayResponse] = useState(true);
-
-  const generateResponses = (newMessage: string) => {
-    setIsGenerating(true);
-    generateUserResponses(newMessage, [...messages, { content: newMessage, role: 'client' }])
-      .then(r => {
-        setResponseQueue(r);
-        setIsGenerating(false);
-      })
-      .catch(error => {
-        console.error('Error generating responses:', error);
-        setIsGenerating(false);
-      });
-  };
+  const [latestMessage, setLatestMessage] = useState('');
+  const [latestMessageId, setLatestMessageId] = useState('');
+  const [isListening, setIsListening] = useState(true);
+  const [status, setStatus] = useState('');
 
   useEffect(() => {
-    const fetchLatestMessage = () => {
-      axios.get('http://localhost:3000/get-latest-message')
-        .then(response => {
-          const { message, message_id } = response.data;
-          if (message && message_id && message_id !== latestMessageId) {
-            setLatestMessage(message);
-            setLatestMessageId(message_id);
-            setQuestion(message);
-            setMessages(prev => [...prev, { content: message, role: 'client' }]);
-            generateResponses(message);
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching latest message:', error);
-        });
+    // Initialize Socket.IO client for Front End namespace
+    const socket = io('http://localhost:3000/frontend'); // Connect to '/frontend' namespace
+
+    // Listen for 'responsesGenerated' event from Back End
+    socket.on('responsesGenerated', (data) => {
+      const { message_id, responses } = data;
+      setLatestMessageId(message_id);
+      setCurrResponses(responses);
+      setStatus('New responses received.');
+      console.log('Received responsesGenerated:', data);
+    });
+
+    // Listen for acknowledgments and errors
+    socket.on('ack', (data) => {
+      setStatus(data.message);
+      console.log('Acknowledgment from server:', data);
+    });
+
+    socket.on('responseSubmitted', (data) => {
+      setStatus(data.message);
+      console.log('Response submitted:', data);
+    });
+
+    socket.on('error', (data) => {
+      setStatus(`Error: ${data.error}`);
+      console.error('Socket.IO error:', data);
+    });
+
+    // Handle disconnection
+    socket.on('disconnect', () => {
+      console.log('Disconnected from Back End');
+    });
+
+    // Cleanup on unmount
+    return () => {
+      socket.disconnect();
     };
+  }, []);
 
-    fetchLatestMessage();
-    const intervalId = setInterval(fetchLatestMessage, 5000);
-
-    return () => clearInterval(intervalId);
-  }, [latestMessageId]);
+  const handleResponseSelection = () => {
+    console.log('Selected response:', textInput);
+    if (textInput) {
+      const socket = io('http://localhost:3000/frontend'); // Connect to '/frontend' namespace
+      socket.emit('submitSelectedResponse', {
+        message_id: latestMessageId,
+        selected_response: textInput,
+      });
+      setStatus('Selected response submitted.');
+      setCurrResponses([]);
+      setLatestMessageId('');
+      socket.disconnect(); // Disconnect after emitting
+      console.log('Emitted submitSelectedResponse:', { message_id: latestMessageId, selected_response: textInput});
+    }
+  };
 
   useEffect(() => {
     if (responseQueue.length > 0) {
@@ -68,10 +94,6 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
     }
   }, [responseQueue]);
 
-  useEffect(() => {
-    setMessageHistory(messages);
-  }, [messages]);
-
   return (
     <div className={styles.app}>
       <div className={styles.container}>
@@ -79,18 +101,22 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
           {isGenerating ? (
             <ThreeDot color="#007BFF" size="medium" text="" textColor="" />
           ) : (
-            <RefreshButton handleRefresh={() => generateResponses(question)} />
+            <RefreshButton handleRefresh={() => {/* Optional: Implement refresh logic */}} />
           )}
         </div>
         <div className={styles.responseView}>
-          {displayResponse && (
-            <Responses
-              responses={currResponses}
-              handleUserInputSubmit={handleUserInputSubmit}
-              isGenerating={isGenerating}
-            />
-          )}
+          <Responses responses={currResponses} setInputText={setTextInput} isGenerating={isGenerating} />
         </div>
+        <InputBar
+          inputText={textInput}
+          setInput={setTextInput}
+          handleSubmitInput={handleResponseSelection}
+          audioURL={audioURL}
+          setIsListening={setIsListening}
+          setDisplayResponses={setDisplayResponse}
+        />
+        <QuickResponses generateUserAudio={generateUserAudio} />
+        {status && <p className={styles.status}>{status}</p>}
       </div>
     </div>
   );

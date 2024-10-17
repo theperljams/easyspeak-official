@@ -177,9 +177,16 @@ export const generateUserResponses = async (question: string, messages: Message[
 	}
 };
 
+
 export const getLatestMessage = async () => {
 	try {
-		const res = await fetch(`${SERVER_URL}/get-latest-message`);
+		const res = await fetch(`${SERVER_URL}/get-latest-message`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'accept': 'application/json',
+			},
+		});
 		const data = await res.json();
 		return data;
 	}
@@ -187,6 +194,21 @@ export const getLatestMessage = async () => {
 		console.error('Error fetching latest message:', error);
 	}
 };
+
+export const submitSelectedResponse = async (message_id: string, selected_response: string) => {
+	try {
+		await fetch(`${SERVER_URL}/submit-selected-response`, {
+			method: 'POST',
+			body: JSON.stringify({ message_id: message_id, selected_response: selected_response }),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+	}
+	catch (error) {
+		console.error('Error submitting selected response:', error);
+	}
+}
 
 export const signOut = async () => {
 	const { error } = await supabase.auth.signOut();

@@ -9,6 +9,7 @@ import {Dash} from './Dash';
 
 import { IoIosArrowForward } from "react-icons/io";
 import type { Message } from './components/Interfaces';
+import { MessageChat } from './MessageChat';
 
 export function Home() {
 
@@ -32,6 +33,7 @@ export function Home() {
 			{ showNav && <Navbar setScreen={setScreen} setShowNav={() => setShowNav(false)}/> } 
 			{ !showNav && <div className={styles.close} onClick={() => setShowNav(true)}><IoIosArrowForward size={45}/></div>}
 			{/* { screen == 0 && <Test messageHistory={messages ? messages : []} setMessageHistory={setMesssages}/>} */}
+			{ screen == 0 && <MessageChat/>} 
 			{ screen == 1 && <Chat messageHistory={messages ? messages : []} setMessageHistory={setMesssages}/> }
 			{/* { screen == 2 && <Training/> } */}
 		</div>
