@@ -11,6 +11,7 @@
   "scripts": {
     "test": "nodemon src/test_app.ts",
     "start": "nodemon src/app.ts",
+    "debug": "export DEBUG=socket.io:*; nodemon src/test_app.ts",
     "start-test": "TEST_MODE=true nodemon src/app.ts",
     "build": "rimraf dist && tsc",
     "ts.check": "tsc --project tsconfig.json",

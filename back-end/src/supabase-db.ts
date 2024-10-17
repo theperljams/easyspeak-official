@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import { getEmbedding } from './supabase-oai-llm';
 
 dotenv.config();
 
@@ -16,8 +17,9 @@ const SIMILARITY_THRESHOLD = 0.1;
 const MATCH_COUNT = 50;
 
 
-export const insertQAPair = async (user_id: string, content: string, embedding: number[], table_name: string) => {
+export const insertQAPair = async (user_id: string, content: string,  table_name: string) => {
   console.log(table_name);
+  let embedding = await getEmbedding(content);
   try {
     await supabase.from(table_name).insert({
       user_id,
@@ -91,9 +93,9 @@ export const getContextLong = async (embedding: number[], user_id: string) => {
   }
 }
 
-export const getContextShort = async (embedding: number[], user_id: string) => {
+export const getContextConversation = async (embedding: number[], user_id: string) => {
   try {
-    const { data, error } = await supabase.rpc('match_short', {
+    const { data, error } = await supabase.rpc('match_conversations', {
       match_count: MATCH_COUNT,
       query_embedding: embedding,
       similarity_threshold: SIMILARITY_THRESHOLD,

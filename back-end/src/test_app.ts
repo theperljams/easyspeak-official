@@ -1,15 +1,18 @@
-// server.js
-
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import http from 'http';
+import http, { get } from 'http';
 import { Server } from 'socket.io';
-// import { processChatCompletion } from './llm'; // Uncomment when implementing response generation
+import { processChatCompletion } from './llm'; 
+import { insertQAPair } from './supabase-db';
+import { getEmbedding } from './supabase-oai-llm';
 
 dotenv.config();
 
 const app = express();
+
+// At the very top of server.js
+process.env.DEBUG = 'socket.io:*';
 
 // Middleware
 app.use(cors());
@@ -30,59 +33,34 @@ const io = new Server(server, {
 const messagingNamespace = io.of('/messaging'); // For Messaging Client
 const frontendNamespace = io.of('/frontend');   // For Front End
 
-// In-memory storage for messages
-const messages = new Map();
-
 // Handle connections in the Messaging namespace
 messagingNamespace.on('connection', (socket) => {
   console.log(`Messaging Client connected: ${socket.id}`);
 
   socket.on('newMessage', async (data) => {
-    const { content, user_id, message_id } = data;
+    const { content, user_id } = data;
 
     // Input validation
-    if (!content || !user_id || !message_id) {
-      socket.emit('error', { error: 'Missing "content", "user_id", or "message_id".' });
-      return;
-    }
-
-    // Check for duplicate message_id
-    if (messages.has(message_id)) {
-      socket.emit('error', { error: 'Duplicate "message_id".' });
+    if (!content || !user_id) {
+      socket.emit('error', { error: 'Missing "content" or "user_id".' });
       return;
     }
 
     try {
-      // Stub for response generation
-      const generatedResponses = [
-        'This is a stubbed response 1.',
-        'This is a stubbed response 2.',
-        'This is a stubbed response 3.'
-      ];
 
-      // Uncomment and implement the following when ready
-      // const generatedResponses = await processChatCompletion(content, user_id);
+      const generatedResponses = await processChatCompletion(content, user_id);
 
       if (!generatedResponses || generatedResponses.length === 0) {
         socket.emit('error', { error: 'Failed to generate responses.' });
         return;
       }
 
-      // Store the message and its generated responses in-memory
-      messages.set(message_id, {
-        content,
-        user_id,
-        generated_responses: generatedResponses,
-        selected_response: null,
-        created_at: new Date(),
-      });
-
-      console.log(`Generated responses for message_id ${message_id}:`, generatedResponses);
+      console.log(`Generated responses:`, generatedResponses);
 
       // Emit 'responsesGenerated' to Front End namespace only
       frontendNamespace.emit('responsesGenerated', {
-        message_id,
         responses: generatedResponses,
+        curMessage: content
       });
 
       // Acknowledge the Messaging Client
@@ -102,57 +80,44 @@ messagingNamespace.on('connection', (socket) => {
 frontendNamespace.on('connection', (socket) => {
   console.log(`Front End connected: ${socket.id}`);
 
-  socket.emit('ack', { message: 'Connected to Back End.' });
+  socket.on('ack', (data) => { 
+    console.log(data); 
+  });
+
+  // socket.emit('ack', { message: 'Connected to Back End.' });
 
   socket.on('submitSelectedResponse', (data) => {
-    console.log("made it here");
-    const { message_id, selected_response } = data;
+    const { selected_response, currMessage } = data;
 
     console.log("Message received: ", data);
 
     // Input validation
-    if (!message_id || !selected_response) {
-      socket.emit('error', { error: 'Missing "message_id" or "selected_response".' });
+    if (!selected_response) {
+      socket.emit('error', { error: 'Missing "selected_response".' });
       return;
     }
 
-    // Check if the message exists
-    if (!messages.has(message_id)) {
-      socket.emit('error', { error: 'Message not found.' });
-      return;
-    }
-
-    const message = messages.get(message_id);
-
-    // Check if a response has already been selected
-    if (message.selected_response) {
-      socket.emit('error', { error: 'A response has already been selected for this message.' });
-      return;
-    }
-
-    // Validate that the selected_response is one of the generated_responses
-    if (!message.generated_responses.includes(selected_response)) {
-      socket.emit('error', { error: 'Selected response is not valid.' });
-      return;
-    }
-
-    // Update the message with the selected response
-    message.selected_response = selected_response;
-    messages.set(message_id, message);
-
-    console.log(`Selected response for message_id ${message_id}: ${selected_response}`);
+    console.log(`Selected response: ${selected_response}`);
 
     // Acknowledge the Front End
     socket.emit('responseSubmitted', { message: 'Selected response submitted successfully.' });
-    console.log("Message sent: ", message.selected_response);
-    // Optional: Notify Messaging Client or perform additional actions (e.g., send response back via Slack)
+    console.log("Message sent: ", selected_response);
+
+    // Emit the selected response to the /messaging namespace
+    messagingNamespace.emit('sendSelectedResponse', {
+      'selected_response': selected_response
+    });
+
+    let QAPair: string = `message:${currMessage} response:${selected_response}`; 
+    insertQAPair("pearl@easyspeak-aac.com" , QAPair, "conversations");
+    console.log("QAPair: ", QAPair);
+
   });
 
   socket.on('disconnect', () => {
     console.log(`Front End disconnected: ${socket.id}`);
   });
 });
-
 // Start the server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

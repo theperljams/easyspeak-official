@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { fetchRetrievals } from './tests/test_ragie_db';
 import OpenAI from 'openai';
-import { getContextLong } from './supabase-db';
+import { getContextConversation } from './supabase-db';
 import { getEmbedding } from './supabase-oai-llm'
 
 dotenv.config();
@@ -16,7 +16,7 @@ function extractChunkText(data) {
 // Function to generate the system prompt using chunk text
 async function generateSystemPrompt(content: string, user_id: string) {
 
-  const currContext = await getContextLong(await getEmbedding(content), "pearl.k.hulbert@gmail.com");
+  const currContext = await getContextConversation(await getEmbedding(content), "pearl@easyspeak-aac.com");
 
   const infoData = await fetchRetrievals(ragieApiKey, content, user_id, 25, 10, false);
   // console.log("contextInfo:", infoData);

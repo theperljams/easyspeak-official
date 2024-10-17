@@ -1,10 +1,8 @@
-// src/MessageChat.js
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Responses } from "./components/Responses.js";
 import { ThreeDot } from "react-loading-indicators";
 import styles from "./styles/Chat.module.css";
-import { generateUserAudio, generateUserResponses, getLatestMessage, submitSelectedResponse } from "./Api.js";
+import { generateUserAudio } from "./Api.js";
 import type { Message } from "./components/Interfaces.js";
 import { RefreshButton } from "./components/RefreshButton.js";
 import { InputBar } from "./components/InputBar.js";
@@ -21,67 +19,66 @@ export function MessageChat({ messageHistory, setMessageHistory }: Props) {
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [responseQueue, setResponseQueue] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [question, setQuestion] = useState('');
   const [currResponses, setCurrResponses] = useState<string[]>([]);
   const [displayResponse, setDisplayResponse] = useState(true);
-  const [latestMessage, setLatestMessage] = useState('');
-  const [latestMessageId, setLatestMessageId] = useState('');
   const [isListening, setIsListening] = useState(true);
   const [status, setStatus] = useState('');
+  const [message, setMessage] = useState('');
+
+  // useRef to store the socket instance
+  const socketRef = useRef<any>(null);
 
   useEffect(() => {
-    // Initialize Socket.IO client for Front End namespace
-    const socket = io('http://localhost:3000/frontend'); // Connect to '/frontend' namespace
+    // Initialize Socket.IO client for Front End namespace only once
+    socketRef.current = io('http://localhost:3000/frontend'); // Connect to '/frontend' namespace
 
     // Listen for 'responsesGenerated' event from Back End
-    socket.on('responsesGenerated', (data) => {
-      const { message_id, responses } = data;
-      setLatestMessageId(message_id);
+    socketRef.current.on('responsesGenerated', (data) => {
+      const { responses, currMessage } = data;
       setCurrResponses(responses);
+      setMessage(currMessage);
       setStatus('New responses received.');
       console.log('Received responsesGenerated:', data);
     });
 
     // Listen for acknowledgments and errors
-    socket.on('ack', (data) => {
+    socketRef.current.on('ack', (data) => {
       setStatus(data.message);
       console.log('Acknowledgment from server:', data);
     });
 
-    socket.on('responseSubmitted', (data) => {
+    socketRef.current.on('responseSubmitted', (data) => {
       setStatus(data.message);
       console.log('Response submitted:', data);
     });
 
-    socket.on('error', (data) => {
+    socketRef.current.on('error', (data) => {
       setStatus(`Error: ${data.error}`);
       console.error('Socket.IO error:', data);
     });
 
     // Handle disconnection
-    socket.on('disconnect', () => {
+    socketRef.current.on('disconnect', () => {
       console.log('Disconnected from Back End');
     });
 
     // Cleanup on unmount
     return () => {
-      socket.disconnect();
+      socketRef.current.disconnect();
     };
   }, []);
 
   const handleResponseSelection = () => {
     console.log('Selected response:', textInput);
     if (textInput) {
-      const socket = io('http://localhost:3000/frontend'); // Connect to '/frontend' namespace
-      socket.emit('submitSelectedResponse', {
-        message_id: latestMessageId,
+      // Use the existing socket connection to emit the event
+      socketRef.current.emit('submitSelectedResponse', {
         selected_response: textInput,
+        currMessage: message
       });
       setStatus('Selected response submitted.');
       setCurrResponses([]);
-      setLatestMessageId('');
-      socket.disconnect(); // Disconnect after emitting
-      console.log('Emitted submitSelectedResponse:', { message_id: latestMessageId, selected_response: textInput});
+      console.log('Emitted submitSelectedResponse:', { selected_response: textInput });
     }
   };
 
@@ -115,8 +112,6 @@ export function MessageChat({ messageHistory, setMessageHistory }: Props) {
           setIsListening={setIsListening}
           setDisplayResponses={setDisplayResponse}
         />
-        <QuickResponses generateUserAudio={generateUserAudio} />
-        {status && <p className={styles.status}>{status}</p>}
       </div>
     </div>
   );
