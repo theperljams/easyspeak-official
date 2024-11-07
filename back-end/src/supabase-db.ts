@@ -17,11 +17,12 @@ const SIMILARITY_THRESHOLD = 0.1;
 const MATCH_COUNT = 50;
 
 
-export const insertQAPair = async (user_id: string, content: string,  table_name: string) => {
+export const insertQAPair = async (user_id: string, content: string,  table_name: string, timestamp: number) => {
   console.log(table_name);
   let embedding = await getEmbedding(content);
   try {
     await supabase.from(table_name).insert({
+      timestamp,
       user_id,
       content,
       embedding

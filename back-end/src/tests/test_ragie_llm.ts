@@ -41,7 +41,7 @@ async function generateSystemPrompt(content: string, user_id: string) {
  DO NOT share any information not contained in the samples. If there is a text you don't know how to 
   respond to based on the samples, give 3 different "I don't know" responses that sound like something ${user_id} would say. You should ONLY rely on information that you know ${user_id} knows.`;
 
-  console.log(prompt);
+  // console.log(prompt);
 
   return prompt; 
 }

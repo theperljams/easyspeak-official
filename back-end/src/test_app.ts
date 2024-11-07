@@ -37,7 +37,8 @@ messagingNamespace.on('connection', (socket) => {
   console.log(`Messaging Client connected: ${socket.id}`);
 
   socket.on('newMessage', async (data) => {
-    const { content, user_id } = data;
+    const { content, timestamp, user_id } = data;
+    console.log("content and user id ", data);
 
     // Input validation
     if (!content || !user_id) {
@@ -59,7 +60,8 @@ messagingNamespace.on('connection', (socket) => {
       // Emit 'responsesGenerated' to Front End namespace only
       frontendNamespace.emit('responsesGenerated', {
         responses: generatedResponses,
-        curMessage: content
+        currMessage: content,
+        messageTimestamp: timestamp
       });
 
       // Acknowledge the Messaging Client
@@ -86,7 +88,7 @@ frontendNamespace.on('connection', (socket) => {
   // socket.emit('ack', { message: 'Connected to Back End.' });
 
   socket.on('submitSelectedResponse', (data) => {
-    const { selected_response, currMessage } = data;
+    const { selected_response, currMessage, messageTimestamp } = data;
 
     console.log("Message received: ", data);
 
@@ -97,6 +99,7 @@ frontendNamespace.on('connection', (socket) => {
     }
 
     console.log(`Selected response: ${selected_response}`);
+    console.log(`Current message: ${currMessage}`);
 
     // Acknowledge the Front End
     socket.emit('responseSubmitted', { message: 'Selected response submitted successfully.' });
@@ -107,8 +110,17 @@ frontendNamespace.on('connection', (socket) => {
       'selected_response': selected_response
     });
 
-    let QAPair: string = `message:${currMessage} response:${selected_response}`; 
-    insertQAPair("pearl@easyspeak-aac.com" , QAPair, "conversations");
+    let QAPair: string = "";
+
+    if (!currMessage) {
+      QAPair = `started conversation with: ${selected_response}`;
+    }
+    else {
+      QAPair = `message:${currMessage} response:${selected_response}`; 
+    }
+
+    
+    insertQAPair("pearl@easyspeak-aac.com", QAPair, "pearl_message_test", messageTimestamp);
     console.log("QAPair: ", QAPair);
 
   });

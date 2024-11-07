@@ -40,9 +40,10 @@ function extractChunkText(data) {
 async function generateSystemPrompt(content: string, user_id: string) {
 
   const currContext = await getContextConversation(await getEmbedding(content), "pearl@easyspeak-aac.com");
+  // console.log("currContext:", currContext);
 
   const infoData = await fetchRetrievals(ragieApiKey, content, "pearl@easyspeak-aac.com", 25, 10, false);
-  console.log("contextInfo:", infoData);
+  // console.log("contextInfo:", infoData);
   const contextInfo = extractChunkText(infoData);
 
   // const styleData = await fetchRetrievals(ragieApiKey, content, user_id, 20, 20, false);
@@ -64,7 +65,7 @@ async function generateSystemPrompt(content: string, user_id: string) {
  DO NOT share any information not contained in the samples. If there is a text you don't know how to 
   respond to based on the samples, give 3 different "I don't know" responses that sound like something ${user_id} would say. You should ONLY rely on information that you know ${user_id} knows.`;
 
-  console.log(prompt);
+  // console.log(prompt);
 
   return prompt; 
 }

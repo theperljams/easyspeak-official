@@ -24,6 +24,7 @@ export function MessageChat({ messageHistory, setMessageHistory }: Props) {
   const [isListening, setIsListening] = useState(true);
   const [status, setStatus] = useState('');
   const [message, setMessage] = useState('');
+  const [timestamp, setTimestamp] = useState(0);
 
   // useRef to store the socket instance
   const socketRef = useRef<any>(null);
@@ -34,9 +35,12 @@ export function MessageChat({ messageHistory, setMessageHistory }: Props) {
 
     // Listen for 'responsesGenerated' event from Back End
     socketRef.current.on('responsesGenerated', (data) => {
-      const { responses, currMessage } = data;
+      const { responses, currMessage, messageTimestamp} = data;
+      console.log("backend data", data);
       setCurrResponses(responses);
       setMessage(currMessage);
+      setTimestamp(messageTimestamp);
+      console.log("set curr message", currMessage);
       setStatus('New responses received.');
       console.log('Received responsesGenerated:', data);
     });
@@ -72,9 +76,11 @@ export function MessageChat({ messageHistory, setMessageHistory }: Props) {
     console.log('Selected response:', textInput);
     if (textInput) {
       // Use the existing socket connection to emit the event
+      console.log("message", message);
       socketRef.current.emit('submitSelectedResponse', {
         selected_response: textInput,
-        currMessage: message
+        currMessage: message,
+        messageTimestamp: timestamp
       });
       setStatus('Selected response submitted.');
       setCurrResponses([]);
