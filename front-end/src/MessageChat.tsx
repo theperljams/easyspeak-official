@@ -1,5 +1,3 @@
-// MessageChat.tsx
-
 import React, { useState, useEffect, useRef } from "react";
 import { Responses } from "./components/Responses";
 import { ThreeDot } from "react-loading-indicators";
@@ -35,20 +33,27 @@ export function MessageChat() {
       const { message, timestamp, responses } = data;
       console.log("Received newMessage:", data);
 
-      // Add the new message-response set to the queue
-      setMessageQueue((prevQueue) => [
-        ...prevQueue,
-        {
-          message: message,
-          responses: responses,
-          timestamp: timestamp,
-        },
-      ]);
+      setMessageQueue((prevQueue) => {
+        const newQueue = [
+          ...prevQueue,
+          {
+            message: message,
+            responses: responses,
+            timestamp: timestamp,
+          },
+        ];
 
-      // If this is the first message, set currentIndex to 0
-      if (messageQueue.length === 0) {
-        setCurrentIndex(0);
-      }
+        // Sort the queue by timestamp
+        newQueue.sort((a, b) => a.timestamp - b.timestamp);
+
+        // Find the index of the new message
+        const index = newQueue.findIndex((item) => item.timestamp === timestamp);
+
+        // Update the currentIndex
+        setCurrentIndex(index);
+
+        return newQueue;
+      });
 
       setStatus("New message received.");
     });
@@ -99,16 +104,20 @@ export function MessageChat() {
       setTextInput("");
 
       // Remove the message from the queue
-      setMessageQueue((prevQueue) =>
-        prevQueue.filter((item) => item.timestamp !== currentTimestamp)
-      );
+      setMessageQueue((prevQueue) => {
+        const newQueue = prevQueue.filter(
+          (item) => item.timestamp !== currentTimestamp
+        );
 
-      // Adjust currentIndex if needed
-      if (currentIndex >= messageQueue.length - 1) {
-        setCurrentIndex(0);
-      } else {
-        setCurrentIndex(currentIndex);
-      }
+        // Adjust currentIndex if necessary
+        let newIndex = currentIndex;
+        if (newIndex >= newQueue.length) {
+          newIndex = newQueue.length - 1;
+        }
+        setCurrentIndex(newIndex >= 0 ? newIndex : 0);
+
+        return newQueue;
+      });
     }
   };
 
@@ -139,7 +148,7 @@ export function MessageChat() {
           )}
         </div>
 
-        {messageQueue.length > 0 ? (
+        {messageQueue.length > 0 && currentMessageSet ? (
           <>
             <div className={styles.navigation}>
               <button onClick={handlePrev} disabled={currentIndex === 0}>
