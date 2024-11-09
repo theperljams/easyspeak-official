@@ -1,69 +1,77 @@
-import { useState, useEffect, useRef } from "react";
-import { Responses } from "./components/Responses.js";
+// MessageChat.tsx
+
+import React, { useState, useEffect, useRef } from "react";
+import { Responses } from "./components/Responses";
 import { ThreeDot } from "react-loading-indicators";
 import styles from "./styles/Chat.module.css";
-import { generateUserAudio } from "./Api.js";
-import type { Message } from "./components/Interfaces.js";
-import { RefreshButton } from "./components/RefreshButton.js";
-import { InputBar } from "./components/InputBar.js";
-import QuickResponses from "./components/QuickResponses.js";
-import io from 'socket.io-client'; // Import Socket.IO client
+import { RefreshButton } from "./components/RefreshButton";
+import { InputBar } from "./components/InputBar";
+import io from "socket.io-client";
 
-interface Props {
-  messageHistory: Message[];
-  setMessageHistory: (x: Message[]) => void;
+interface MessageSet {
+  message: string;
+  responses: string[];
+  timestamp: number;
 }
 
-export function MessageChat({ messageHistory, setMessageHistory }: Props) {
-  const [textInput, setTextInput] = useState('');
-  const [audioURL, setAudioURL] = useState<string | null>(null);
-  const [responseQueue, setResponseQueue] = useState<string[]>([]);
+export function MessageChat() {
+  const [textInput, setTextInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [currResponses, setCurrResponses] = useState<string[]>([]);
-  const [displayResponse, setDisplayResponse] = useState(true);
   const [isListening, setIsListening] = useState(true);
-  const [status, setStatus] = useState('');
-  const [message, setMessage] = useState('');
-  const [timestamp, setTimestamp] = useState(0);
+  const [status, setStatus] = useState("");
+
+  const [messageQueue, setMessageQueue] = useState<MessageSet[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   // useRef to store the socket instance
   const socketRef = useRef<any>(null);
 
   useEffect(() => {
     // Initialize Socket.IO client for Front End namespace only once
-    socketRef.current = io('http://localhost:3000/frontend'); // Connect to '/frontend' namespace
+    socketRef.current = io("http://localhost:3000/frontend"); // Connect to '/frontend' namespace
 
-    // Listen for 'responsesGenerated' event from Back End
-    socketRef.current.on('responsesGenerated', (data) => {
-      const { responses, currMessage, messageTimestamp} = data;
-      console.log("backend data", data);
-      setCurrResponses(responses);
-      setMessage(currMessage);
-      setTimestamp(messageTimestamp);
-      console.log("set curr message", currMessage);
-      setStatus('New responses received.');
-      console.log('Received responsesGenerated:', data);
+    // Listen for 'newMessage' event from Back End
+    socketRef.current.on("newMessage", (data: any) => {
+      const { message, timestamp, responses } = data;
+      console.log("Received newMessage:", data);
+
+      // Add the new message-response set to the queue
+      setMessageQueue((prevQueue) => [
+        ...prevQueue,
+        {
+          message: message,
+          responses: responses,
+          timestamp: timestamp,
+        },
+      ]);
+
+      // If this is the first message, set currentIndex to 0
+      if (messageQueue.length === 0) {
+        setCurrentIndex(0);
+      }
+
+      setStatus("New message received.");
     });
 
     // Listen for acknowledgments and errors
-    socketRef.current.on('ack', (data) => {
+    socketRef.current.on("ack", (data: any) => {
       setStatus(data.message);
-      console.log('Acknowledgment from server:', data);
+      console.log("Acknowledgment from server:", data);
     });
 
-    socketRef.current.on('responseSubmitted', (data) => {
+    socketRef.current.on("responseSubmitted", (data: any) => {
       setStatus(data.message);
-      console.log('Response submitted:', data);
+      console.log("Response submitted:", data);
     });
 
-    socketRef.current.on('error', (data) => {
+    socketRef.current.on("error", (data: any) => {
       setStatus(`Error: ${data.error}`);
-      console.error('Socket.IO error:', data);
+      console.error("Socket.IO error:", data);
     });
 
     // Handle disconnection
-    socketRef.current.on('disconnect', () => {
-      console.log('Disconnected from Back End');
+    socketRef.current.on("disconnect", () => {
+      console.log("Disconnected from Back End");
     });
 
     // Cleanup on unmount
@@ -72,30 +80,49 @@ export function MessageChat({ messageHistory, setMessageHistory }: Props) {
     };
   }, []);
 
+  const currentMessageSet = messageQueue[currentIndex];
+  const currentResponses = currentMessageSet ? currentMessageSet.responses : [];
+  const currentMessage = currentMessageSet ? currentMessageSet.message : "";
+  const currentTimestamp = currentMessageSet ? currentMessageSet.timestamp : 0;
+
   const handleResponseSelection = () => {
-    console.log('Selected response:', textInput);
-    if (textInput) {
-      // Use the existing socket connection to emit the event
-      console.log("message", message);
-      socketRef.current.emit('submitSelectedResponse', {
+    console.log("Selected response:", textInput);
+    if (textInput && currentMessageSet) {
+      socketRef.current.emit("submitSelectedResponse", {
         selected_response: textInput,
-        currMessage: message,
-        messageTimestamp: timestamp
+        currMessage: currentMessage,
+        messageTimestamp: currentTimestamp,
       });
-      setStatus('Selected response submitted.');
-      setCurrResponses([]);
-      console.log('Emitted submitSelectedResponse:', { selected_response: textInput });
+      setStatus("Selected response submitted.");
+
+      // Optionally, clear the input text
+      setTextInput("");
+
+      // Remove the message from the queue
+      setMessageQueue((prevQueue) =>
+        prevQueue.filter((item) => item.timestamp !== currentTimestamp)
+      );
+
+      // Adjust currentIndex if needed
+      if (currentIndex >= messageQueue.length - 1) {
+        setCurrentIndex(0);
+      } else {
+        setCurrentIndex(currentIndex);
+      }
     }
   };
 
-  useEffect(() => {
-    if (responseQueue.length > 0) {
-      setDisplayResponse(true);
-      setCurrResponses(responseQueue.slice(0, 3));
-    } else {
-      setDisplayResponse(false);
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
     }
-  }, [responseQueue]);
+  };
+
+  const handleNext = () => {
+    if (currentIndex < messageQueue.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
 
   return (
     <div className={styles.app}>
@@ -104,20 +131,59 @@ export function MessageChat({ messageHistory, setMessageHistory }: Props) {
           {isGenerating ? (
             <ThreeDot color="#007BFF" size="medium" text="" textColor="" />
           ) : (
-            <RefreshButton handleRefresh={() => {/* Optional: Implement refresh logic */}} />
+            <RefreshButton
+              handleRefresh={() => {
+                /* Optional: Implement refresh logic */
+              }}
+            />
           )}
         </div>
-        <div className={styles.responseView}>
-          <Responses responses={currResponses} setInputText={setTextInput} isGenerating={isGenerating} />
-        </div>
-        <InputBar
-          inputText={textInput}
-          setInput={setTextInput}
-          handleSubmitInput={handleResponseSelection}
-          audioURL={audioURL}
-          setIsListening={setIsListening}
-          setDisplayResponses={setDisplayResponse}
-        />
+
+        {messageQueue.length > 0 ? (
+          <>
+            <div className={styles.navigation}>
+              <button onClick={handlePrev} disabled={currentIndex === 0}>
+                &lt; Prev
+              </button>
+              <span>
+                {currentIndex + 1} / {messageQueue.length}
+              </span>
+              <button
+                onClick={handleNext}
+                disabled={currentIndex === messageQueue.length - 1}
+              >
+                Next &gt;
+              </button>
+            </div>
+
+            <div className={styles.messageView}>
+              <p>
+                <strong>Message:</strong> {currentMessage}
+              </p>
+            </div>
+
+            <div className={styles.responseView}>
+              <Responses
+                responses={currentResponses}
+                setInputText={setTextInput}
+                isGenerating={isGenerating}
+              />
+            </div>
+
+            <InputBar
+              inputText={textInput}
+              setInput={setTextInput}
+              handleSubmitInput={handleResponseSelection}
+              audioURL={null}
+              setIsListening={setIsListening}
+              setDisplayResponses={() => {}}
+            />
+          </>
+        ) : (
+          <div className={styles.noMessages}>
+            <p>No messages in the queue.</p>
+          </div>
+        )}
       </div>
     </div>
   );

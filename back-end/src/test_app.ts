@@ -1,17 +1,16 @@
+// server.js
+
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import http, { get } from 'http';
+import http from 'http';
 import { Server } from 'socket.io';
-import { processChatCompletion } from './llm'; 
+import { processChatCompletion } from './llm';
 import { insertQAPair } from './supabase-db';
 
 dotenv.config();
 
 const app = express();
-
-// At the very top of server.js
-process.env.DEBUG = 'socket.io:*';
 
 // Middleware
 app.use(cors());
@@ -32,22 +31,25 @@ const io = new Server(server, {
 const messagingNamespace = io.of('/messaging'); // For Messaging Client
 const frontendNamespace = io.of('/frontend');   // For Front End
 
+// Initialize the message-response queue
+let messageQueue = [];
+
 // Handle connections in the Messaging namespace
 messagingNamespace.on('connection', (socket) => {
   console.log(`Messaging Client connected: ${socket.id}`);
 
   socket.on('newMessage', async (data) => {
     const { content, timestamp, user_id } = data;
-    console.log("content and user id ", data);
+    console.log("Received newMessage:", data);
 
     // Input validation
-    if (!content || !user_id) {
-      socket.emit('error', { error: 'Missing "content" or "user_id".' });
+    if (!content || !user_id || !timestamp) {
+      socket.emit('error', { error: 'Missing "content", "timestamp", or "user_id".' });
       return;
     }
 
     try {
-
+      // Process the message to generate responses
       const generatedResponses = await processChatCompletion(content, user_id);
 
       if (!generatedResponses || generatedResponses.length === 0) {
@@ -57,15 +59,22 @@ messagingNamespace.on('connection', (socket) => {
 
       console.log(`Generated responses:`, generatedResponses);
 
-      // Emit 'responsesGenerated' to Front End namespace only
-      frontendNamespace.emit('responsesGenerated', {
+      // Add the message, timestamp, and responses to the queue
+      messageQueue.push({
+        message: content,
+        timestamp: timestamp,
         responses: generatedResponses,
-        currMessage: content,
-        messageTimestamp: timestamp
+      });
+
+      // Send the message and responses to the Front End
+      frontendNamespace.emit('newMessage', {
+        message: content,
+        timestamp: timestamp,
+        responses: generatedResponses,
       });
 
       // Acknowledge the Messaging Client
-      socket.emit('ack', { message: 'Message processed successfully.' });
+      socket.emit('ack', { message: 'Message processed and stored in queue.' });
     } catch (error) {
       console.error('Error processing message:', error);
       socket.emit('error', { error: 'An error occurred while processing the message.' });
@@ -81,20 +90,18 @@ messagingNamespace.on('connection', (socket) => {
 frontendNamespace.on('connection', (socket) => {
   console.log(`Front End connected: ${socket.id}`);
 
-  socket.on('ack', (data) => { 
-    console.log(data); 
+  socket.on('ack', (data) => {
+    console.log(data);
   });
-
-  // socket.emit('ack', { message: 'Connected to Back End.' });
 
   socket.on('submitSelectedResponse', (data) => {
     const { selected_response, currMessage, messageTimestamp } = data;
 
-    console.log("Message received: ", data);
+    console.log("Received submitSelectedResponse:", data);
 
     // Input validation
-    if (!selected_response) {
-      socket.emit('error', { error: 'Missing "selected_response".' });
+    if (!selected_response || !currMessage || !messageTimestamp) {
+      socket.emit('error', { error: 'Missing "selected_response", "currMessage", or "messageTimestamp".' });
       return;
     }
 
@@ -103,25 +110,34 @@ frontendNamespace.on('connection', (socket) => {
 
     // Acknowledge the Front End
     socket.emit('responseSubmitted', { message: 'Selected response submitted successfully.' });
-    console.log("Message sent: ", selected_response);
+    console.log("Response submitted to messaging client.");
 
-    // Emit the selected response to the /messaging namespace
+    // Send the selected response along with the message to the messaging client
     messagingNamespace.emit('sendSelectedResponse', {
-      'selected_response': selected_response
+      'selected_response': selected_response,
+      'curr_message': currMessage,
+      'message_timestamp': messageTimestamp,
     });
 
-    let QAPair: string = "";
+    let QAPair = "";
 
     if (!currMessage) {
       QAPair = `started conversation with: ${selected_response}`;
-    }
-    else {
-      QAPair = `message:${currMessage} response:${selected_response}`; 
+    } else {
+      QAPair = `message: ${currMessage} response: ${selected_response}`;
     }
 
-    
+    // Insert the Q&A pair into the database
     insertQAPair("pearl@easyspeak-aac.com", QAPair, "pearl_message_test", messageTimestamp);
-    console.log("QAPair: ", QAPair);
+    console.log("QAPair inserted into database: ", QAPair);
+
+    // Remove the message from the queue
+    messageQueue = messageQueue.filter(
+      (item) => item.timestamp !== messageTimestamp
+    );
+
+    // Optionally, send updated queue to front end
+    // frontendNamespace.emit('messageQueueUpdate', { messageQueue: messageQueue });
 
   });
 
@@ -129,6 +145,7 @@ frontendNamespace.on('connection', (socket) => {
     console.log(`Front End disconnected: ${socket.id}`);
   });
 });
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
