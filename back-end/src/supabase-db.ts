@@ -17,7 +17,15 @@ const SIMILARITY_THRESHOLD = 0.1;
 const MATCH_COUNT = 50;
 
 
-export const insertQAPair = async (user_id: string, content: string,  table_name: string, timestamp: number) => {
+// supabase-db.js (or the appropriate file)
+
+export const insertQAPair = async (
+  user_id,
+  content,
+  table_name,
+  timestamp,
+  hashed_sender_name
+) => {
   console.log(table_name);
   let embedding = await getEmbedding(content);
   try {
@@ -25,13 +33,55 @@ export const insertQAPair = async (user_id: string, content: string,  table_name
       timestamp,
       user_id,
       content,
-      embedding
+      embedding,
+      hashed_sender_name,
     });
-    
   } catch (error) {
     console.error('Error inserting QA pair into Supabase:', error);
   }
-}
+};
+
+export const getMessagesByHashedSenderName = async (hashed_sender_name, limit) => {
+  try {
+    let { data, error } = await supabase
+      .from('pearl_message_test')
+      .select('*')
+      .eq('sender_name', hashed_sender_name)
+      .order('timestamp', { ascending: false }) // Optional: Order by timestamp
+      .limit(limit);
+
+    if (error) {
+      console.error('Error fetching messages by hashed_sender_name:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Unexpected error fetching messages by hashed_sender_name:', error);
+    return null;
+  }
+};
+
+export const getMessagesUpToTimestamp = async (timestamp, limit) => {
+  try {
+    let { data, error } = await supabase
+      .from('pearl_message_test')
+      .select('*')
+      .lte('timestamp', timestamp)
+      .order('timestamp', { ascending: false }) // Optional: Order by timestamp
+      .limit(limit);
+
+    if (error) {
+      console.error('Error fetching messages up to timestamp:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Unexpected error fetching messages up to timestamp:', error);
+    return null;
+  }
+};
 
 export const getContextAll = async (user_id: string) => {
   try {

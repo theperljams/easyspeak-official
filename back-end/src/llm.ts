@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { fetchRetrievals } from './tests/test_ragie_db';
 import OpenAI from 'openai';
-import { getContextConversation } from './supabase-db';
+import { getContextConversation, getMessagesByHashedSenderName, getMessagesUpToTimestamp } from './supabase-db';
 import axios, { AxiosInstance } from 'axios';
 
 dotenv.config();
@@ -37,9 +37,15 @@ function extractChunkText(data) {
 }
 
 // Function to generate the system prompt using chunk text
-async function generateSystemPrompt(content: string, user_id: string) {
+async function generateSystemPrompt(content: string, user_id: string, name: string, timestamp: number) {
 
-  const currContext = await getContextConversation(await getEmbedding(content), "pearl@easyspeak-aac.com");
+  // const currContext = await getContextConversation(await getEmbedding(content), "pearl@easyspeak-aac.com");
+  // console.log("currContext:", currContext);
+
+  const currContext = await getMessagesByHashedSenderName(name, 10);
+  console.log("currContext:", currContext);
+
+  // const currContext = await getMessagesUpToTimestamp(timestamp, 10);
   // console.log("currContext:", currContext);
 
   const infoData = await fetchRetrievals(ragieApiKey, content, "pearl@easyspeak-aac.com", 25, 10, false);
@@ -51,19 +57,38 @@ async function generateSystemPrompt(content: string, user_id: string) {
   // const contextStyle = extractChunkText(styleData);
   
 
+//   const prompt  = `You are an assistant drafting texts for ${user_id}. Respond to the given content as if you were
+//   sending a text from ${user_id}'s phone. Your goal is to sound as much like them as possible. These texts should reflect ${user_id}'s personality and way of speaking
+//   based on the context provided. The following context is a sample of ${user_id}'s text conversations. Contine the conversation as if you 
+//   were responding to another text from ${user_id}'s phone.
+  
+//   Here is the text you are responding to: ${content}
+
+//   Here are the samples: ${currContext} ${contextInfo}
+
+//   Craft a numbered list of 3 different responses in different contexts. Imitate ${user_id}'s style as shown in their sample texts. Pay attention to details such as common phrases they use,
+//    anything that looks like it could be an inside joke, or anything else that makes their style distinct.
+//  DO NOT share any information not contained in the samples. If there is a text you don't know how to 
+//   respond to based on the samples, give 3 different "I don't know" responses that sound like something ${user_id} would say. You should ONLY rely on information that you know ${user_id} knows.`;
+
   const prompt  = `You are an assistant drafting texts for ${user_id}. Respond to the given content as if you were
   sending a text from ${user_id}'s phone. Your goal is to sound as much like them as possible. These texts should reflect ${user_id}'s personality and way of speaking
-  based on the context provided. The following context is a sample of ${user_id}'s text conversations. Contine the conversation as if you 
+  based on the context provided. You are given to samples of ${user_id}'s text conversations. The first one contains previous conversations with the person 
+  ${user_id} is currently texting. The second one is various sample texts showing how ${user_id} texts in general. Contine the conversation as if you 
   were responding to another text from ${user_id}'s phone.
   
   Here is the text you are responding to: ${content}
 
-  Here are the samples: ${currContext} ${contextInfo}
+  Here are the samples: 
+  Conversation with current person: ${currContext} 
+  
+  Other past conversations: ${contextInfo}
 
   Craft a numbered list of 3 different responses in different contexts. Imitate ${user_id}'s style as shown in their sample texts. Pay attention to details such as common phrases they use,
    anything that looks like it could be an inside joke, or anything else that makes their style distinct.
  DO NOT share any information not contained in the samples. If there is a text you don't know how to 
   respond to based on the samples, give 3 different "I don't know" responses that sound like something ${user_id} would say. You should ONLY rely on information that you know ${user_id} knows.`;
+
 
   // console.log(prompt);
 
@@ -108,8 +133,8 @@ const parseNumberedList = (inputString: string) => {
 }
 
 // Main function to handle the workflow
-export async function processChatCompletion(query: string, user_id: string) {
-  const systemPrompt = await generateSystemPrompt(query, user_id);
+export async function processChatCompletion(query: string, user_id: string, name: string, timestamp: number) {
+  const systemPrompt = await generateSystemPrompt(query, user_id, name, timestamp);
   const chatResponse = await getChatCompletion(openAiApiKey, systemPrompt, query);
   const responseList: string[] = parseNumberedList(chatResponse);
   console.log('Response:', responseList);

@@ -39,18 +39,18 @@ messagingNamespace.on('connection', (socket) => {
   console.log(`Messaging Client connected: ${socket.id}`);
 
   socket.on('newMessage', async (data) => {
-    const { content, timestamp, user_id } = data;
+    const { content, timestamp, user_id, hashed_sender_name } = data;
     console.log("Received newMessage:", data);
 
     // Input validation
-    if (!content || !user_id || !timestamp) {
-      socket.emit('error', { error: 'Missing "content", "timestamp", or "user_id".' });
+    if (!content || !user_id || !timestamp || !hashed_sender_name) {
+      socket.emit('error', { error: 'Missing required fields in "newMessage" event.' });
       return;
     }
 
     try {
       // Process the message to generate responses
-      const generatedResponses = await processChatCompletion(content, user_id);
+      const generatedResponses = await processChatCompletion(content, user_id, hashed_sender_name, timestamp);
 
       if (!generatedResponses || generatedResponses.length === 0) {
         socket.emit('error', { error: 'Failed to generate responses.' });
@@ -64,6 +64,7 @@ messagingNamespace.on('connection', (socket) => {
         message: content,
         timestamp: timestamp,
         responses: generatedResponses,
+        hashed_sender_name: hashed_sender_name,
       });
 
       // Send the message and responses to the Front End
@@ -71,6 +72,7 @@ messagingNamespace.on('connection', (socket) => {
         message: content,
         timestamp: timestamp,
         responses: generatedResponses,
+        hashed_sender_name: hashed_sender_name,
       });
 
       // Acknowledge the Messaging Client
@@ -100,8 +102,8 @@ frontendNamespace.on('connection', (socket) => {
     console.log("Received submitSelectedResponse:", data);
 
     // Input validation
-    if (!selected_response || !currMessage || !messageTimestamp) {
-      socket.emit('error', { error: 'Missing "selected_response", "currMessage", or "messageTimestamp".' });
+    if (!selected_response || !messageTimestamp) {
+      socket.emit('error', { error: 'Missing "selected_response" or "messageTimestamp".' });
       return;
     }
 
@@ -119,6 +121,11 @@ frontendNamespace.on('connection', (socket) => {
       'message_timestamp': messageTimestamp,
     });
 
+    // Retrieve the message from the queue to get hashed_sender_name
+    const messageItem = messageQueue.find(
+      (item) => item.timestamp === messageTimestamp
+    );
+
     let QAPair = "";
 
     if (!currMessage) {
@@ -127,9 +134,21 @@ frontendNamespace.on('connection', (socket) => {
       QAPair = `message: ${currMessage} response: ${selected_response}`;
     }
 
-    // Insert the Q&A pair into the database
-    insertQAPair("pearl@easyspeak-aac.com", QAPair, "pearl_message_test", messageTimestamp);
-    console.log("QAPair inserted into database: ", QAPair);
+    if (messageItem) {
+      const { hashed_sender_name } = messageItem;
+
+      // Insert the Q&A pair into the database
+      insertQAPair(
+        "pearl@easyspeak-aac.com",
+        QAPair,
+        "pearl_message_test",
+        messageTimestamp,
+        hashed_sender_name
+      );
+      console.log("QAPair inserted into database: ", QAPair);
+    } else {
+      console.error('Message not found in queue for timestamp:', messageTimestamp);
+    }
 
     // Remove the message from the queue
     messageQueue = messageQueue.filter(

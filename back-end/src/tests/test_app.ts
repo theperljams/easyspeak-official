@@ -1,6 +1,6 @@
 import readline from 'readline';
 import { generateResponses } from './test_llm';
-import { processChatCompletion } from './test_ragie_llm';
+import { processChatCompletion } from '../llm';
 
 // Commented-out question arrays remain unchanged
 // const questions = ["Tell me about your family", ...];
@@ -33,7 +33,7 @@ const promptUser = (user_id: string) => {
   rl.question('Question: ', async (input) => {
     const startTime = Date.now();
     try {
-      const response = await processChatCompletion(input, user_id);
+      const response = await processChatCompletion(input, user_id, "7a7ba7c0197cf6d2b0dccb6a6fe451e9e34b396137f9661db53a98c23a89bb8f", 2);
       const endTime = Date.now();
       console.log("Response:", response);
       console.log(`Response time: ${(endTime - startTime) / 1000} seconds`);
@@ -49,7 +49,7 @@ const askPredefinedQuestions = async (user_id: string) => {
     const startTime = Date.now();
     console.log("Question:", question);
     try {
-      const response = await processChatCompletion(question, user_id);
+      const response = await processChatCompletion(question, user_id, "7a7ba7c0197cf6d2b0dccb6a6fe451e9e34b396137f9661db53a98c23a89bb8f", 2);
       const endTime = Date.now();
       console.log("Response:", response);
       console.log(`Response time: ${(endTime - startTime) / 1000} seconds`);
