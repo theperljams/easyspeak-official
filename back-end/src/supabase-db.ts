@@ -20,25 +20,27 @@ const MATCH_COUNT = 50;
 // supabase-db.js (or the appropriate file)
 
 export const insertQAPair = async (
-  user_id,
-  content,
-  table_name,
-  timestamp,
-  hashed_sender_name
+  user_id: string,
+  content: string,
+  table_name: string,
+  timestamp: number,
+  sender_name: string
 ) => {
   console.log(table_name);
   let embedding = await getEmbedding(content);
-  try {
-    await supabase.from(table_name).insert({
+  console.log("Inserting: ", user_id, content, table_name, timestamp, sender_name);
+  const {data, error} = await supabase.from(table_name).insert({
       timestamp,
       user_id,
       content,
       embedding,
-      hashed_sender_name,
+      sender_name
     });
-  } catch (error) {
-    console.error('Error inserting QA pair into Supabase:', error);
-  }
+    if (error) {
+      console.error("Supabase Error:", error);
+    } else {
+      console.log("Inserted Data:", data);
+    }
 };
 
 export const getMessagesByHashedSenderName = async (hashed_sender_name, limit) => {

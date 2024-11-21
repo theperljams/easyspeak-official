@@ -43,7 +43,7 @@ async function generateSystemPrompt(content: string, user_id: string, name: stri
   // console.log("currContext:", currContext);
 
   const currContext = await getMessagesByHashedSenderName(name, 10);
-  console.log("currContext:", currContext);
+  // console.log("currContext:", currContext);
 
   // const currContext = await getMessagesUpToTimestamp(timestamp, 10);
   // console.log("currContext:", currContext);
