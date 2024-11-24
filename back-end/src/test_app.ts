@@ -22,7 +22,7 @@ const server = http.createServer(app);
 // Initialize Socket.IO server with namespaces
 const io = new Server(server, {
   cors: {
-    origin: '*', // Replace with your Front End's URL
+    origin: '*', // Replace with your Front End's URL in production
     methods: ['GET', 'POST'],
   },
 });
@@ -83,6 +83,21 @@ messagingNamespace.on('connection', (socket) => {
     }
   });
 
+  // Listen for 'chatChanged' event from Messaging Client
+  socket.on('chatChanged', (data) => {
+    const { new_chat_id } = data;
+    console.log(`Chat changed to: ${new_chat_id}`);
+
+    // Optionally, clear the messageQueue if it's specific to a chat
+    messageQueue = [];
+
+    // Emit 'chatChanged' event to the Front End
+    frontendNamespace.emit('chatChanged', { new_chat_id });
+
+    // Acknowledge the Messaging Client
+    socket.emit('ack', { message: 'Chat change processed.' });
+  });
+
   socket.on('disconnect', () => {
     console.log(`Messaging Client disconnected: ${socket.id}`);
   });
@@ -114,7 +129,7 @@ frontendNamespace.on('connection', (socket) => {
     socket.emit('responseSubmitted', { message: 'Selected response submitted successfully.' });
     console.log("Response submitted to messaging client.");
 
-    // Send the selected response along with the message to the messaging client
+    // Send the selected response along with the message to the Messaging Client
     messagingNamespace.emit('sendSelectedResponse', {
       'selected_response': selected_response,
       'curr_message': currMessage,

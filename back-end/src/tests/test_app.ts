@@ -33,7 +33,7 @@ const promptUser = (user_id: string) => {
   rl.question('Question: ', async (input) => {
     const startTime = Date.now();
     try {
-      const response = await processChatCompletion(input, user_id, "7a7ba7c0197cf6d2b0dccb6a6fe451e9e34b396137f9661db53a98c23a89bb8f", 2);
+      const response = await processChatCompletion(input, user_id, "ceb1a2d1a186721f8719ad5f8106b55662ed21798c962a5ab6b686bc345dec0e", 2);
       const endTime = Date.now();
       console.log("Response:", response);
       console.log(`Response time: ${(endTime - startTime) / 1000} seconds`);

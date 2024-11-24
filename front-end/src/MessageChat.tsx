@@ -1,3 +1,5 @@
+// MessageChat.tsx
+
 import React, { useState, useEffect, useRef } from "react";
 import { Responses } from "./components/Responses";
 import { ThreeDot } from "react-loading-indicators";
@@ -56,6 +58,18 @@ export function MessageChat() {
       });
 
       setStatus("New message received.");
+    });
+
+    // Listen for 'chatChanged' event from Back End
+    socketRef.current.on("chatChanged", (data: any) => {
+      const { new_chat_id } = data;
+      console.log("Chat changed to:", new_chat_id);
+
+      // Clear the message queue and reset the current index
+      setMessageQueue([]);
+      setCurrentIndex(0);
+
+      setStatus(`Switched to a new chat: ${new_chat_id}`);
     });
 
     // Listen for acknowledgments and errors
@@ -178,21 +192,27 @@ export function MessageChat() {
                 isGenerating={isGenerating}
               />
             </div>
-
-            <InputBar
-              inputText={textInput}
-              setInput={setTextInput}
-              handleSubmitInput={handleResponseSelection}
-              audioURL={null}
-              setIsListening={setIsListening}
-              setDisplayResponses={() => {}}
-            />
           </>
         ) : (
           <div className={styles.noMessages}>
             <p>No messages in the queue.</p>
           </div>
         )}
+
+        {/* InputBar component for typing and submitting responses */}
+        <InputBar
+          inputText={textInput}
+          setInput={setTextInput}
+          handleSubmitInput={handleResponseSelection}
+          audioURL={null}
+          setIsListening={setIsListening}
+          setDisplayResponses={() => {}}
+        />
+
+        {/* Display status messages */}
+        <div className={styles.status}>
+          <p>{status}</p>
+        </div>
       </div>
     </div>
   );
