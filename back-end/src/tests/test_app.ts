@@ -33,7 +33,7 @@ const promptUser = (user_id: string) => {
   rl.question('Question: ', async (input) => {
     const startTime = Date.now();
     try {
-      const response = await processChatCompletion(input, user_id, "ceb1a2d1a186721f8719ad5f8106b55662ed21798c962a5ab6b686bc345dec0e", 2);
+      const response = await processChatCompletion(input, user_id, "5e7699b80db48e2a066abcf57f8dea59a6ae3fa9267fae4e67d0cd2c92775e03", 2);
       const endTime = Date.now();
       console.log("Response:", response);
       console.log(`Response time: ${(endTime - startTime) / 1000} seconds`);
@@ -63,15 +63,15 @@ const askPredefinedQuestions = async (user_id: string) => {
 const start = () => {
   rl.question('Choose mode (1 for predefined questions, 2 for manual input): ', (mode) => {
     if (mode === '1' || mode === '2') {
-      rl.question('Enter user ID: ', (userInput) => {
-        const user_id = userInput.trim();
+      // rl.question('Enter user ID: ', (userInput) => {
+      //   const user_id = userInput.trim();
         if (mode === '1') {
-          askPredefinedQuestions(user_id);
+          askPredefinedQuestions("pearl@easyspeak-aac.com");
         } else if (mode === '2') {
-          promptUser(user_id);
+          promptUser("pearl@easyspeak-aac.com");
         }
-      });
-    } else {
+      }
+    else {
       console.log("Invalid mode choice. Please enter 1 or 2.");
       start(); // Restart if invalid mode is entered
     }

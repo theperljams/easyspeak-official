@@ -47,7 +47,7 @@ export const getMessagesByHashedSenderName = async (hashed_sender_name, limit) =
   try {
     let { data, error } = await supabase
       .from('pearl_message_test')
-      .select('*')
+      .select('content') // Only select the 'content' column
       .eq('sender_name', hashed_sender_name)
       .order('timestamp', { ascending: false }) // Optional: Order by timestamp
       .limit(limit);
@@ -57,7 +57,15 @@ export const getMessagesByHashedSenderName = async (hashed_sender_name, limit) =
       return null;
     }
 
-    return data;
+    // Check if data is not null and is an array
+    if (Array.isArray(data)) {
+      // Transform the data to an array of strings
+      const contentArray = data.map((row) => row.content);
+      return contentArray;
+    } else {
+      // If data is null or not an array, return an empty array
+      return [];
+    }
   } catch (error) {
     console.error('Unexpected error fetching messages by hashed_sender_name:', error);
     return null;
