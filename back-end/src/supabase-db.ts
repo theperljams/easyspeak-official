@@ -72,6 +72,99 @@ export const getMessagesByHashedSenderName = async (hashed_sender_name, limit) =
   }
 };
 
+export const getCurrentConversationMessages = async () => {
+  try {
+    // Step 1: Get the timestamp of the most recent message
+    let { data: latestMessageData, error: latestMessageError } = await supabase
+      .from('pearl_message_test')
+      .select('timestamp')
+      .order('timestamp', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (latestMessageError) {
+      console.error('Error fetching the latest message timestamp:', latestMessageError);
+      return null;
+    }
+
+    const latestTimestamp = latestMessageData.timestamp;
+
+    // Calculate the timestamp 5 minutes before the latest timestamp
+    const fiveMinutesAgoTimestamp = latestTimestamp - 5 * 60 * 1000; // Subtract 5 minutes in milliseconds
+
+    // Step 2: Get all messages within 5 minutes of the latest timestamp
+    let { data: messagesData, error: messagesError } = await supabase
+      .from('pearl_message_test')
+      .select('content')
+      .gte('timestamp', fiveMinutesAgoTimestamp)
+      .order('timestamp', { ascending: true });
+
+    if (messagesError) {
+      console.error('Error fetching messages within 5 minutes:', messagesError);
+      return null;
+    }
+
+    // Transform the data to an array of strings
+    const contentArray = messagesData.map((row) => row.content);
+
+    return contentArray;
+  } catch (error) {
+    console.error('Unexpected error fetching current conversation messages:', error);
+    return null;
+  }
+};
+
+export const getCurrentConversationMessagesBySender = async (hashed_sender_name) => {
+  try {
+    // Step 1: Get the timestamp of the most recent message from the specific sender
+    let { data: latestMessageData, error: latestMessageError } = await supabase
+      .from('pearl_message_test')
+      .select('timestamp')
+      .eq('sender_name', hashed_sender_name)
+      .order('timestamp', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (latestMessageError) {
+      console.error('Error fetching the latest message timestamp for the sender:', latestMessageError);
+      return null;
+    }
+
+    if (!latestMessageData) {
+      console.log('No messages found for the specified sender.');
+      return [];
+    }
+
+    const latestTimestamp = latestMessageData.timestamp;
+
+    // Calculate the timestamp 5 minutes before the latest timestamp
+    const fiveMinutesAgoTimestamp = latestTimestamp - 5 * 60 * 1000; // Subtract 5 minutes in milliseconds
+
+    // Step 2: Get all messages within 5 minutes of the latest timestamp
+    let { data: messagesData, error: messagesError } = await supabase
+      .from('pearl_message_test')
+      .select('content')
+      .gte('timestamp', fiveMinutesAgoTimestamp)
+      .lte('timestamp', latestTimestamp)
+      .order('timestamp', { ascending: true });
+
+    if (messagesError) {
+      console.error('Error fetching messages within 5 minutes of the sender\'s latest message:', messagesError);
+      return null;
+    }
+
+    // Transform the data to an array of strings
+    const contentArray = messagesData.map((row) => row.content);
+
+    return contentArray;
+  } catch (error) {
+    console.error('Unexpected error fetching current conversation messages by sender:', error);
+    return null;
+  }
+};
+
+
+
 export const getMessagesUpToTimestamp = async (timestamp, limit) => {
   try {
     let { data, error } = await supabase
