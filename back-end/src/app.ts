@@ -1,31 +1,108 @@
-import express, {json} from 'express';
-import { generateAudio, generateQuestion, generateResponses, getEmbedding } from './supabase-oai-llm';
-import {getContextAll, getUserData, insertQAPair} from './supabase-db';
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+import { processChatCompletion } from './llm';
+import { generateAudio, generateQuestion, getEmbedding } from './supabase-oai-llm';
+import {getUserData, insertQAPair} from './supabase-db';
+import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(express.static('tmp'));
-const cors = require('cors');
 
+const server = http.createServer(app);
 
-app.use(cors());
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
 
-const isTestMode = process.env.TEST_MODE === 'true';
+const messagingNamespace = io.of('/messaging'); // For Messaging Client
+const frontendNamespace = io.of('/frontend');   // For MessageChat.tsx
 
-// Define an array of hardcoded responses
-const hardcodedResponses = [
-  ['Response set 1 - Response 1', 'Response set 1 - Response 2', 'Response set 1 - Response 3'],
-  ['Response set 2 - Response 1', 'Response set 2 - Response 2', 'Response set 2 - Response 3'],
-  ['Response set 3 - Response 1', 'Response set 3 - Response 2', 'Response set 3 - Response 3']
-];
-let responseCounter = 0;
+messagingNamespace.on('connection', (socket) => {
+  console.log(`Messaging Client connected: ${socket.id}`);
+
+  socket.on('newMessage', async (data) => {
+    const { content, timestamp, user_id, hashed_sender_name } = data;
+
+    try {
+      const generatedResponses = await processChatCompletion(content, user_id, hashed_sender_name, timestamp, { source: 'slack' });
+
+      // Send the message and responses to the Front End
+      frontendNamespace.emit('newMessage', {
+        message: content,
+        timestamp: timestamp,
+        responses: generatedResponses,
+        hashed_sender_name: hashed_sender_name,
+      });
+
+      // Acknowledge the Messaging Client
+      socket.emit('ack', { message: 'Message processed.' });
+    } catch (error) {
+      console.error('Error processing message:', error);
+      socket.emit('error', { error: 'An error occurred while processing the message.' });
+    }
+  });
+
+  // Listen for 'chatChanged' event from Messaging Client
+  socket.on('chatChanged', (data) => {
+    const { new_chat_id } = data;
+    console.log(`Chat changed to: ${new_chat_id}`);
+
+    // Emit 'chatChanged' event to the Front End
+    frontendNamespace.emit('chatChanged', { new_chat_id });
+
+    // Acknowledge the Messaging Client
+    socket.emit('ack', { message: 'Chat change processed.' });
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`Messaging Client disconnected: ${socket.id}`);
+  });
+});
+
+frontendNamespace.on('connection', (socket) => {
+  console.log(`Front End connected: ${socket.id}`);
+
+  socket.on('ack', (data) => {
+    console.log(data);
+  });
+
+  socket.on('submitSelectedResponse', (data) => {
+    const { selected_response, currMessage, messageTimestamp } = data;
+
+    console.log("Received submitSelectedResponse:", data);
+
+    // Acknowledge the Front End
+    socket.emit('responseSubmitted', { message: 'Selected response submitted successfully.' });
+    console.log("Response submitted to messaging client.");
+
+    // Send the selected response along with the message to the Messaging Client
+    messagingNamespace.emit('sendSelectedResponse', {
+      'selected_response': selected_response,
+      'curr_message': currMessage,
+      'message_timestamp': messageTimestamp,
+    });
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`Front End disconnected: ${socket.id}`);
+  });
+});
 
 app.get('/ping', (req, res) => {
   return res.send('pong 🏓');
 });
 
 app.post('/generate', async (req, res) => {
-  const { content, messages, /*user_id*/ jwt } = req.body;
+  const { content, messages, jwt } = req.body;
 
   const { access_token } = JSON.parse(jwt);
 
@@ -35,16 +112,8 @@ app.post('/generate', async (req, res) => {
     return res.status(400).send('Question is required');
   }
 
-  if (isTestMode) {
-    // Rotate through hardcoded responses in test mode
-    const response = hardcodedResponses[responseCounter % hardcodedResponses.length];
-    responseCounter++;
-    console.log('Returning hardcoded response:', response);
-    return res.json(response);
-  }
-
   try {
-    const openAiResponse = await generateResponses(content, messages, user_id);
+    const openAiResponse = await processChatCompletion(content, user_id, "hashed_sender_name", Date.now(), { source: 'realtime' });
     res.json(openAiResponse);
   } catch (error) {
     res.status(500).send('Error calling OpenAI API');
@@ -97,7 +166,7 @@ app.post('/tts', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
