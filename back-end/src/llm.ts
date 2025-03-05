@@ -158,6 +158,18 @@ const parseNumberedList = (inputString: string) => {
   return items;
 }
 
+// export async function processChatCompletion(query: string, user_id: string, name: string, timestamp: number, context?: any) {
+//   // ... existing logic ...
+
+//   if (context && context.source === 'slack') {
+//     // Extract relevant information from Slack context
+//     const slackMessage = context.message;
+//     // ... adapt logic to use slackMessage ...
+//   }
+
+//   // ... rest of the function ...
+// }
+
 // Main function to handle the workflow
 export async function processChatCompletion(query: string, user_id: string, name: string, timestamp: number) {
   const systemPrompt = await generateSystemPrompt(query, user_id, name, timestamp);

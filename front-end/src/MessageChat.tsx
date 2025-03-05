@@ -106,33 +106,31 @@ export function MessageChat() {
 
   const handleResponseSelection = () => {
     console.log("Selected response:", textInput);
-    if (textInput && currentMessageSet) {
-      socketRef.current.emit("submitSelectedResponse", {
-        selected_response: textInput,
-        currMessage: currentMessage,
-        messageTimestamp: currentTimestamp,
-      });
-      setStatus("Selected response submitted.");
+    socketRef.current.emit("submitSelectedResponse", {
+      selected_response: textInput,
+      currMessage: currentMessage || "", // Use empty string if no current message
+      messageTimestamp: currentTimestamp || null, // Use null if no timestamp
+    });
+    setStatus("Selected response submitted.");
 
-      // Optionally, clear the input text
-      setTextInput("");
+    // Optionally, clear the input text
+    setTextInput("");
 
-      // Remove the message from the queue
-      setMessageQueue((prevQueue) => {
-        const newQueue = prevQueue.filter(
-          (item) => item.timestamp !== currentTimestamp
-        );
+    // Remove the message from the queue
+    setMessageQueue((prevQueue) => {
+      const newQueue = prevQueue.filter(
+        (item) => item.timestamp !== currentTimestamp
+      );
 
-        // Adjust currentIndex if necessary
-        let newIndex = currentIndex;
-        if (newIndex >= newQueue.length) {
-          newIndex = newQueue.length - 1;
-        }
-        setCurrentIndex(newIndex >= 0 ? newIndex : 0);
+      // Adjust currentIndex if necessary
+      let newIndex = currentIndex;
+      if (newIndex >= newQueue.length) {
+        newIndex = newQueue.length - 1;
+      }
+      setCurrentIndex(newIndex >= 0 ? newIndex : 0);
 
-        return newQueue;
-      });
-    }
+      return newQueue;
+    });
   };
 
   const handlePrev = () => {

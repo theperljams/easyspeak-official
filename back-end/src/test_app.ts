@@ -117,8 +117,8 @@ frontendNamespace.on('connection', (socket) => {
     console.log("Received submitSelectedResponse:", data);
 
     // Input validation
-    if (!selected_response || !messageTimestamp) {
-      socket.emit('error', { error: 'Missing "selected_response" or "messageTimestamp".' });
+    if (!selected_response) {
+      socket.emit('error', { error: 'Missing "selected_response".' });
       return;
     }
 
@@ -136,11 +136,6 @@ frontendNamespace.on('connection', (socket) => {
       'message_timestamp': messageTimestamp,
     });
 
-    // Retrieve the message from the queue to get hashed_sender_name
-    const messageItem = messageQueue.find(
-      (item) => item.timestamp === messageTimestamp
-    );
-
     let QAPair = "";
 
     if (!currMessage) {
@@ -149,30 +144,45 @@ frontendNamespace.on('connection', (socket) => {
       QAPair = `message: ${currMessage} response: ${selected_response}`;
     }
 
-    if (messageItem) {
-      const { hashed_sender_name } = messageItem;
+    let hashed_sender_name = "default_sender"; // Default value
 
+    if (messageTimestamp) {
+      // Retrieve the message from the queue to get hashed_sender_name
+      const messageItem = messageQueue.find(
+        (item) => item.timestamp === messageTimestamp
+      );
+
+      if (messageItem) {
+        hashed_sender_name = messageItem.hashed_sender_name;
+
+        // Insert the Q&A pair into the database
+        insertQAPair(
+          "pearl@easyspeak-aac.com",
+          QAPair,
+          "pearl_message_test",
+          messageTimestamp,
+          hashed_sender_name
+        );
+        console.log("QAPair inserted into database: ", QAPair);
+      } else {
+        console.error('Message not found in queue for timestamp:', messageTimestamp);
+      }
+
+      // Remove the message from the queue
+      messageQueue = messageQueue.filter(
+        (item) => item.timestamp !== messageTimestamp
+      );
+    } else {
       // Insert the Q&A pair into the database
       insertQAPair(
         "pearl@easyspeak-aac.com",
         QAPair,
         "pearl_message_test",
-        messageTimestamp,
+        Date.now(),
         hashed_sender_name
       );
       console.log("QAPair inserted into database: ", QAPair);
-    } else {
-      console.error('Message not found in queue for timestamp:', messageTimestamp);
     }
-
-    // Remove the message from the queue
-    messageQueue = messageQueue.filter(
-      (item) => item.timestamp !== messageTimestamp
-    );
-
-    // Optionally, send updated queue to front end
-    // frontendNamespace.emit('messageQueueUpdate', { messageQueue: messageQueue });
-
   });
 
   socket.on('disconnect', () => {

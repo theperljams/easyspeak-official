@@ -26,7 +26,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 	const [currResponses, setCurrResponses] = useState<string[]>([]);
 	const [displayResponse, setDisplayResponse] = useState(true);
 
-	const {finalTranscript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
+	const {finalTranscript, browserSupportsSpeechRecognition, resetTranscript} = useSpeechRecognition();
 
 	if (!browserSupportsSpeechRecognition) {
 		return <p>Browser does not support speech recognition.</p>;
