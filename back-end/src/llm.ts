@@ -3,6 +3,7 @@ import { fetchRetrievals } from './tests/test_ragie_db';
 import OpenAI from 'openai';
 import { getContextConversation, getCurrentConversationMessages, getCurrentConversationMessagesBySender, getMessagesByHashedSenderName, getMessagesUpToTimestamp } from './supabase-db';
 import axios, { AxiosInstance } from 'axios';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ const axiosInstance: AxiosInstance = axios.create({
   },
 });
 
+const googleApiKey = process.env.GOOGLE_API_KEY;
+const genAI = new GoogleGenerativeAI(googleApiKey!);
 
 export const getEmbedding = async (content: string) => {
   try {
@@ -121,18 +124,21 @@ async function generateSystemPrompt(content: string, user_id: string, name: stri
   return prompt; 
 }
 
-// Function to call OpenAI API with generated prompt and user query
-async function getChatCompletion(openAiApiKey, systemPrompt, query) {
-  const openai = new OpenAI({ apiKey: openAiApiKey });
-  const chatCompletion = await openai.chat.completions.create({
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: query },
-    ],
-    model: "gpt-4o-mini",
+// Function to call Gemini API with generated prompt and user query
+async function getChatCompletion(googleApiKey: string, systemPrompt: string, query: string) {
+  const model = genAI.getGenerativeModel({ 
+    model: "gemini-2.0-flash-lite",
+    systemInstruction: systemPrompt
   });
 
-  return chatCompletion.choices[0].message.content;
+  const result = await model.generateContent({
+    contents: [{ role: 'user', parts: [{ text: query }] }],
+    generationConfig: {
+      temperature: 0.7,
+    }
+  });
+
+  return result.response.text();
 }
 
 const hasNumericalCharacter = (inputString: string) => {
@@ -173,7 +179,7 @@ const parseNumberedList = (inputString: string) => {
 // Main function to handle the workflow
 export async function processChatCompletion(query: string, user_id: string, name: string, timestamp: number) {
   const systemPrompt = await generateSystemPrompt(query, user_id, name, timestamp);
-  const chatResponse = await getChatCompletion(openAiApiKey, systemPrompt, query);
+  const chatResponse = await getChatCompletion(googleApiKey, systemPrompt, query);
   const responseList: string[] = parseNumberedList(chatResponse);
   console.log('Response:', responseList);
   return responseList;
