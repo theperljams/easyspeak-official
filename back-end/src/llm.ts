@@ -4,12 +4,17 @@ import OpenAI from 'openai';
 import { getContextConversation, getCurrentConversationMessages, getCurrentConversationMessagesBySender, getMessagesByHashedSenderName, getMessagesUpToTimestamp } from './supabase-db';
 import axios, { AxiosInstance } from 'axios';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { put } from '@vercel/blob'; // Add import for put function
 
 dotenv.config();
 
-const ragieApiKey = process.env.RAGIE_API_KEY;
 const openAiApiKey = process.env.OPENAI_API_KEY;
 const OPENAI_EMBEDDING_URL: string = 'https://api.openai.com/v1/embeddings';
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: openAiApiKey,
+});
 
 const axiosInstance: AxiosInstance = axios.create({
   headers: {
@@ -40,59 +45,11 @@ function extractChunkText(data) {
 }
 
 // Function to generate the system prompt using chunk text
-async function generateSystemPrompt(content: string, user_id: string, name: string, timestamp: number) {
+async function generateSystemPrompt(content: string, user_id: string) {
 
   const convoContext = await getCurrentConversationMessagesBySender(name);
 
   const personContext = await getMessagesByHashedSenderName(name, 10);
-  // console.log("currContext:", currContext);
-
-
-  const infoData = await fetchRetrievals(ragieApiKey, content, "pearl@easyspeak-aac.com", 25, 10, false);
-  // console.log("contextInfo:", infoData);
-  const contextInfo = extractChunkText(infoData);
-
-  // const styleData = await fetchRetrievals(ragieApiKey, content, user_id, 20, 20, false);
-  // console.log("contextStyle:", styleData);
-  // const contextStyle = extractChunkText(styleData);
-  
-
-//   const prompt  = `You are an assistant drafting texts for ${user_id}. Respond to the given content as if you were
-//   sending a text from ${user_id}'s phone. Your goal is to sound as much like them as possible. These texts should reflect ${user_id}'s personality and way of speaking
-//   based on the context provided. The following context is a sample of ${user_id}'s text conversations. Contine the conversation as if you 
-//   were responding to another text from ${user_id}'s phone.
-  
-//   Here is the text you are responding to: ${content}
-
-//   Here are the samples: ${currContext} ${contextInfo}
-
-//   Craft a numbered list of 3 different responses in different contexts. Imitate ${user_id}'s style as shown in their sample texts. Pay attention to details such as common phrases they use,
-//    anything that looks like it could be an inside joke, or anything else that makes their style distinct.
-//  DO NOT share any information not contained in the samples. If there is a text you don't know how to 
-//   respond to based on the samples, give 3 different "I don't know" responses that sound like something ${user_id} would say. You should ONLY rely on information that you know ${user_id} knows.`;
-
-// const prompt  = `You are an assistant drafting texts for ${user_id}. Respond to the given content as if you were
-//   sending a text from ${user_id}'s phone. Your goal is to sound as much like them as possible. These texts should reflect ${user_id}'s personality and way of speaking
-//   based on the context provided. You are given two samples of ${user_id}'s text conversations. The first one contains conversations with the person 
-//   ${user_id} is currently texting. The second one is various sample texts showing how ${user_id} texts in general and will likely contain some similar 
-//   conversations ${user_id} has had in the past. Contine the conversation as if you 
-//   were responding to another text from ${user_id}'s phone.
-  
-//   Here is the text you are responding to: ${content}
-
-//   Here are the samples: 
-
-//   Past conversations with current person: ${currContext} 
-  
-//   Other past conversations: ${contextInfo}
-
-//   Craft a numbered list of 3 different responses in different contexts. Imitate ${user_id}'s style as shown in their sample texts. From these samples: infer ${user_id}'s 
-//   tone, style, values and beliefs, background and experience, personal preferences, writing habits, and emotional underpinning. Assume the audience is a good friend and 
-//   the purpose is just casual conversation. If the first sample is left blank, do your best by relying on previous similar conversations from the second sample.
-//  DO NOT share any information not contained in the samples. If there is a text you don't know how to 
-//   respond to based on the samples, give 3 different "I don't know" responses that sound like something ${user_id} would say. You should ONLY rely on information that you know ${user_id} knows.`;
-
-  // console.log(prompt);
 
 
   const prompt  = `You are an assistant drafting texts for ${user_id}. Respond to the given content as if you were
@@ -164,23 +121,32 @@ const parseNumberedList = (inputString: string) => {
   return items;
 }
 
-// export async function processChatCompletion(query: string, user_id: string, name: string, timestamp: number, context?: any) {
-//   // ... existing logic ...
 
-//   if (context && context.source === 'slack') {
-//     // Extract relevant information from Slack context
-//     const slackMessage = context.message;
-//     // ... adapt logic to use slackMessage ...
-//   }
-
-//   // ... rest of the function ...
-// }
-
-// Main function to handle the workflow
-export async function processChatCompletion(query: string, user_id: string, name: string, timestamp: number) {
-  const systemPrompt = await generateSystemPrompt(query, user_id, name, timestamp);
+export async function processChatCompletion(query: string, user_id: string) {
+  const systemPrompt = await generateSystemPrompt(query, user_id);
   const chatResponse = await getChatCompletion(googleApiKey, systemPrompt, query);
   const responseList: string[] = parseNumberedList(chatResponse);
   console.log('Response:', responseList);
   return responseList;
+}
+
+export const generateAudio = async (content: string) => {
+    try {
+        const audioFile = await openai.audio.speech.create({
+            model: "tts-1",
+            voice: "alloy",
+            input: content,
+        });
+
+        const buffer: Buffer = Buffer.from(await audioFile.arrayBuffer());
+
+        const { url } = await put('speech.wav', buffer, { access: 'public' });
+        const speechUrl: string = url;
+        console.log("speechUrl:", speechUrl);
+
+        return speechUrl;
+    } catch (error: any) {
+        console.error('Error generating audio:', error);
+        throw error;
+    }
 }

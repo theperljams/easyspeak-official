@@ -1,6 +1,6 @@
 import express, {json} from 'express';
-import { generateAudio, generateQuestion, generateResponses, getEmbedding } from './supabase-oai-llm';
-import {getContextAll, getUserData, insertQAPair} from './supabase-db';
+import {insertQAPair, getUserData} from './db';
+import { generateAudio } from './llm';
 
 const app = express();
 app.use(express.json());
@@ -59,26 +59,11 @@ app.post('/insert', async (req, res) => {
 
   console.log(req);
   try {
-    const embeddingResponse = await getEmbedding(content);
-    await insertQAPair(user_id, content, embeddingResponse, table_name);
+    await insertQAPair(user_id, content, table_name);
     res.json('Success');
   } catch (error) {
     res.status(500).send('Error inserting into DB');
   }
-});
-
-app.post('/training', async (req, res) => {
-  const { user_id, messages, chat } = req.body;
-  if (!messages) {
-    return res.status(400).send('Messages are required');
-  }
-  try {
-    const response = await generateQuestion(user_id, messages, chat);
-    res.json(response);
-  } catch (error) {
-    res.status(500).send('Error in training')
-  }
-
 });
 
 app.post('/tts', async (req, res) => {
