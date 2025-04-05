@@ -44,6 +44,7 @@ export const getContextCurrent = async (embedding: number[], user_id: string, ma
     
     let result: Array<string> = [];
     for (const i in data) result.push(data[i].content);
+    console.log(result);
     return result;
     
   } catch (error) {

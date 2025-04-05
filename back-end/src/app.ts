@@ -1,6 +1,6 @@
 import express, {json} from 'express';
 import {insertQAPair, getUserData} from './db';
-import { generateAudio } from './llm';
+import { generateAudio, processChatCompletion } from './llm';
 
 const app = express();
 app.use(express.json());
@@ -44,8 +44,8 @@ app.post('/generate', async (req, res) => {
   }
 
   try {
-    const openAiResponse = await generateResponses(content, messages, user_id);
-    res.json(openAiResponse);
+    const aiResponse = await processChatCompletion(content, user_id);
+    res.json(aiResponse);
   } catch (error) {
     res.status(500).send('Error calling OpenAI API');
   }
