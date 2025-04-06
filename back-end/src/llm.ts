@@ -1,46 +1,26 @@
 import dotenv from 'dotenv';
-import OpenAI from 'openai';
 import { getContextLegacy, getContextCurrent } from './db';
-import axios, { AxiosInstance } from 'axios';
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { put } from '@vercel/blob'; // Add import for put function
+import { ModelFactory, EmbeddingModelType, ChatCompletionModelType, AudioModelType } from './models/modelFactory';
 
 dotenv.config();
 
-const openAiApiKey = process.env.OPENAI_API_KEY;
-const OPENAI_EMBEDDING_URL: string = 'https://api.openai.com/v1/embeddings';
+// Configure which model types to use
+const EMBEDDING_MODEL = EmbeddingModelType.OPENAI;
+const CHAT_COMPLETION_MODEL = ChatCompletionModelType.CEREBRAS; // or OPENAI
+const AUDIO_MODEL = AudioModelType.OPENAI;
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: openAiApiKey,
-});
-
-const axiosInstance: AxiosInstance = axios.create({
-  headers: {
-      'Authorization': `Bearer ${openAiApiKey}`,
-      'Content-Type': 'application/json',
-  },
-});
-
-const googleApiKey = process.env.GOOGLE_API_KEY;
-const genAI = new GoogleGenerativeAI(googleApiKey!);
+// Create model instances
+const embeddingModel = ModelFactory.createEmbeddingModel(EMBEDDING_MODEL);
+const chatCompletionModel = ModelFactory.createChatCompletionModel(CHAT_COMPLETION_MODEL);
+const audioModel = ModelFactory.createAudioModel(AUDIO_MODEL);
 
 export const getEmbedding = async (content: string) => {
   try {
-      const response = await axiosInstance.post(OPENAI_EMBEDDING_URL, {
-          model: "text-embedding-ada-002",
-          input: content,
-          encoding_format: "float",
-      });
-      return response.data.data[0].embedding;
+    return await embeddingModel.getEmbedding(content);
   } catch (error: any) {
-      console.error('Error in getEmbedding:', error);
-      throw error;
+    console.error('Error in getEmbedding:', error);
+    throw error;
   }
-}
-
-function extractChunkText(data) {
-  return data.scored_chunks.map((chunk) => chunk.text);
 }
 
 // Function to generate the system prompt using chunk text
@@ -84,23 +64,6 @@ async function generateSystemPrompt(content: string, user_id: string) {
   return prompt; 
 }
 
-// Function to call Gemini API with generated prompt and user query
-async function getChatCompletion(googleApiKey: string, systemPrompt: string, query: string) {
-  const model = genAI.getGenerativeModel({ 
-    model: "gemini-2.0-flash-lite",
-    systemInstruction: systemPrompt
-  });
-
-  const result = await model.generateContent({
-    contents: [{ role: 'user', parts: [{ text: query }] }],
-    generationConfig: {
-      temperature: 0.7,
-    }
-  });
-
-  return result.response.text();
-}
-
 const hasNumericalCharacter = (inputString: string) => {
   return /\d/.test(inputString);
 }
@@ -124,32 +87,19 @@ const parseNumberedList = (inputString: string) => {
   return items;
 }
 
-
 export async function processChatCompletion(query: string, user_id: string) {
   const systemPrompt = await generateSystemPrompt(query, user_id);
-  const chatResponse = await getChatCompletion(googleApiKey, systemPrompt, query);
+  const chatResponse = await chatCompletionModel.getChatCompletion(systemPrompt, query);
   const responseList: string[] = parseNumberedList(chatResponse);
   console.log('Response:', responseList);
   return responseList;
 }
 
 export const generateAudio = async (content: string) => {
-    try {
-        const audioFile = await openai.audio.speech.create({
-            model: "tts-1",
-            voice: "alloy",
-            input: content,
-        });
-
-        const buffer: Buffer = Buffer.from(await audioFile.arrayBuffer());
-
-        const { url } = await put('speech.wav', buffer, { access: 'public' });
-        const speechUrl: string = url;
-        console.log("speechUrl:", speechUrl);
-
-        return speechUrl;
-    } catch (error: any) {
-        console.error('Error generating audio:', error);
-        throw error;
-    }
+  try {
+    return await audioModel.generateAudio(content);
+  } catch (error: any) {
+    console.error('Error generating audio:', error);
+    throw error;
+  }
 }
