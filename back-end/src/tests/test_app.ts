@@ -1,6 +1,6 @@
 import readline from 'readline';
-import { generateResponses } from './test_llm';
 import { processChatCompletion } from '../llm';
+import { prompts } from '../prompts/textGeneration';
 
 // Commented-out question arrays remain unchanged
 // const questions = ["Tell me about your family", ...];
@@ -29,27 +29,27 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-const promptUser = (user_id: string) => {
+const promptUser = (user_id: string, promptType: keyof typeof prompts) => {
   rl.question('Question: ', async (input) => {
     const startTime = Date.now();
     try {
-      const response = await processChatCompletion(input, user_id, "dbc76a6bbf62951be540187035ebe4e008ec1273a562ff56a7f21a897231bd89", 2);
+      const response = await processChatCompletion(input, user_id);
       const endTime = Date.now();
       console.log("Response:", response);
       console.log(`Response time: ${(endTime - startTime) / 1000} seconds`);
     } catch (error) {
       console.error("Error:", error);
     }
-    promptUser(user_id); // Continue prompting the user
+    promptUser(user_id, promptType);
   });
 };
 
-const askPredefinedQuestions = async (user_id: string) => {
+const askPredefinedQuestions = async (user_id: string, promptType: keyof typeof prompts) => {
   for (const question of questions) {
     const startTime = Date.now();
     console.log("Question:", question);
     try {
-      const response = await processChatCompletion(question, user_id, "7a7ba7c0197cf6d2b0dccb6a6fe451e9e34b396137f9661db53a98c23a89bb8f", 2);
+      const response = await processChatCompletion(question, user_id);
       const endTime = Date.now();
       console.log("Response:", response);
       console.log(`Response time: ${(endTime - startTime) / 1000} seconds`);
@@ -57,23 +57,30 @@ const askPredefinedQuestions = async (user_id: string) => {
       console.error("Error:", error);
     }
   }
-  rl.close(); // Close the readline interface after processing all questions
+  rl.close();
 };
 
 const start = () => {
   rl.question('Choose mode (1 for predefined questions, 2 for manual input): ', (mode) => {
     if (mode === '1' || mode === '2') {
-      // rl.question('Enter user ID: ', (userInput) => {
-      //   const user_id = userInput.trim();
-        if (mode === '1') {
-          askPredefinedQuestions("pearl@easyspeak-aac.com");
-        } else if (mode === '2') {
-          promptUser("pearl@easyspeak-aac.com");
+      rl.question('Choose prompt type (default/concise): ', (promptType) => {
+        if (!['default', 'concise'].includes(promptType)) {
+          console.log("Invalid prompt type. Using default.");
+          promptType = 'default';
         }
-      }
-    else {
+        
+        rl.question('Enter user email: ', (userInput) => {
+          const user_id = userInput.trim() || "test@example.com";
+          if (mode === '1') {
+            askPredefinedQuestions(user_id, promptType as keyof typeof prompts);
+          } else {
+            promptUser(user_id, promptType as keyof typeof prompts);
+          }
+        });
+      });
+    } else {
       console.log("Invalid mode choice. Please enter 1 or 2.");
-      start(); // Restart if invalid mode is entered
+      start();
     }
   });
 };
