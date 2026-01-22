@@ -1,5 +1,9 @@
 # Easy Speak
 
+## Demo
+
+Here is a demo of one of our design partners using the app: https://youtu.be/_LJFKlCikJM?si=DlYzrgkBBC1Jj8vJ&t=35
+
 ## Running Locally
 
 ### Back-end
