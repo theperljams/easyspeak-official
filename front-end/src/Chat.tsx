@@ -10,153 +10,207 @@ import type { Message } from "./components/Interfaces.js";
 import { RefreshButton } from "./components/RefreshButton.js";
 import QuickResponses from "./components/QuickResponses.js";
 
+// Simple SVG Icons for arrows
+const ChevronLeft = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+);
+
+const ChevronRight = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+);
+
 interface Props {
-	messageHistory: Message[];
-	setMessageHistory: (x: Message[]) => void;
+    messageHistory: Message[];
+    setMessageHistory: (x: Message[]) => void;
 }
 
 export function Chat({ messageHistory, setMessageHistory }: Props) {
-	const [isListening, setIsListening] = useState(true);
-	const [textInput, setTextInput] = useState('');
-	const [audioURL, setAudioURL] = useState<string | null>(null);
-	const [messages, setMessages] = useState<Message[]>([]);
-	const [responseQueue, setResponseQueue] = useState<string[]>([]);
-	const [isGenerating, setIsGenerating] = useState(false);
-	const [question, setQuestion] = useState('');
-	const [currResponses, setCurrResponses] = useState<string[]>([]);
-	const [displayResponse, setDisplayResponse] = useState(true);
-	const [currentPage, setCurrentPage] = useState(0);
-	const RESPONSES_PER_PAGE = 3;
+    const [isListening, setIsListening] = useState(true);
+    const [textInput, setTextInput] = useState('');
+    const [audioURL, setAudioURL] = useState<string | null>(null);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [responseQueue, setResponseQueue] = useState<string[]>([]);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [question, setQuestion] = useState('');
+    const [currResponses, setCurrResponses] = useState<string[]>([]);
+    const [displayResponse, setDisplayResponse] = useState(true);
+    const [currentPage, setCurrentPage] = useState(0);
+    const RESPONSES_PER_PAGE = 3;
 
-	const {finalTranscript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
+    const { finalTranscript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
 
-	if (!browserSupportsSpeechRecognition) {
-		return <p>Browser does not support speech recognition.</p>;
-	}
+    const totalPages = Math.ceil(responseQueue.length / RESPONSES_PER_PAGE);
 
-	const startListening = () => {
-		SpeechRecognition.startListening({ continuous: true, language: 'en-IN' });
-	};
+    if (!browserSupportsSpeechRecognition) {
+        return <p>Browser does not support speech recognition.</p>;
+    }
 
-	const generateResponses = (newTranscript: string) => {
-		setIsGenerating(true);
-		console.log("responseQueue: ", responseQueue);
-		generateUserResponses(newTranscript, [...messages, { content: newTranscript, role: 'user' }])
-			.then(r => {
-				setResponseQueue(r); // Queue the responses
-				setIsGenerating(false);
-			})
-			.catch(error => {
-				console.error('Error generating responses:', error);
-				setIsGenerating(false);
-			});
-	};
+    const startListening = () => {
+        SpeechRecognition.startListening({ continuous: true, language: 'en-IN' });
+    };
 
-	useEffect(() => {
-		if (finalTranscript) {
-			console.log(finalTranscript);
-			setMessages(prev => [...prev, { content: finalTranscript, role: 'user' }]);
-			setQuestion(finalTranscript);
-			generateResponses(finalTranscript);
-			resetTranscript();
-		}
-	}, [finalTranscript]);
+    const generateResponses = (newTranscript: string) => {
+        setIsGenerating(true);
+        console.log("responseQueue: ", responseQueue);
+        generateUserResponses(newTranscript, [...messages, { content: newTranscript, role: 'user' }])
+            .then(r => {
+                setResponseQueue(r); // Queue the responses
+                setIsGenerating(false);
+            })
+            .catch(error => {
+                console.error('Error generating responses:', error);
+                setIsGenerating(false);
+            });
+    };
 
-	useEffect(() => {	
-		console.log("responseQueue: ", responseQueue);
-		if (responseQueue.length == 0) { 
-			setDisplayResponse(true);
-			setCurrentPage(0);
-		}
-		else if (textInput == '') {
-			setDisplayResponse(false);
-		}
-		else {
-			setDisplayResponse(true);
-		}
-		console.log("displayResponse: ", displayResponse);
-		if (displayResponse) {
-			const startIndex = currentPage * RESPONSES_PER_PAGE;
-			const endIndex = startIndex + RESPONSES_PER_PAGE;
-			setCurrResponses(responseQueue.slice(startIndex, endIndex));
-		}
-		if (responseQueue.length > 0 && textInput != '') {
-			const startIndex = currentPage * RESPONSES_PER_PAGE;
-			const endIndex = startIndex + RESPONSES_PER_PAGE;
-			setCurrResponses(responseQueue.slice(startIndex, endIndex));
-		}
-	}, [responseQueue, displayResponse, textInput, currentPage]);
+    // --- Navigation Handlers ---
+    const handleNextPage = () => {
+        setCurrentPage(prev => Math.min(prev + 1, totalPages - 1));
+    };
+
+    const handlePrevPage = () => {
+        setCurrentPage(prev => Math.max(prev - 1, 0));
+    };
+
+    useEffect(() => {
+        if (finalTranscript) {
+            console.log(finalTranscript);
+            setMessages(prev => [...prev, { content: finalTranscript, role: 'user' }]);
+            setQuestion(finalTranscript);
+            generateResponses(finalTranscript);
+            resetTranscript();
+        }
+    }, [finalTranscript]);
+
+    useEffect(() => {
+        console.log("responseQueue: ", responseQueue);
+        if (responseQueue.length == 0) {
+            setDisplayResponse(true);
+            setCurrentPage(0);
+        }
+        else if (textInput == '') {
+            setDisplayResponse(false);
+        }
+        else {
+            setDisplayResponse(true);
+        }
+        console.log("displayResponse: ", displayResponse);
+        
+        // Update current responses based on page
+        const startIndex = currentPage * RESPONSES_PER_PAGE;
+        const endIndex = startIndex + RESPONSES_PER_PAGE;
+        setCurrResponses(responseQueue.slice(startIndex, endIndex));
+        
+    }, [responseQueue, displayResponse, textInput, currentPage]);
 
 
-	const handleUserInputSubmit = () => {
-		console.log('handle User input submit');
-		if (textInput !== '') {
-			console.log('text input:', textInput);
-			setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
-			let tableName = "";
-			let name1 = "";
-			let name2 = "";
-			if (localStorage.getItem('user_id') === "seth@alscrowd.org") {
-				tableName = "sethxamy";
-				name1 = "Amy: ";
-				name2 = "Seth: ";
-			} else {
-				tableName = "short";
-				name1 = "Q: ";
-				name2 = "A: ";
-			}
-			sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, tableName);
+    const handleUserInputSubmit = () => {
+        console.log('handle User input submit');
+        if (textInput !== '') {
+            // ... existing logic ...
+            console.log('text input:', textInput);
+            setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
+            let tableName = "";
+            let name1 = "";
+            let name2 = "";
+            if (localStorage.getItem('user_id') === "seth@alscrowd.org") {
+                tableName = "sethxamy";
+                name1 = "Amy: ";
+                name2 = "Seth: ";
+            } else {
+                tableName = "short";
+                name1 = "Q: ";
+                name2 = "A: ";
+            }
+            sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, tableName);
 
-			// Don't reset page - stay on current page after submitting
-			setDisplayResponse(true);
-			generateUserAudio(textInput)
-				.then(tempURL => {
-					console.log('audio URL:', tempURL);
-					setAudioURL(tempURL);
-					setTextInput('');
-				})
-				.catch(error => {
-					console.error('Error speaking:', error);
-				});
-		}
-	};
+            setDisplayResponse(true);
+            generateUserAudio(textInput)
+                .then(tempURL => {
+                    console.log('audio URL:', tempURL);
+                    setAudioURL(tempURL);
+                    setTextInput('');
+                })
+                .catch(error => {
+                    console.error('Error speaking:', error);
+                });
+        }
+    };
 
-	useEffect(() => {
-		setMessageHistory(messages);
-	}, [messages]);
+    useEffect(() => {
+        setMessageHistory(messages);
+    }, [messages]);
 
-	useEffect(() => {
-		if (isListening) {
-			startListening();
-		} else {
-			SpeechRecognition.stopListening();
-		}
-	}, [isListening]);
+    useEffect(() => {
+        if (isListening) {
+            startListening();
+        } else {
+            SpeechRecognition.stopListening();
+        }
+    }, [isListening]);
 
-	return (
-		<div className={styles.app}>
-			<div className={styles.container}>
-				<div className={styles.loadingIndicator}>
-					{isGenerating ? (
-						<ThreeDot color="#007BFF" size="medium" text="" textColor="" />
-					) : (
-						<RefreshButton handleRefresh={() => generateResponses(question)} />
-					)}
-				</div>
-				<div className={styles.responseView}>
-					<Responses 
-						responses={currResponses} 
-						setInputText={setTextInput} 
-						isGenerating={isGenerating}
-						currentPage={currentPage}
-						totalPages={Math.ceil(responseQueue.length / RESPONSES_PER_PAGE)}
-						onNextPage={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(responseQueue.length / RESPONSES_PER_PAGE) - 1))}
-						onPrevPage={() => setCurrentPage(prev => Math.max(prev - 1, 0))}
-					/>
-				</div>
-				<InputBar inputText={textInput} setInput={setTextInput} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsListening={setIsListening} setDisplayResponses={setDisplayResponse} />
-				<QuickResponses generateUserAudio={generateUserAudio} />
-			</div>
-		</div>
-	);
+    return (
+        <div className={styles.app}>
+            <div className={styles.container}>
+                <div className={styles.loadingIndicator}>
+                    {isGenerating ? (
+                        <ThreeDot color="#007BFF" size="medium" text="" textColor="" />
+                    ) : (
+                        <RefreshButton handleRefresh={() => generateResponses(question)} />
+                    )}
+                </div>
+
+                {/* Updated Response View with Arrows */}
+                <div 
+                    className={styles.responseView} 
+                    style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        gap: '10px',
+                        width: '100%' 
+                    }}
+                >
+                    <button 
+                        onClick={handlePrevPage} 
+                        disabled={currentPage === 0 || responseQueue.length === 0}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: currentPage === 0 ? 'default' : 'pointer',
+                            opacity: currentPage === 0 ? 0.3 : 1
+                        }}
+                    >
+                        <ChevronLeft />
+                    </button>
+
+                    <Responses
+                        responses={currResponses}
+                        setInputText={setTextInput}
+                        isGenerating={isGenerating}
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onNextPage={handleNextPage}
+                        onPrevPage={handlePrevPage}
+                    />
+
+                    <button 
+                        onClick={handleNextPage} 
+                        disabled={currentPage >= totalPages - 1 || responseQueue.length === 0}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: currentPage >= totalPages - 1 ? 'default' : 'pointer',
+                            opacity: currentPage >= totalPages - 1 ? 0.3 : 1
+                        }}
+                    >
+                        <ChevronRight />
+                    </button>
+                </div>
+
+                <InputBar inputText={textInput} setInput={setTextInput} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsListening={setIsListening} setDisplayResponses={setDisplayResponse} />
+                <QuickResponses generateUserAudio={generateUserAudio} />
+            </div>
+        </div>
+    );
 }
