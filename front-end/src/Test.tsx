@@ -49,7 +49,7 @@ export function Test ({messageHistory, setMessageHistory} : Props) {
 			console.log('text input: ', textInput);
 			sendQuestionAnswerPair(`Other: ${question} User: ${textInput}`, 'short');
 			setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
-			setCurrentPage(0);
+			// Don't reset page - stay on current page after submitting
 		}
 	};
 

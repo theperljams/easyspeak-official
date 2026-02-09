@@ -107,8 +107,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 			}
 			sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, tableName);
 
-			// Reset to first page when submitting
-			setCurrentPage(0);
+			// Don't reset page - stay on current page after submitting
 			setDisplayResponse(true);
 			generateUserAudio(textInput)
 				.then(tempURL => {
