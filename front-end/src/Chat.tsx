@@ -124,6 +124,12 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
             }
             sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, tableName);
 
+            // Advance to next page if there are more responses
+            const maxPages = Math.ceil(responseQueue.length / RESPONSES_PER_PAGE);
+            if (currentPage < maxPages - 1) {
+                setCurrentPage(prev => prev + 1);
+            }
+            
             setDisplayResponse(true);
             generateUserAudio(textInput)
                 .then(tempURL => {

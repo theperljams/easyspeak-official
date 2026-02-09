@@ -49,7 +49,11 @@ export function Test ({messageHistory, setMessageHistory} : Props) {
 			console.log('text input: ', textInput);
 			sendQuestionAnswerPair(`Other: ${question} User: ${textInput}`, 'short');
 			setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
-			// Don't reset page - stay on current page after submitting
+			// Advance to next page if there are more responses
+			const maxPages = Math.ceil(userGeneratedResponses.length / RESPONSES_PER_PAGE);
+			if (currentPage < maxPages - 1) {
+				setCurrentPage(prev => prev + 1);
+			}
 		}
 	};
 

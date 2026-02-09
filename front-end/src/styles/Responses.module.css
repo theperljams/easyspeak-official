@@ -21,26 +21,33 @@
 }
 
 .arrowButton {
-	background: #FEFEFE;
-	border: 1px solid #CFC2FF;
+	background: #007AF0;
+	border: 2px solid #0056b3;
 	border-radius: 50%;
-	width: 60px;
-	height: 60px;
+	width: 80px;
+	height: 80px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
 	transition: all 0.2s;
-	color: #030303;
+	color: #FFFFFF;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	flex-shrink: 0;
 }
 
 .arrowButton:hover:not(:disabled) {
-	background-color: #CFC2FF;
-	transform: scale(1.1);
+	background-color: #0056b3;
+	transform: scale(1.15);
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .arrowButton:disabled {
 	cursor: not-allowed;
+	background: #cccccc;
+	border-color: #999999;
+	color: #666666;
+	box-shadow: none;
 }
 
 .response {

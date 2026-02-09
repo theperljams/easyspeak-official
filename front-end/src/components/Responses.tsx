@@ -23,9 +23,8 @@ export function Responses({ responses, setInputText, isGenerating, currentPage, 
 					className={styles.arrowButton}
 					onClick={onPrevPage}
 					disabled={currentPage === 0}
-					style={{ opacity: currentPage === 0 ? 0.3 : 1 }}
 				>
-					<IoChevronBack size={40} />
+					<IoChevronBack size={50} />
 				</button>
 			)}
             
@@ -51,9 +50,8 @@ export function Responses({ responses, setInputText, isGenerating, currentPage, 
 					className={styles.arrowButton}
 					onClick={onNextPage}
 					disabled={currentPage === totalPages - 1}
-					style={{ opacity: currentPage === totalPages - 1 ? 0.3 : 1 }}
 				>
-					<IoChevronForward size={40} />
+					<IoChevronForward size={50} />
 				</button>
 			)}
 		</div>
