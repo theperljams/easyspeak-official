@@ -12,11 +12,11 @@ import QuickResponses from "./components/QuickResponses.js";
 
 // Simple SVG Icons for arrows
 const ChevronLeft = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
 );
 
 const ChevronRight = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
 );
 
 interface Props {
@@ -54,7 +54,8 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
         console.log("responseQueue: ", responseQueue);
         generateUserResponses(newTranscript, [...messages, { content: newTranscript, role: 'user' }])
             .then(r => {
-                setResponseQueue(r); // Queue the responses
+                // Accumulate responses instead of replacing
+                setResponseQueue(prev => [...prev, ...r]);
                 setIsGenerating(false);
             })
             .catch(error => {
@@ -177,41 +178,57 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
                         width: '100%' 
                     }}
                 >
-                    <button 
-                        onClick={handlePrevPage} 
-                        disabled={currentPage === 0 || responseQueue.length === 0}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: currentPage === 0 ? 'default' : 'pointer',
-                            opacity: currentPage === 0 ? 0.3 : 1
-                        }}
-                    >
-                        <ChevronLeft />
-                    </button>
+                    {totalPages > 1 && (
+                        <button 
+                            onClick={handlePrevPage} 
+                            disabled={currentPage === 0}
+                            style={{
+                                background: currentPage === 0 ? '#cccccc' : '#007AF0',
+                                border: '2px solid #0056b3',
+                                borderRadius: '50%',
+                                width: '80px',
+                                height: '80px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: currentPage === 0 ? 'not-allowed' : 'pointer',
+                                color: '#FFFFFF',
+                                boxShadow: currentPage === 0 ? 'none' : '0 4px 8px rgba(0, 0, 0, 0.2)',
+                                flexShrink: 0
+                            }}
+                        >
+                            <ChevronLeft />
+                        </button>
+                    )}
 
                     <Responses
                         responses={currResponses}
                         setInputText={setTextInput}
                         isGenerating={isGenerating}
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onNextPage={handleNextPage}
-                        onPrevPage={handlePrevPage}
                     />
 
-                    <button 
-                        onClick={handleNextPage} 
-                        disabled={currentPage >= totalPages - 1 || responseQueue.length === 0}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: currentPage >= totalPages - 1 ? 'default' : 'pointer',
-                            opacity: currentPage >= totalPages - 1 ? 0.3 : 1
-                        }}
-                    >
-                        <ChevronRight />
-                    </button>
+                    {totalPages > 1 && (
+                        <button 
+                            onClick={handleNextPage} 
+                            disabled={currentPage >= totalPages - 1}
+                            style={{
+                                background: currentPage >= totalPages - 1 ? '#cccccc' : '#007AF0',
+                                border: '2px solid #0056b3',
+                                borderRadius: '50%',
+                                width: '80px',
+                                height: '80px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer',
+                                color: '#FFFFFF',
+                                boxShadow: currentPage >= totalPages - 1 ? 'none' : '0 4px 8px rgba(0, 0, 0, 0.2)',
+                                flexShrink: 0
+                            }}
+                        >
+                            <ChevronRight />
+                        </button>
+                    )}
                 </div>
 
                 <InputBar inputText={textInput} setInput={setTextInput} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsListening={setIsListening} setDisplayResponses={setDisplayResponse} />

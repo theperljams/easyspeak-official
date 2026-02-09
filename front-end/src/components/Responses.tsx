@@ -1,5 +1,4 @@
 import type { Dispatch, SetStateAction } from 'react';
-import { IoChevronBack, IoChevronForward } from 'react-icons/io5';
 
 import styles from '../styles/Responses.module.css';
 
@@ -7,27 +6,11 @@ interface Props {
 	responses: string[];
 	setInputText: (x: string) => void;
 	isGenerating: boolean;
-	currentPage: number;
-	totalPages: number;
-	onNextPage: () => void;
-	onPrevPage: () => void;
 }
 
-export function Responses({ responses, setInputText, isGenerating, currentPage, totalPages, onNextPage, onPrevPage }: Props) {
-	const showArrows = totalPages > 1;
-
+export function Responses({ responses, setInputText, isGenerating }: Props) {
 	return (
 		<div className={styles.responses}>
-			{showArrows && (
-				<button 
-					className={styles.arrowButton}
-					onClick={onPrevPage}
-					disabled={currentPage === 0}
-				>
-					<IoChevronBack size={50} />
-				</button>
-			)}
-            
 			<div className={styles.responsesList}>
 				{responses.map((response, index) => (
 					<button
@@ -44,16 +27,6 @@ export function Responses({ responses, setInputText, isGenerating, currentPage, 
 					</button>
 				))}
 			</div>
-
-			{showArrows && (
-				<button 
-					className={styles.arrowButton}
-					onClick={onNextPage}
-					disabled={currentPage === totalPages - 1}
-				>
-					<IoChevronForward size={50} />
-				</button>
-			)}
 		</div>
 	);
 }
