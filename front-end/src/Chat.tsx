@@ -25,6 +25,8 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 	const [question, setQuestion] = useState('');
 	const [currResponses, setCurrResponses] = useState<string[]>([]);
 	const [displayResponse, setDisplayResponse] = useState(true);
+	const [currentPage, setCurrentPage] = useState(0);
+	const RESPONSES_PER_PAGE = 3;
 
 	const {finalTranscript, browserSupportsSpeechRecognition, resetTranscript } = useSpeechRecognition();
 
@@ -64,6 +66,7 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 		console.log("responseQueue: ", responseQueue);
 		if (responseQueue.length == 0) { 
 			setDisplayResponse(true);
+			setCurrentPage(0);
 		}
 		else if (textInput == '') {
 			setDisplayResponse(false);
@@ -73,12 +76,16 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 		}
 		console.log("displayResponse: ", displayResponse);
 		if (displayResponse) {
-			setCurrResponses(responseQueue);
+			const startIndex = currentPage * RESPONSES_PER_PAGE;
+			const endIndex = startIndex + RESPONSES_PER_PAGE;
+			setCurrResponses(responseQueue.slice(startIndex, endIndex));
 		}
 		if (responseQueue.length > 0 && textInput != '') {
-			setCurrResponses(responseQueue);
+			const startIndex = currentPage * RESPONSES_PER_PAGE;
+			const endIndex = startIndex + RESPONSES_PER_PAGE;
+			setCurrResponses(responseQueue.slice(startIndex, endIndex));
 		}
-	}, [responseQueue, displayResponse, textInput]);
+	}, [responseQueue, displayResponse, textInput, currentPage]);
 
 
 	const handleUserInputSubmit = () => {
@@ -100,13 +107,8 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 			}
 			sendQuestionAnswerPair(`${name1}${question} ${name2}${textInput}`, tableName);
 
-			if (responseQueue.length > 3) {
-				console.log(responseQueue);
-				responseQueue.splice(0,3);
-				console.log("responseQueue: ", responseQueue);
-				setCurrResponses(responseQueue.slice(0,3));
-				console.log("currResponses: ", currResponses);
-			}
+			// Reset to first page when submitting
+			setCurrentPage(0);
 			setDisplayResponse(true);
 			generateUserAudio(textInput)
 				.then(tempURL => {
@@ -143,7 +145,15 @@ export function Chat({ messageHistory, setMessageHistory }: Props) {
 					)}
 				</div>
 				<div className={styles.responseView}>
-					<Responses responses={currResponses} setInputText={setTextInput} isGenerating={isGenerating} />
+					<Responses 
+						responses={currResponses} 
+						setInputText={setTextInput} 
+						isGenerating={isGenerating}
+						currentPage={currentPage}
+						totalPages={Math.ceil(responseQueue.length / RESPONSES_PER_PAGE)}
+						onNextPage={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(responseQueue.length / RESPONSES_PER_PAGE) - 1))}
+						onPrevPage={() => setCurrentPage(prev => Math.max(prev - 1, 0))}
+					/>
 				</div>
 				<InputBar inputText={textInput} setInput={setTextInput} handleSubmitInput={handleUserInputSubmit} audioURL={audioURL} setIsListening={setIsListening} setDisplayResponses={setDisplayResponse} />
 				<QuickResponses generateUserAudio={generateUserAudio} />

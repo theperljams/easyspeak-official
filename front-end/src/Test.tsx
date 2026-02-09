@@ -22,12 +22,15 @@ export function Test ({messageHistory, setMessageHistory} : Props) {
 	const [textInput, setTextInput] = useState('');
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [userGeneratedResponses, setUserGeneratedResponses] = useState(['', '', '']);
+	const [currentPage, setCurrentPage] = useState(0);
+	const RESPONSES_PER_PAGE = 3;
 	
 	// for use later: sending quesiton answer pairs to the database 
 	const [question, setQuestion] = useState('');
 
 	const generate = () => {
 		setUserGeneratedResponses(['', '', '']);
+		setCurrentPage(0);
 		setMessages(prev => [...prev, { content: textInput, role: 'user' }]);
 		setQuestion(textInput);
 		generateUserResponses(textInput, [...messages, { content: textInput, role: 'user' }])
@@ -46,7 +49,7 @@ export function Test ({messageHistory, setMessageHistory} : Props) {
 			console.log('text input: ', textInput);
 			sendQuestionAnswerPair(`Other: ${question} User: ${textInput}`, 'short');
 			setMessages(prev => [...prev, { content: textInput, role: 'assistant' }]);
-			
+			setCurrentPage(0);
 		}
 	};
 
@@ -68,7 +71,15 @@ export function Test ({messageHistory, setMessageHistory} : Props) {
 					<TestChat mode={'chat'} messages={messages}/>
 				</div>
 				{userGeneratedResponses && <div className={styles.responseView}>
-					{<Responses responses={userGeneratedResponses} setInputText={setTextInput} isGenerating={false}/>}
+				{<Responses 
+					responses={userGeneratedResponses.slice(currentPage * RESPONSES_PER_PAGE, (currentPage + 1) * RESPONSES_PER_PAGE)} 
+					setInputText={setTextInput} 
+					isGenerating={false}
+					currentPage={currentPage}
+					totalPages={Math.ceil(userGeneratedResponses.length / RESPONSES_PER_PAGE)}
+					onNextPage={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(userGeneratedResponses.length / RESPONSES_PER_PAGE) - 1))}
+					onPrevPage={() => setCurrentPage(prev => Math.max(prev - 1, 0))}
+				/>}
 				</div>}
 				<div className={styles.footer}>
 					<TestInputBar inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} generate={generate}/>

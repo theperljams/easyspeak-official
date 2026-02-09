@@ -1,7 +1,9 @@
 .responses {
 	display: flex;
+	align-items: center;
 	margin-bottom: 0px;
 	background-color: transparent;
+	gap: 10px;
 }
 
 .responsesList {
@@ -16,6 +18,29 @@
 	justify-content: space-evenly;
 	align-items: center;
 	gap: 20px;
+}
+
+.arrowButton {
+	background: #FEFEFE;
+	border: 1px solid #CFC2FF;
+	border-radius: 50%;
+	width: 60px;
+	height: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: all 0.2s;
+	color: #030303;
+}
+
+.arrowButton:hover:not(:disabled) {
+	background-color: #CFC2FF;
+	transform: scale(1.1);
+}
+
+.arrowButton:disabled {
+	cursor: not-allowed;
 }
 
 .response {
