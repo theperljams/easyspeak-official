@@ -32,25 +32,44 @@ app.get('/ping', (req, res) => {
     return res.send('pong 🏓');
 });
 app.post('/generate', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { content, messages, /*user_id*/ jwt } = req.body;
-    const { access_token } = JSON.parse(jwt);
-    const { email: user_id } = yield (0, db_1.getUserData)(access_token);
-    if (!content) {
-        return res.status(400).send('Question is required');
-    }
-    if (isTestMode) {
-        // Rotate through hardcoded responses in test mode
-        const response = hardcodedResponses[responseCounter % hardcodedResponses.length];
-        responseCounter++;
-        console.log('Returning hardcoded response:', response);
-        return res.json(response);
-    }
     try {
+        const { content, messages, jwt } = req.body;
+        if (!content) {
+            return res.status(400).send('Question is required');
+        }
+        if (!jwt) {
+            return res.status(401).send('JWT is required');
+        }
+        let access_token;
+        try {
+            const parsedJwt = JSON.parse(jwt);
+            if (!parsedJwt || !parsedJwt.access_token) {
+                return res.status(401).send('Invalid JWT format');
+            }
+            access_token = parsedJwt.access_token;
+        }
+        catch (parseError) {
+            console.error('JWT parse error:', parseError);
+            return res.status(401).send('Invalid JWT');
+        }
+        const userData = yield (0, db_1.getUserData)(access_token);
+        if (!userData || !userData.email) {
+            return res.status(401).send('Invalid user');
+        }
+        const user_id = userData.email;
+        if (isTestMode) {
+            // Rotate through hardcoded responses in test mode
+            const response = hardcodedResponses[responseCounter % hardcodedResponses.length];
+            responseCounter++;
+            console.log('Returning hardcoded response:', response);
+            return res.json(response);
+        }
         const openAiResponse = yield (0, llm_1.generateResponses)(content, messages, user_id);
         res.json(openAiResponse);
     }
     catch (error) {
-        res.status(500).send('Error calling OpenAI API');
+        console.error('Error in /generate:', error);
+        res.status(500).send('Error generating responses');
     }
 }));
 app.post('/insert', (req, res) => __awaiter(void 0, void 0, void 0, function* () {

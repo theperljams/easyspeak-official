@@ -156,23 +156,41 @@ export const generateUserAudio = async (input: string) => {
 };
 
 export const generateUserResponses = async (question: string, messages: Message[]) => {
-	// localStorage.getItem('user_id') 
 	try {
+		const authToken = localStorage.getItem('sb-pzwlpekxngevlesykvfx-auth-token');
+		
+		if (!authToken) {
+			console.error('No auth token found in localStorage');
+			return [];
+		}
+
 		console.log(JSON.stringify({ content: question }));
 		const res = await fetch(`${SERVER_URL}/generate`, {
 			method: 'POST',
-			body: JSON.stringify({ content: question, messages: messages, user_id: localStorage.getItem('user_id'), jwt: localStorage.getItem('sb-pzwlpekxngevlesykvfx-auth-token') }),
+			body: JSON.stringify({ 
+				content: question, 
+				messages: messages, 
+				user_id: localStorage.getItem('user_id'), 
+				jwt: authToken 
+			}),
 			headers: {
 				'Content-Type': 'application/json',
 				'accept': 'application/json',
 			},
 		});
+
+		if (!res.ok) {
+			const errorText = await res.text();
+			console.error(`Server error: ${res.status} - ${errorText}`);
+			return [];
+		}
+
 		const data = await res.json() as string[];
 		console.log(data);
 		return data;
 	}
 	catch (error) {
-		console.error('error generating responses');
+		console.error('error generating responses:', error);
 		return [];
 	}
 };
