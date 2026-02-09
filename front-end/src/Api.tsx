@@ -157,12 +157,20 @@ export const generateUserAudio = async (input: string) => {
 
 export const generateUserResponses = async (question: string, messages: Message[]) => {
 	try {
-		const authToken = localStorage.getItem('sb-pzwlpekxngevlesykvfx-auth-token');
+		// Get the current session from Supabase
+		const { data: { session } } = await supabase.auth.getSession();
 		
-		if (!authToken) {
-			console.error('No auth token found in localStorage');
+		if (!session) {
+			console.error('Not authenticated. Please log in.');
+			// Redirect to login if not authenticated
+			if (window.location.pathname !== '/' && window.location.pathname !== '/signup') {
+				window.location.href = '/';
+			}
 			return [];
 		}
+
+		// Get the access token from the session
+		const authToken = JSON.stringify({ access_token: session.access_token });
 
 		console.log(JSON.stringify({ content: question }));
 		const res = await fetch(`${SERVER_URL}/generate`, {
@@ -170,7 +178,7 @@ export const generateUserResponses = async (question: string, messages: Message[
 			body: JSON.stringify({ 
 				content: question, 
 				messages: messages, 
-				user_id: localStorage.getItem('user_id'), 
+				user_id: session.user.email, 
 				jwt: authToken 
 			}),
 			headers: {
@@ -182,6 +190,10 @@ export const generateUserResponses = async (question: string, messages: Message[
 		if (!res.ok) {
 			const errorText = await res.text();
 			console.error(`Server error: ${res.status} - ${errorText}`);
+			if (res.status === 401) {
+				// Token is invalid, redirect to login
+				window.location.href = '/';
+			}
 			return [];
 		}
 
