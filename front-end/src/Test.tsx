@@ -68,23 +68,83 @@ export function Test ({messageHistory, setMessageHistory} : Props) {
 		}	
 	}, []);
 
+	const totalPages = Math.ceil(userGeneratedResponses.length / RESPONSES_PER_PAGE);
+	const displayedResponses = userGeneratedResponses.slice(currentPage * RESPONSES_PER_PAGE, (currentPage + 1) * RESPONSES_PER_PAGE);
+
 	return (
 		<div className={styles.app}>
 			<div className={styles.container}>
 				<div className={styles.mainView}>
 					<TestChat mode={'chat'} messages={messages}/>
 				</div>
-				{userGeneratedResponses && <div className={styles.responseView}>
-				{<Responses 
-					responses={userGeneratedResponses.slice(currentPage * RESPONSES_PER_PAGE, (currentPage + 1) * RESPONSES_PER_PAGE)} 
-					setInputText={setTextInput} 
-					isGenerating={false}
-					currentPage={currentPage}
-					totalPages={Math.ceil(userGeneratedResponses.length / RESPONSES_PER_PAGE)}
-					onNextPage={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(userGeneratedResponses.length / RESPONSES_PER_PAGE) - 1))}
-					onPrevPage={() => setCurrentPage(prev => Math.max(prev - 1, 0))}
-				/>}
-				</div>}
+				{userGeneratedResponses && (
+					<div 
+						className={styles.responseView}
+						style={{ 
+							display: 'flex', 
+							alignItems: 'center', 
+							justifyContent: 'center', 
+							gap: '10px',
+							width: '100%' 
+						}}
+					>
+						{totalPages > 1 && (
+							<button 
+								onClick={() => setCurrentPage(prev => Math.max(prev - 1, 0))} 
+								disabled={currentPage === 0}
+								style={{
+									background: currentPage === 0 ? '#cccccc' : '#007AF0',
+									border: '2px solid #0056b3',
+									borderRadius: '50%',
+									width: '80px',
+									height: '80px',
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									cursor: currentPage === 0 ? 'not-allowed' : 'pointer',
+									color: '#FFFFFF',
+									boxShadow: currentPage === 0 ? 'none' : '0 4px 8px rgba(0, 0, 0, 0.2)',
+									flexShrink: 0,
+									fontSize: '24px',
+									fontWeight: 'bold'
+								}}
+							>
+								‹
+							</button>
+						)}
+
+						<Responses 
+							responses={displayedResponses} 
+							setInputText={setTextInput} 
+							isGenerating={false}
+						/>
+
+						{totalPages > 1 && (
+							<button 
+								onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages - 1))} 
+								disabled={currentPage >= totalPages - 1}
+								style={{
+									background: currentPage >= totalPages - 1 ? '#cccccc' : '#007AF0',
+									border: '2px solid #0056b3',
+									borderRadius: '50%',
+									width: '80px',
+									height: '80px',
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									cursor: currentPage >= totalPages - 1 ? 'not-allowed' : 'pointer',
+									color: '#FFFFFF',
+									boxShadow: currentPage >= totalPages - 1 ? 'none' : '0 4px 8px rgba(0, 0, 0, 0.2)',
+									flexShrink: 0,
+									fontSize: '24px',
+									fontWeight: 'bold'
+								}}
+							>
+								›
+							</button>
+						)}
+					</div>
+				)}
 				<div className={styles.footer}>
 					<TestInputBar inputText={textInput} setInput={(s) => {setTextInput(s);}} handleSubmitInput={handleUserInputSubmit} generate={generate}/>
 				</div>
